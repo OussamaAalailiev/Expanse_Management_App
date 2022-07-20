@@ -29,10 +29,11 @@ public class Goal {
     private Double amount;//This field was just added, Not tested yet! it is bound to User's positive sold:
 
 //    @ManyToOne(cascade = CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     private CategoryIncome categoryIncome;
-    @ManyToOne
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ManyToOne
     private User user;
     @OneToMany(mappedBy = "goal")
     private List<Income> incomes;

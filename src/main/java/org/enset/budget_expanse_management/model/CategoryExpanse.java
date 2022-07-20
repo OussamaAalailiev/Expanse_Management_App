@@ -1,5 +1,6 @@
 package org.enset.budget_expanse_management.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,8 +32,10 @@ public class CategoryExpanse {
 
     @ManyToOne
     private CategoryGroup categoryGroup;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "categoryExpanse")
     private List<Expanse> expanses;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "categoryExpanse")
     private List<Budget> budgets;
 

@@ -1,5 +1,6 @@
 package org.enset.budget_expanse_management.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class CategoryIncome {
         this.categoryIncomeType = categoryIncomeType;
     }
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToOne(mappedBy = "categoryIncome")
     private Income income;
     @OneToMany(mappedBy = "categoryIncome")
