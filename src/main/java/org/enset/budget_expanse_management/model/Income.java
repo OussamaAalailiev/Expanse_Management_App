@@ -1,0 +1,43 @@
+package org.enset.budget_expanse_management.model;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.enset.budget_expanse_management.enums.CategoryIncomeType;
+
+import javax.persistence.*;
+import java.util.Date;
+
+@Data @NoArgsConstructor @AllArgsConstructor
+@Entity
+public class Income {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Double amount;
+    @Column(length = 55)
+    private String title;
+    @Temporal(TemporalType.DATE)//To format the date properly in Date format before being saved into DB:
+    private Date createdDate;
+//    @Enumerated(EnumType.STRING) @Column(length = 30)
+//    private CategoryIncomeType categoryIncomeType;
+
+    //@OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
+    private CategoryIncome categoryIncome;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ManyToOne
+    private User user;
+    @ManyToOne
+    private Goal goal;
+
+    public Income(Long id, Double amount, String title, Date createdDate){
+        this.id = id;
+        this.amount = amount;
+        this.title = title;
+        this.createdDate = createdDate;
+    }
+
+
+}
