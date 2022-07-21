@@ -47,7 +47,7 @@ public enum CategoryExpanseType {
     Sport_Fitness, //index=31
     Books_audio_subscriptions,
     Charity,
-    Zakat,
+    Self_Improvement,
     Culture_SportEvents,
     Education_development,
     HealthCare_Doctor,
@@ -69,7 +69,7 @@ public enum CategoryExpanseType {
     /** Category Group for > 'INVESTMENT': */
     Collections,// index=50 i'm here!
     Financial_Investments,
-    Reality,
+    Zakat,
     Savings,
     Vehicles_chattels, //chattels: (in general use) a personal possession (an item of property).
 

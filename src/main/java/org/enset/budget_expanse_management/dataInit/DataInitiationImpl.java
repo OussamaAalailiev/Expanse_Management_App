@@ -36,6 +36,7 @@ public class DataInitiationImpl implements DataInitiation {
 
     int userCounter = 0;
     int incomeCounter = 0;
+    int categoryIncomeCounter = 0;
     int expanseCounter = 0;
     int budgetCounter = 0;
 
@@ -51,7 +52,7 @@ public class DataInitiationImpl implements DataInitiation {
             Books_audio_subscriptions, Charity, Zakat, Culture_SportEvents, Education_development,
             HealthCare_Doctor, Hobbies, Life_events, Tv_Streaming, Cosmetics_beauty,
             Alcohol_tobacco, Lottery_gambling, Charges_Fees, Child_Support, Fines, Insurance,
-            Loan, Taxes,  Collections, Financial_Investments, Reality, Savings, Vehicles_chattels
+            Loan, Taxes,  Collections, Financial_Investments, Self_Improvement, Savings, Vehicles_chattels
     };
 
 
@@ -231,8 +232,9 @@ public class DataInitiationImpl implements DataInitiation {
         Stream.of("Save 1200 DH every Month", "Saving money for a Trip")
                 .forEach(goalTitle->{
                     Goal goal = new Goal();
+                    //Integer id = new Random().nextInt(categoryIncomeTypes.length);
                     CategoryIncome categoryIncome = categoryIncomeRepository.findById(
-                            new Random().nextInt(categoryIncomeTypes.length)).get();
+                            new Random().nextInt(7)).get();
                     goal.setCategoryIncome(categoryIncome);
                     goal.setTitle(goalTitle);
                     goal.setDateDebut(new Date());
@@ -246,6 +248,7 @@ public class DataInitiationImpl implements DataInitiation {
                     goal.setAmount(new Random().nextInt(150000)+0.50);
 
                     goalRepository.save(goal);
+                    categoryIncomeCounter++;
                     incomeCounter++;
                 });
     }

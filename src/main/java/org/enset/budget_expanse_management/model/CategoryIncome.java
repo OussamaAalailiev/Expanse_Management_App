@@ -24,8 +24,8 @@ public class CategoryIncome {
     }
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @OneToOne(mappedBy = "categoryIncome")
-    private Income income;
+    @OneToMany(mappedBy = "categoryIncome") //Modified from "@OneToOne" to "@OneToMany":
+    private List<Income> income;
     @OneToMany(mappedBy = "categoryIncome")
     private List<Goal> goalList;
 

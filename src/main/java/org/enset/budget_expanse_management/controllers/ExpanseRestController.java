@@ -1,16 +1,16 @@
 package org.enset.budget_expanse_management.controllers;
 
 import org.enset.budget_expanse_management.model.Expanse;
+import org.enset.budget_expanse_management.model.Goal;
 import org.enset.budget_expanse_management.model.Income;
 import org.enset.budget_expanse_management.repositories.ExpanseRepository;
 import org.enset.budget_expanse_management.repositories.IncomeRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+//@Transactional
 @RestController
 @RequestMapping(path = "/api")
 public class ExpanseRestController {
@@ -33,5 +33,38 @@ public class ExpanseRestController {
         }
         return expanseRepository.findById(Long.valueOf(id)).get();
     }
+
+    @PostMapping(path = "/expanses/admin")
+    public Expanse addNewExpanseController(@RequestBody Expanse expanse){
+        System.out.println(" -----------------------------------");
+        System.out.println(" ------------- Expanse is added Successfully ----------");
+        Expanse savedExpanse = expanseRepository.save(expanse);
+        return savedExpanse;
+    }
+
+    @PutMapping(path = "/expanses/admin/{id}")
+    public Expanse editExpanseController(@PathVariable(name = "id") String id ,@RequestBody Expanse expanse){
+        boolean isExpansePresent = expanseRepository.findById(Long.valueOf(id)).isPresent();
+        System.out.println(" -----------------------------------");
+        System.out.println(" ------------- Expanse is updated Successfully ----------");
+        if (!isExpansePresent){
+            throw new RuntimeException("Expanse is not found, please edit an existing Expanse!");
+        }
+        expanse.setId(Long.valueOf(id));
+        return expanseRepository.save(expanse);
+    }
+
+    @DeleteMapping(path = "/expanses/admin/delete/{id}")
+    public void deleteExpanse(@PathVariable(name = "id") String id){
+        boolean isExpansePresent = expanseRepository.findById(Long.valueOf(id)).isPresent();
+        if (!isExpansePresent){
+            throw new RuntimeException("Expanse is not found, please delete an existing Expanse!");
+        }
+        System.out.println(" -----------------------------------");
+        System.out.println(" ------------- Expanse is deleted Successfully ----------");
+        Expanse expanseToBeDeleted = expanseRepository.findById(Long.valueOf(id)).get();
+        expanseRepository.delete(expanseToBeDeleted);
+    }
+
 
 }

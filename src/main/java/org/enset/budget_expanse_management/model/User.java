@@ -26,7 +26,7 @@ public class User {
     private String name;
     private Double totalSold;
     private Boolean active;//To check if User's account is active or inactive:
-    @Column(length = 80)
+    @Column(length = 80, unique = true)
     private String email;
 //    @Column(length = 35)
 //    private String password;
