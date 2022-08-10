@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-//@Transactional
+@CrossOrigin(origins = "http://localhost:4090")
+@Transactional
 @RestController
 @RequestMapping(path = "/api")
 public class IncomeRestController {
 
-    private IncomeRepository incomeRepository;
+    private final IncomeRepository incomeRepository;
 
     public IncomeRestController(IncomeRepository incomeRepository) {
         this.incomeRepository = incomeRepository;

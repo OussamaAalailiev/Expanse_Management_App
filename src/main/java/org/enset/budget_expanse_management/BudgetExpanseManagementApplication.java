@@ -7,13 +7,16 @@ import org.enset.budget_expanse_management.enums.GoalCategoryType;
 import org.enset.budget_expanse_management.enums.UserCurrency;
 import org.enset.budget_expanse_management.model.*;
 import org.enset.budget_expanse_management.repositories.*;
+import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @SpringBootApplication
 public class BudgetExpanseManagementApplication {
@@ -28,7 +31,8 @@ public class BudgetExpanseManagementApplication {
                             ExpanseRepository expanseRepository,
                             GoalRepository goalRepository,
                             BudgetRepository budgetRepository,
-                            DataInitiation dataInitiation
+                            DataInitiation dataInitiation,
+                            BudgetExpanseManagementService managementService
     ){
      return args -> {
 
@@ -112,16 +116,51 @@ public class BudgetExpanseManagementApplication {
 //         budgetRepository.save(budgetFor7awli); budgetRepository.save(budgetForMonthlyFood);
 //         budgetRepository.save(budgetForPC);
 
+
+         /*
          dataInitiation.initCategoryExpanseGroupWithCategoriesData();
          dataInitiation.initCategoryIncomeWithCategoriesData();
          dataInitiation.initCategoryExpanseWithCategoriesData();
 
          dataInitiation.initUsers();
-         dataInitiation.getUsersAfterDataInit();
+         // dataInitiation.getUsersAfterDataInit();
          dataInitiation.initExpanses();
          dataInitiation.initIncomes();
          dataInitiation.initGoals();
          dataInitiation.initBudgets();
+
+         managementService.addExpanseToBudgetServiceInit();
+          */
+
+         dataInitiation.getUsersAfterDataInit();
+         System.out.println("******************************");
+         System.out.println("********** Getting All Expanses & Budgets that have same user & *******");
+         System.out.println("**********  & same CategoryExpanseId & during same period of time: *******");
+         managementService.getAllExpAndBudWithSameUserDateAndCatExpService();
+
+//         for (Object o : expanseRepository.getAllExpansesAndBudgetsWithSameUserDateAndCategoryExp(20)) {
+//             System.out.println(o.toString());
+//             if (o instanceof Expanse) {
+//                 Expanse expanse = new Expanse(((Expanse) o).getId(),
+//                         ((Expanse) o).getAmount(), ((Expanse) o).getTitle(),
+//                         ((Expanse) o).getCreatedDate());
+//                 expanse.setUser(((Expanse) o).getUser());
+//                 System.out.println("Expanse: " + expanse.getId() + " " + expanse.getAmount() + " " + expanse.getTitle()
+//                         + " " + expanse.getCreatedDate() + " " + expanse.getUser().getId());
+//                 System.out.println("---------------------------------------");
+//             }
+//             if (o instanceof Budget) {
+//                 Budget budget = new Budget(((Budget) o).getId(),
+//                         ((Budget) o).getTitle(), ((Budget) o).getDescription(),
+//                         ((Budget) o).getDateDebut(), ((Budget) o).getEndDate(),
+//                         ((Budget) o).getAmount());
+//
+//                 budget.setUser(((Budget) o).getUser());
+//                 System.out.println("Budget: " + budget.getId() + " " + budget.getAmount() + " " + budget.getTitle()
+//                         + " " + budget.getDateDebut() + " " + budget.getEndDate() + " " + budget.getUser().getId());
+//             }
+//
+//         }
 
 
      };

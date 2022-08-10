@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Stream;
 
@@ -25,14 +25,14 @@ import static org.enset.budget_expanse_management.enums.UserCurrency.*;
 @Service//This class is used to just enters some example data into Database:
 public class DataInitiationImpl implements DataInitiation {
 
-    private UserRepository userRepository;
-    private IncomeRepository incomeRepository;
-    private ExpanseRepository expanseRepository;
-    private GoalRepository goalRepository;
-    private BudgetRepository budgetRepository;
-    private CategoryIncomeRepository categoryIncomeRepository;
-    private CategoryExpanseRepository categoryExpanseRepository;
-    private CategoryGroupExpansesRepository categoryGroupExpansesRepository;
+    private final UserRepository userRepository;
+    private final IncomeRepository incomeRepository;
+    private final ExpanseRepository expanseRepository;
+    private final GoalRepository goalRepository;
+    private final BudgetRepository budgetRepository;
+    private final CategoryIncomeRepository categoryIncomeRepository;
+    private final CategoryExpanseRepository categoryExpanseRepository;
+    private final CategoryGroupExpansesRepository categoryGroupExpansesRepository;
 
     int userCounter = 0;
     int incomeCounter = 0;
@@ -213,6 +213,7 @@ public class DataInitiationImpl implements DataInitiation {
                     expanse.setAmount(amountsExpanses[expanseCounter]);
                     expanse.setCreatedDate(new Date());
                     expanse.setUser(userList.get(new Random().nextInt(userList.size())));
+
 //                    expanse.setCategoryExpanseType(
 //                            categoryExpanseTypes[new Random().nextInt(categoryExpanseTypes.length)]);
 
@@ -268,9 +269,13 @@ public class DataInitiationImpl implements DataInitiation {
                     budget.setTitle(budgetTitle);
                     budget.setDescription("Some Budget Description ...");
                     budget.setDateDebut(new Date());
+//                    budget.setEndDate(LocalDate.of(new Random().nextInt(4)+2022,
+//                            new Random().nextInt(11)+1,
+//                            new Random().nextInt(30)+1));
                     budget.setEndDate(LocalDate.of(new Random().nextInt(4)+2022,
                             new Random().nextInt(11)+1,
                             new Random().nextInt(30)+1));
+
 //                    budget.setCategoryExpanseType(
 //                            categoryExpanseTypes[new Random().nextInt(categoryExpanseTypes.length)]
 //                    );

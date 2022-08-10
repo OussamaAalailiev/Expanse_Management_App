@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping(path = "/api")
 public class CategoryIncomeRestController {
 
-    private CategoryIncomeRepository categoryIncomeRepository;
+    private final CategoryIncomeRepository categoryIncomeRepository;
 
     public CategoryIncomeRestController(CategoryIncomeRepository categoryIncomeRepository) {
         this.categoryIncomeRepository = categoryIncomeRepository;

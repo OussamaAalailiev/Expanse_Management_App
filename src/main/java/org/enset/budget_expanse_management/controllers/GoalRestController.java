@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@Transactional
+@CrossOrigin(origins = "http://localhost:4090")
+@Transactional
 @RestController
 @RequestMapping(path = "/api")
 public class GoalRestController {
 
-    private GoalRepository goalRepository;
+    private final GoalRepository goalRepository;
 
     public GoalRestController(GoalRepository goalRepository) {
         this.goalRepository = goalRepository;

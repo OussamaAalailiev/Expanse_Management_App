@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping(path = "/api")
 public class CategoryExpanseRestController {
 
-    private CategoryExpanseRepository categoryExpanseRepository;
+    private final CategoryExpanseRepository categoryExpanseRepository;
 
     public CategoryExpanseRestController(CategoryExpanseRepository categoryExpanseRepository) {
         this.categoryExpanseRepository = categoryExpanseRepository;

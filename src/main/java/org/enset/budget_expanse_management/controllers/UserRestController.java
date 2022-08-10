@@ -11,9 +11,11 @@ import java.util.UUID;
 //@Transactional
 @RestController
 @RequestMapping(path = "/api")
+@CrossOrigin(origins = "http://localhost:4090")//Means that only pages
+// from this Website are allowed to request resources from This App(Backend), it could be integrated by Spring Security.
 public class UserRestController {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public UserRestController(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -46,6 +48,7 @@ public class UserRestController {
         if (!isUserPresent){
             throw new RuntimeException("User is not found, please edit an existing user!");
         }
+        // Maybe to be hidden
         user.setId(UUID.fromString(id));
         return userRepository.save(user);
     }

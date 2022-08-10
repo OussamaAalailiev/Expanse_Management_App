@@ -11,10 +11,6 @@ import org.enset.budget_expanse_management.enums.GoalCategoryType;
 import javax.persistence.*;
 import java.util.List;
 
-/**This class is replaced by enum field in each other class (ex: Income, etc ..)
- *   because the user cannot choose a Category by name (just by id which is not convenient): */
-
-
 
 @Data @NoArgsConstructor @AllArgsConstructor
 @Entity
@@ -49,4 +45,5 @@ public class CategoryExpanse {
         this.categoryExpanseType = categoryExpanseType;
         this.categoryGroup = categoryGroup;
     }
+
 }

@@ -28,6 +28,7 @@ public class Goal {
 //    private GoalCategoryType goalCategoryType;
     private Double amount;//This field was just added, Not tested yet! it is bound to User's positive sold:
 
+    private Boolean goalAchieved;//True or False.
 //    @ManyToOne(cascade = CascadeType.ALL)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne

@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@Transactional
+@CrossOrigin(origins = "http://localhost:4090")
+@Transactional
 @RestController
 @RequestMapping(path = "/api")
 public class ExpanseRestController {
 
-    private ExpanseRepository expanseRepository;
+    private final ExpanseRepository expanseRepository;
 
     public ExpanseRestController(ExpanseRepository expanseRepository) {
         this.expanseRepository = expanseRepository;

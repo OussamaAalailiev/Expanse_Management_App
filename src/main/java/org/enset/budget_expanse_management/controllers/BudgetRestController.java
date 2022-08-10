@@ -8,12 +8,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@Transactional
+@CrossOrigin(origins = "http://localhost:4090")
+@Transactional
 @RestController
 @RequestMapping(path = "/api")
 public class BudgetRestController {
 
-    private BudgetRepository budgetRepository;
+    private final BudgetRepository budgetRepository;
 
     public BudgetRestController(BudgetRepository budgetRepository) {
         this.budgetRepository = budgetRepository;

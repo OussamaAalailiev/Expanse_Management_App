@@ -22,10 +22,14 @@ public class Budget {
     private String description;
     @Temporal(TemporalType.DATE)
     private Date dateDebut;//This 'dateDebut' or System Date refer to the current date.
+//    private Date endDate;
     private LocalDate endDate;
 //    @Enumerated(EnumType.STRING) @Column(length = 30)
 //    private CategoryExpanseType categoryExpanseType;
     private Double amount;//New field added!
+
+    private Double amountSpent;
+    private Double amountRemains;
 
 //    @ManyToOne(cascade = CascadeType.ALL)
     @ManyToOne
@@ -35,13 +39,15 @@ public class Budget {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private User user;
     @OneToMany(mappedBy = "budget")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Expanse> expanses;
 
-    public Budget(Integer id, String title, String description, Date dateDebut, LocalDate endDate) {
+    public Budget(Integer id, String title, String description, Date dateDebut, LocalDate endDate, Double amount) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.dateDebut = dateDebut;
         this.endDate = endDate;
+        this.amount = amount;
     }
 }
