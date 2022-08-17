@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.enset.budget_expanse_management.enums.CategoryExpanseType;
 import org.enset.budget_expanse_management.enums.CategoryIncomeType;
 import org.enset.budget_expanse_management.enums.GoalCategoryType;
@@ -12,11 +13,12 @@ import javax.persistence.*;
 import java.util.List;
 
 
-@Data @NoArgsConstructor @AllArgsConstructor
+//@Data
+@NoArgsConstructor @AllArgsConstructor
 @Entity
 public class CategoryExpanse {
 
-    @Id //Id will be generated manually by an Algorithm when an category will be added:
+    @Id //'id' will be generated manually by an Algorithm when an category will be added:
     private Integer id;
 //    @Column(length = 30)
 //    @Enumerated(EnumType.STRING)//This annotation will let the DataBase to save the enum value in 'goalCategory' TEXT:
@@ -46,4 +48,43 @@ public class CategoryExpanse {
         this.categoryGroup = categoryGroup;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public CategoryExpanseType getCategoryExpanseType() {
+        return categoryExpanseType;
+    }
+
+    public void setCategoryExpanseType(CategoryExpanseType categoryExpanseType) {
+        this.categoryExpanseType = categoryExpanseType;
+    }
+
+    public CategoryGroup getCategoryGroup() {
+        return categoryGroup;
+    }
+
+    public void setCategoryGroup(CategoryGroup categoryGroup) {
+        this.categoryGroup = categoryGroup;
+    }
+
+    public List<Expanse> getExpanses() {
+        return expanses;
+    }
+
+    public void setExpanses(List<Expanse> expanses) {
+        this.expanses = expanses;
+    }
+
+    public List<Budget> getBudgets() {
+        return budgets;
+    }
+
+    public void setBudgets(List<Budget> budgets) {
+        this.budgets = budgets;
+    }
 }

@@ -6,14 +6,12 @@ import org.enset.budget_expanse_management.enums.CategoryIncomeType;
 import org.enset.budget_expanse_management.enums.UserCurrency;
 import org.enset.budget_expanse_management.model.*;
 import org.enset.budget_expanse_management.repositories.*;
+import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.enset.budget_expanse_management.enums.CategoryExpanseType.*;
@@ -33,6 +31,8 @@ public class DataInitiationImpl implements DataInitiation {
     private final CategoryIncomeRepository categoryIncomeRepository;
     private final CategoryExpanseRepository categoryExpanseRepository;
     private final CategoryGroupExpansesRepository categoryGroupExpansesRepository;
+
+    private final BudgetExpanseManagementService managementService;
 
     int userCounter = 0;
     int incomeCounter = 0;
@@ -68,7 +68,7 @@ public class DataInitiationImpl implements DataInitiation {
                               ExpanseRepository expanseRepository, GoalRepository goalRepository,
                               BudgetRepository budgetRepository, CategoryIncomeRepository categoryIncomeRepository,
                               CategoryExpanseRepository categoryExpanseRepository,
-                              CategoryGroupExpansesRepository categoryGroupExpansesRepository) {
+                              CategoryGroupExpansesRepository categoryGroupExpansesRepository, BudgetExpanseManagementService managementService) {
         this.userRepository = userRepository;
         this.incomeRepository = incomeRepository;
         this.expanseRepository = expanseRepository;
@@ -77,6 +77,7 @@ public class DataInitiationImpl implements DataInitiation {
         this.categoryIncomeRepository = categoryIncomeRepository;
         this.categoryExpanseRepository = categoryExpanseRepository;
         this.categoryGroupExpansesRepository = categoryGroupExpansesRepository;
+        this.managementService = managementService;
     }
 
     public void initCategoryExpanseGroupWithCategoriesData(){
@@ -285,6 +286,45 @@ public class DataInitiationImpl implements DataInitiation {
                     budgetCounter++;
                     budgetRepository.save(budget);
                 });
+    }
+
+    @Override
+    public void updateAmountRemainsOfAllNewBudgetsInit() {
+        budgetRepository.findAll().forEach(budget -> {
+            budget.setAmountRemains(budget.getAmount());
+            budgetRepository.save(budget);
+        });
+    }
+
+    @Override
+    public void testIfBudgetsWereRespectedOnAddExpanseInit() {
+        User user = new User();
+        UUID uuid = UUID.randomUUID();
+        user.setId(uuid);
+        user.setName(" dfhsdfghsdgf");
+        userRepository.save(user);
+        CategoryExpanse categoryExpanse = categoryExpanseRepository.findById(20).get();
+
+        Budget budget1 = new Budget();
+        budget1.setAmount(1000.00);
+        budget1.setCategoryExpanse(categoryExpanse); budget1.setUser(user);
+        budget1.setDateDebut(new Date()); budget1.setEndDate(LocalDate.of(2022,11,1));
+        budgetRepository.save(budget1);
+
+        Budget budget2 = new Budget();
+        budget1.setAmount(2000.00);
+        budget1.setCategoryExpanse(categoryExpanse); budget2.setUser(user);
+        budget1.setDateDebut(new Date()); budget1.setEndDate(LocalDate.of(2022,10,1));
+        budgetRepository.save(budget2);
+
+        Expanse expanseAddedByUser = new Expanse();
+        expanseAddedByUser.setAmount(333.0);
+        expanseAddedByUser.setCreatedDate(new Date());
+        expanseAddedByUser.setCategoryExpanse(categoryExpanse);
+        expanseAddedByUser.setUser(user);
+
+        managementService.checkIfBudgetIsRespectedOnAddExpanse(expanseAddedByUser);
+
     }
 
 

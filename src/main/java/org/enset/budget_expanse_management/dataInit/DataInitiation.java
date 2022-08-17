@@ -10,4 +10,7 @@ public interface DataInitiation {
     public void initExpanses();
     public void initGoals();
     public void initBudgets();
+
+    public void updateAmountRemainsOfAllNewBudgetsInit();
+    public void testIfBudgetsWereRespectedOnAddExpanseInit();
 }

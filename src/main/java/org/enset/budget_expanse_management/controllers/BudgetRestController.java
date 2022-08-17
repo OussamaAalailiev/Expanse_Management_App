@@ -1,8 +1,8 @@
 package org.enset.budget_expanse_management.controllers;
 
 import org.enset.budget_expanse_management.model.Budget;
-import org.enset.budget_expanse_management.model.Goal;
 import org.enset.budget_expanse_management.repositories.BudgetRepository;
+import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,13 +15,53 @@ import java.util.List;
 public class BudgetRestController {
 
     private final BudgetRepository budgetRepository;
+    private final BudgetExpanseManagementService managementService;
 
-    public BudgetRestController(BudgetRepository budgetRepository) {
+    public BudgetRestController(BudgetRepository budgetRepository,
+                                BudgetExpanseManagementService managementService) {
         this.budgetRepository = budgetRepository;
+        this.managementService = managementService;
     }
+
+//    @GetMapping(path = "/budgets")
+//    public List<Budget> getAllBudgetsController(){
+//        //Algorithm To check If a Budget is respected On Add an Expanse,
+//        // by getting from Exp 'user.id' + 'amount' + 'CategoryExpanse' + 'createdDate':
+////        List<Budget> allBudgetList = budgetRepository.findAll();
+//
+//        List<Budget> allBudgetList = budgetRepository.findAll();
+//        if (!allBudgetList.isEmpty()){
+//
+//            for (Budget budget : allBudgetList) {
+//                Double totalAmountSpent;
+//                Double amountRemainsCalculated;
+//
+//                Boolean isUserIsNotNull = expanse.getUser()!=null && budget.getUser()!=null;
+//                Boolean sameUserId = (expanse.getUser().getId() == budget.getUser().getId());
+//                Boolean sameCategoryExpanse = (expanse.getCategoryExpanse().getId().equals(budget.getId()));
+//                Boolean betweenSameDate = (expanse.getCreatedDate().compareTo(budget.getDateDebut()) == 0)
+//                        || (expanse.getCreatedDate().compareTo(Date.valueOf(budget.getEndDate())) == 0)
+//                        && (expanse.getCreatedDate().compareTo(Date.valueOf(budget.getEndDate())) <= 0);
+//                Boolean isBudgetAmountSpentStillLess = budget.getAmountSpent() < budget.getAmount();
+//
+//                if (sameUserId && sameCategoryExpanse && betweenSameDate
+//                        && isBudgetAmountSpentStillLess && isUserIsNotNull) {
+//                    totalAmountSpent = budget.getAmountSpent() + budget.getAmount();
+//                    amountRemainsCalculated = budget.getAmountRemains() - expanse.getAmount();
+//                    budget.setAmountSpent(totalAmountSpent);
+//                    budget.setAmountRemains(amountRemainsCalculated);
+//                    budgetRepository.save(budget);
+//                }
+//            }
+//        }
+//        //return ;
+//        return budgetRepository.findAll();
+//    }
 
     @GetMapping(path = "/budgets")
     public List<Budget> getAllBudgetsController(){
+        //managementService.checkIfBudgetIsRespectedByCalculation();//this triggers a Budgets Amount spent Calculation:
+        managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
         return budgetRepository.findAll();
     }
 

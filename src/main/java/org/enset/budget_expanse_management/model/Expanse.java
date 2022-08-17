@@ -25,9 +25,10 @@ public class Expanse {
 //    @ManyToOne(cascade = CascadeType.ALL)
     @ManyToOne
     private CategoryExpanse categoryExpanse;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     private User user;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     private Budget budget;
 

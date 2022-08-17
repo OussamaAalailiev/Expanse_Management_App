@@ -9,4 +9,5 @@ import java.util.UUID;
 //@CrossOrigin(origins = "http://localhost:4090")//Means that only pages
 //// from this Website are allowed to request resources from This App(Backend), it could be integrated by Spring Security.
 public interface UserRepository extends JpaRepository<User, UUID> {
+    User findByNameContains(String name);
 }

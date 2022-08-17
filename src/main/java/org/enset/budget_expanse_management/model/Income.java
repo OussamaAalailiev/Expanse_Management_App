@@ -24,10 +24,10 @@ public class Income {
 //    private CategoryIncomeType categoryIncomeType;
 
     //@OneToOne(cascade = CascadeType.ALL)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne//Modified from "@OneToOne" to "@ManyToOne":
     private CategoryIncome categoryIncome;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+   // @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     private User user;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

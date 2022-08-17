@@ -1,10 +1,8 @@
 package org.enset.budget_expanse_management.controllers;
 
 import org.enset.budget_expanse_management.model.Expanse;
-import org.enset.budget_expanse_management.model.Goal;
-import org.enset.budget_expanse_management.model.Income;
 import org.enset.budget_expanse_management.repositories.ExpanseRepository;
-import org.enset.budget_expanse_management.repositories.IncomeRepository;
+import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,9 +15,12 @@ import java.util.List;
 public class ExpanseRestController {
 
     private final ExpanseRepository expanseRepository;
+    private final BudgetExpanseManagementService managementService;
 
-    public ExpanseRestController(ExpanseRepository expanseRepository) {
+    public ExpanseRestController(ExpanseRepository expanseRepository,
+                                 BudgetExpanseManagementService managementService) {
         this.expanseRepository = expanseRepository;
+        this.managementService = managementService;
     }
 
     @GetMapping(path = "/expanses")
@@ -40,6 +41,7 @@ public class ExpanseRestController {
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Expanse is added Successfully ----------");
         Expanse savedExpanse = expanseRepository.save(expanse);
+        managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
         return savedExpanse;
     }
 
@@ -52,7 +54,9 @@ public class ExpanseRestController {
             throw new RuntimeException("Expanse is not found, please edit an existing Expanse!");
         }
         expanse.setId(Long.valueOf(id));
-        return expanseRepository.save(expanse);
+        Expanse savedExpanse = expanseRepository.save(expanse);
+        managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
+        return savedExpanse;
     }
 
     @DeleteMapping(path = "/expanses/admin/delete/{id}")

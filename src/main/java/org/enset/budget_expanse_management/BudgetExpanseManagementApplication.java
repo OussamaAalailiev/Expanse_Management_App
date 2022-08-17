@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootApplication
 public class BudgetExpanseManagementApplication {
@@ -31,6 +32,7 @@ public class BudgetExpanseManagementApplication {
                             ExpanseRepository expanseRepository,
                             GoalRepository goalRepository,
                             BudgetRepository budgetRepository,
+                            CategoryExpanseRepository categoryExpanseRepository,
                             DataInitiation dataInitiation,
                             BudgetExpanseManagementService managementService
     ){
@@ -117,51 +119,100 @@ public class BudgetExpanseManagementApplication {
 //         budgetRepository.save(budgetForPC);
 
 
-         /*
-         dataInitiation.initCategoryExpanseGroupWithCategoriesData();
-         dataInitiation.initCategoryIncomeWithCategoriesData();
-         dataInitiation.initCategoryExpanseWithCategoriesData();
 
-         dataInitiation.initUsers();
-         // dataInitiation.getUsersAfterDataInit();
-         dataInitiation.initExpanses();
-         dataInitiation.initIncomes();
-         dataInitiation.initGoals();
-         dataInitiation.initBudgets();
+//         dataInitiation.initCategoryExpanseGroupWithCategoriesData();
+//         dataInitiation.initCategoryIncomeWithCategoriesData();
+//         dataInitiation.initCategoryExpanseWithCategoriesData();
+//
+//         dataInitiation.initUsers();
+//         // dataInitiation.getUsersAfterDataInit();
+//         dataInitiation.initExpanses();
+//         dataInitiation.initIncomes();
+//         dataInitiation.initGoals();
+//         dataInitiation.initBudgets();
+//
+//         managementService.addExpanseToBudgetServiceInit();
 
-         managementService.addExpanseToBudgetServiceInit();
-          */
 
          dataInitiation.getUsersAfterDataInit();
          System.out.println("******************************");
-         System.out.println("********** Getting All Expanses & Budgets that have same user & *******");
-         System.out.println("**********  & same CategoryExpanseId & during same period of time: *******");
-         managementService.getAllExpAndBudWithSameUserDateAndCatExpService();
+//         System.out.println("********** Getting All Expanses & Budgets that have same user & *******");
+//         System.out.println("**********  & same CategoryExpanseId & during same period of time: *******");
 
-//         for (Object o : expanseRepository.getAllExpansesAndBudgetsWithSameUserDateAndCategoryExp(20)) {
-//             System.out.println(o.toString());
-//             if (o instanceof Expanse) {
-//                 Expanse expanse = new Expanse(((Expanse) o).getId(),
-//                         ((Expanse) o).getAmount(), ((Expanse) o).getTitle(),
-//                         ((Expanse) o).getCreatedDate());
-//                 expanse.setUser(((Expanse) o).getUser());
-//                 System.out.println("Expanse: " + expanse.getId() + " " + expanse.getAmount() + " " + expanse.getTitle()
-//                         + " " + expanse.getCreatedDate() + " " + expanse.getUser().getId());
-//                 System.out.println("---------------------------------------");
-//             }
-//             if (o instanceof Budget) {
-//                 Budget budget = new Budget(((Budget) o).getId(),
-//                         ((Budget) o).getTitle(), ((Budget) o).getDescription(),
-//                         ((Budget) o).getDateDebut(), ((Budget) o).getEndDate(),
-//                         ((Budget) o).getAmount());
-//
-//                 budget.setUser(((Budget) o).getUser());
-//                 System.out.println("Budget: " + budget.getId() + " " + budget.getAmount() + " " + budget.getTitle()
-//                         + " " + budget.getDateDebut() + " " + budget.getEndDate() + " " + budget.getUser().getId());
-//             }
-//
-//         }
+         //managementService.getAllExpAndBudWithSameUserDateAndCatExpService();
 
+         //To Initiate amountRemains = budget.amount on Every new Budget entered (temporarily Solution):
+         //dataInitiation.updateAmountRemainsOfAllNewBudgetsInit();
+
+         System.out.println();
+         System.out.println();
+         /** Check if budgets were Respected: */
+         System.out.println("************************************");
+         System.out.println("**************** Check if budgets were Respected: ********************");
+         budgetRepository.getAllExpansesAndBudgetsWithSameUserDateAndCategoryExp3()
+                 .forEach(resultDTOExpansesBudgets -> {
+                     System.out.println(resultDTOExpansesBudgets.toString());
+                 });
+
+//         User user = userRepository.findByNameContains("Oussama");
+//         System.out.println("User -----------");
+//         System.out.println("User Id: " + user.getId());
+//         System.out.println("User Name: " + user.getName());
+//         CategoryExpanse categoryExpanse = categoryExpanseRepository.findById(20).get();
+//
+//         System.out.println("categoryExpanse -----------");
+//         System.out.println("categoryExpanse Id: " + categoryExpanse.getId());
+//         System.out.println("categoryExpanse Name: " + categoryExpanse.getCategoryExpanseType());
+
+//
+//         Budget budget1 = new Budget();
+//         budget1.setAmount(1000.00);
+//         budget1.setCategoryExpanse(categoryExpanse); budget1.setUser(user);
+//         budget1.setDateDebut(new Date()); budget1.setEndDate(LocalDate.of(2022,11,1));
+//         budgetRepository.save(budget1);
+//
+//         Budget budget2 = new Budget();
+//         budget1.setAmount(2000.00);
+//         budget1.setCategoryExpanse(categoryExpanse); budget2.setUser(user);
+//         budget1.setDateDebut(new Date()); budget1.setEndDate(LocalDate.of(2022,10,1));
+//         budgetRepository.save(budget2);
+
+//         Expanse expanseAddedByUser = new Expanse();
+//         expanseAddedByUser.setAmount(333.0);
+//         expanseAddedByUser.setCreatedDate(new Date());
+//         expanseAddedByUser.setCategoryExpanse(categoryExpanse);
+//         expanseAddedByUser.setUser(user);
+//         expanseRepository.save(expanseAddedByUser);
+//
+//         managementService.checkIfBudgetIsRespectedOnAddExpanse(expanseAddedByUser);
+
+         //dataInitiation.testIfBudgetsWereRespectedOnAddExpanseInit();
+
+
+//         System.out.println("------------- resultDTOExpansesBudgets ---------------");
+//         budgetRepository.getAllExpansesAndBudgetsWithSameUserDateAndCategoryExp2()
+//                 .forEach(resultDTOExpansesBudgets -> {
+//                     System.out.println(resultDTOExpansesBudgets.toString());
+//         });
+
+         System.out.println("----------------------------------------------------------------");
+         System.out.println("---------------- Testing if budget is well respected & Calculated --------------------");
+         //managementService.checkIfBudgetIsRespectedByCalculation();
+
+//         Expanse expanse = new Expanse();
+//         User user = userRepository
+//                 .findById(UUID.fromString("dfa735ec-328b-43c3-ad70-f5dba33eb585")).get();
+//         CategoryExpanse categoryExpanse = categoryExpanseRepository.findById(33).get();
+//         expanse.setAmount(99.0); expanse.setCreatedDate(new Date());
+//         expanse.setCategoryExpanse(categoryExpanse); expanse.setUser(user);
+//
+//         expanseRepository.save(expanse);
+
+         Expanse expanseN7 = expanseRepository.findById(7L).get();
+         expanseN7.setAmount(119.0);
+        // expanseRepository.save(expanseN7);
+
+         managementService.calculateBudgetsOnAddOrUpdateExpanseService(expanseN7);
 
      };
     }

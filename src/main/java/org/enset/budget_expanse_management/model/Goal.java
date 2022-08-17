@@ -30,12 +30,13 @@ public class Goal {
 
     private Boolean goalAchieved;//True or False.
 //    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     private CategoryIncome categoryIncome;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+   // @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     private User user;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "goal")
     private List<Income> incomes;
 
