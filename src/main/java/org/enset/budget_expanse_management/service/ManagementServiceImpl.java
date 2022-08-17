@@ -299,7 +299,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
     @Override
     public void calculateExpansesOnAddBudgetService(Budget budget) {
-        
+
     }
 
 //    @Override
