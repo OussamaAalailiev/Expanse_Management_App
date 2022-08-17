@@ -28,4 +28,5 @@ public interface BudgetExpanseManagementService {
      *  by a user at each query:
      *  */
     public void calculateExpansesOnAddBudgetService(Budget budget);
+    public void updateBudgetService(Budget budget);
 }

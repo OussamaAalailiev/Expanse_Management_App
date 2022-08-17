@@ -4,15 +4,18 @@ import org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets;
 import org.enset.budget_expanse_management.model.Budget;
 import org.enset.budget_expanse_management.model.CategoryExpanse;
 import org.enset.budget_expanse_management.model.Expanse;
+import org.enset.budget_expanse_management.model.User;
 import org.enset.budget_expanse_management.repositories.BudgetRepository;
 import org.enset.budget_expanse_management.repositories.CategoryExpanseRepository;
 import org.enset.budget_expanse_management.repositories.ExpanseRepository;
+import org.enset.budget_expanse_management.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
-import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Transactional
 @Service
@@ -22,12 +25,16 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     private final BudgetRepository budgetRepository;
     private final CategoryExpanseRepository categoryExpanseRepository;
 
+    private final UserRepository userRepository;
+
     public ManagementServiceImpl(ExpanseRepository expanseRepository,
                                  BudgetRepository budgetRepository,
-                                 CategoryExpanseRepository categoryExpanseRepository) {
+                                 CategoryExpanseRepository categoryExpanseRepository,
+                                 UserRepository userRepository) {
         this.expanseRepository = expanseRepository;
         this.budgetRepository = budgetRepository;
         this.categoryExpanseRepository = categoryExpanseRepository;
+        this.userRepository = userRepository;
     }
 
 //    @Override
@@ -297,9 +304,43 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }
     }
 
-    @Override
+    @Override//In case a user adds a new Budget:
     public void calculateExpansesOnAddBudgetService(Budget budget) {
+        /**BEFORE Saving a new Budget: */
+        /**Test data commented down below: */
+//        budget.setTitle("Internet Subscription");
+//        budget.setAmountSpent(0.0);
+//        budget.setAmount(200.00); budget.setDateDebut(new Date(2022, Calendar.AUGUST,18));
+//        budget.setAmountRemains(budget.getAmount());//This will always apply on add new Budget.
+//        CategoryExpanse categoryExpanse = categoryExpanseRepository.findById(56).get();
+//        User user = userRepository
+//                .findById(UUID.fromString("653eb6f2-a817-4184-af31-4cff631692f8")).get();
+//        budget.setCategoryExpanse(categoryExpanse);
+//        budget.setUser(user);
+        budget.setAmountRemains(budget.getAmount());
+        Budget newSavedBudgetToDB = budgetRepository.save(budget);
+        /**AFTER Saving a new Budget to DB: */
+        List<ResultDTOExpansesBudgets> expansesBudgets = budgetRepository.onAddBudgetComputeOnCommonExpanses
+                (newSavedBudgetToDB.getId(), newSavedBudgetToDB.getCategoryExpanse().getId());
+        if (expansesBudgets.size() > 0 ){
+            //Do some Calculation...
+            Double amountRemainsCalculated = newSavedBudgetToDB.getAmountRemains()
+                    - expansesBudgets.get(0).getAmountExpanseSum();
+            newSavedBudgetToDB.setAmountSpent(expansesBudgets.get(0).getAmountExpanseSum());
+            newSavedBudgetToDB.setAmountRemains(amountRemainsCalculated);
+            budgetRepository.save(newSavedBudgetToDB);
+        }
 
+    }
+
+    /**The user cannot update 'amountSpent' & 'amountRemains' & also Probably 'CategoryExId' of Budget for now: */
+    @Override
+    public void updateBudgetService(Budget budget) {
+        if (budgetRepository.findById(budget.getId()).isPresent()){
+//            Double newAmountUpdate = budget.getAmount();
+//            budget.setAmount(newAmountUpdate);
+            budgetRepository.save(budget);
+        }
     }
 
 //    @Override

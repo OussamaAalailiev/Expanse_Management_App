@@ -61,7 +61,7 @@ public class BudgetRestController {
     @GetMapping(path = "/budgets")
     public List<Budget> getAllBudgetsController(){
         //managementService.checkIfBudgetIsRespectedByCalculation();//this triggers a Budgets Amount spent Calculation:
-        managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
+        //managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
         return budgetRepository.findAll();
     }
 

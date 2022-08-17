@@ -41,7 +41,7 @@ public class ExpanseRestController {
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Expanse is added Successfully ----------");
         Expanse savedExpanse = expanseRepository.save(expanse);
-        managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
+        //managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
         return savedExpanse;
     }
 
@@ -55,7 +55,7 @@ public class ExpanseRestController {
         }
         expanse.setId(Long.valueOf(id));
         Expanse savedExpanse = expanseRepository.save(expanse);
-        managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
+       // managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
         return savedExpanse;
     }
 

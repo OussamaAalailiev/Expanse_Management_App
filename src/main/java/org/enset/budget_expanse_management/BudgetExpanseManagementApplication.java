@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -208,12 +209,29 @@ public class BudgetExpanseManagementApplication {
 //
 //         expanseRepository.save(expanse);
 
-         Expanse expanseN7 = expanseRepository.findById(7L).get();
-         expanseN7.setAmount(119.0);
-        // expanseRepository.save(expanseN7);
+         /**Testing On Add or Update an expanse, if we compute common budgets well: */
+         Expanse expanseN7 = expanseRepository.findById(8L).get();
+         expanseN7.setAmount(10000.00);
 
          managementService.calculateBudgetsOnAddOrUpdateExpanseService(expanseN7);
 
+         /**Testing On Add or Update a Budget, if we compute common expanses well if they exist: */
+       /*
+        Budget budget= new Budget();
+        budget.setTitle("Achat de 2 Chat"); budget.setDescription("Some Budget Description ....");
+        budget.setAmountSpent(0.0);
+        budget.setAmount(10000.00); budget.setDateDebut(new Date());
+        budget.setEndDate(LocalDate.of(2022, 8,31));
+        budget.setAmountRemains(budget.getAmount());//This will always apply on add new Budget.
+        CategoryExpanse categoryExpanse = categoryExpanseRepository.findById(14).get();
+        User user = userRepository
+                .findById(UUID.fromString("653eb6f2-a817-4184-af31-4cff631692f8")).get();
+        budget.setCategoryExpanse(categoryExpanse);
+        budget.setUser(user);
+
+        managementService.calculateExpansesOnAddBudgetService(budget);
+
+        */
      };
     }
 }

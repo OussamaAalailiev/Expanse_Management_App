@@ -31,7 +31,7 @@ public class Budget {
     private Double amount;//New field added!
 
     private Double amountSpent;
-    private Double amountRemains=amount; //At the beginning 'amount' is equal to 'amountRemains' (Modified at 13/08/2022):
+    private Double amountRemains; //At the beginning 'amount' is equal to 'amountRemains' (Modified at 13/08/2022):
 
 //    @ManyToOne(cascade = CascadeType.ALL)
     @ManyToOne

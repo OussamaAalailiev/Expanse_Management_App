@@ -323,7 +323,7 @@ public class DataInitiationImpl implements DataInitiation {
         expanseAddedByUser.setCategoryExpanse(categoryExpanse);
         expanseAddedByUser.setUser(user);
 
-        managementService.checkIfBudgetIsRespectedOnAddExpanse(expanseAddedByUser);
+      //  managementService.checkIfBudgetIsRespectedOnAddExpanse(expanseAddedByUser);
 
     }
 
