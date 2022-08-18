@@ -23,7 +23,8 @@ public interface BudgetExpanseManagementService {
 
     /**Inner Joint that get all common Budgets with one Expanse at each query:
      * The following function works well! :) */
-    public void calculateBudgetsOnAddOrUpdateExpanseService(Expanse expanse);
+    public void calculateBudgetsOnUpdateExpanseService(Expanse expanse);
+    public void calculateBudgetsOnAddExpanseService(Expanse expanse);
     /**Inner Joint that get all common Expanses(if exists) with one new Budget added
      *  by a user at each query:
      *  */

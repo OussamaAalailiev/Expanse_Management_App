@@ -33,7 +33,7 @@ public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
             "FROM Expanse e INNER JOIN Budget b " +
             "ON (e.user.id=b.user.id) AND e.id=:y AND (e.categoryExpanse.id =:x AND b.categoryExpanse.id =:x)\n" +
             "   AND ( e.createdDate BETWEEN b.dateDebut AND b.endDate)")
-    public List<ResultDTOExpansesBudgets> checkIfBudgetsAreRespectedOnAdd(
+    public List<ResultDTOExpansesBudgets> onAddOrUpdateExpanseComputeOnCommonBudgets(
             @Param("x") Integer categoryOfExpanseId, @Param("y") Long expanseId);
 
 }
