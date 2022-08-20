@@ -201,14 +201,16 @@ public class BudgetExpanseManagementApplication {
          //managementService.checkIfBudgetIsRespectedByCalculation();
          /**Testing On Add a new expanse, if we compute common budgets well: Working for now! */
 
-//         Expanse newExpanse = new Expanse();
-//         User user = userRepository
-//                 .findById(UUID.fromString("dfa735ec-328b-43c3-ad70-f5dba33eb585")).get();
-//         CategoryExpanse categoryExpanse = categoryExpanseRepository.findById(60).get();
-//         //newExpanse.setId(10L);
-//         newExpanse.setAmount(600.90); newExpanse.setCreatedDate(new Date());
-//         newExpanse.setCategoryExpanse(categoryExpanse); newExpanse.setUser(user);
-//         managementService.calculateBudgetsOnAddExpanseService(newExpanse);
+         /*
+         Expanse newExpanse = new Expanse();
+         User user = userRepository
+                 .findById(UUID.fromString("dfa735ec-328b-43c3-ad70-f5dba33eb585")).get();
+         CategoryExpanse categoryExpanse = categoryExpanseRepository.findById(33).get();
+         //newExpanse.setId(10L);
+         newExpanse.setAmount(200.90); newExpanse.setCreatedDate(new Date());
+         newExpanse.setCategoryExpanse(categoryExpanse); newExpanse.setUser(user);
+         managementService.calculateBudgetsOnAddExpanseService(newExpanse);
+          */
 
 
          /**Testing On Add or Update an expanse, if we compute common budgets well: Not sure*/
@@ -219,7 +221,7 @@ public class BudgetExpanseManagementApplication {
 
         // managementService.calculateBudgetsOnAddExpanseService(newExpanse);
 
-         /**Testing On Add or Update a Budget, if we compute common expanses well if they exist: */
+         /**Testing On Add a Budget, if we compute common expanses well if they exist: */
        /*
         Budget budget= new Budget();
         budget.setTitle("Achat de 2 Chat"); budget.setDescription("Some Budget Description ....");
@@ -238,21 +240,23 @@ public class BudgetExpanseManagementApplication {
         */
 
          /**Testing On Add a new Budget, if we compute common expanses well if they exist: Working for now!*/
-         /*
+
+        /*
          Budget budget= new Budget();
-         budget.setTitle("Subscription of Monthly Tramway"); budget.setDescription("Some Budget Description ....");
-         budget.setAmountSpent(0.0);
-         budget.setAmount(230.0); budget.setDateDebut(new Date());
-         budget.setEndDate(LocalDate.of(2022, 8,18));
+         budget.setTitle("Amazon Books Subscription"); budget.setDescription("Some Budget Description ....");
+         //budget.setAmountSpent(0.0);
+         budget.setAmount(100.0); budget.setDateDebut(new Date());
+         budget.setEndDate(LocalDate.of(2022, 9,30));
          budget.setAmountRemains(budget.getAmount());//This will always apply on add new Budget.
-         CategoryExpanse categoryExpanseTransport = categoryExpanseRepository.findById(2).get();
-         User userOussama = userRepository
-                 .findById(UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1")).get();
+         CategoryExpanse categoryExpanseTransport = categoryExpanseRepository.findById(33).get();
+         User userSafwane = userRepository
+                 .findById(UUID.fromString("dfa735ec-328b-43c3-ad70-f5dba33eb585")).get();
          budget.setCategoryExpanse(categoryExpanseTransport);
-         budget.setUser(userOussama);
+         budget.setUser(userSafwane);
 
          managementService.calculateExpansesOnAddBudgetService(budget);
-          */
+         */
+
 
          /*
          Expanse newExpanse = new Expanse();
@@ -267,16 +271,27 @@ public class BudgetExpanseManagementApplication {
           */
 
          /**Testing On Update an Expanse, and if we compute common budgets well if they exist: */
-         /* Update an expanse that correspond to common budget(s) :
-         Expanse expanseToBeUpdate = expanseRepository.findById(13L).get();
-         expanseToBeUpdate.setAmount(22.0);
+         // Update an expanse that correspond to common budget(s) :
+
+         /*
+         Expanse expanseToBeUpdate = expanseRepository.findById(14L).get();
+         expanseToBeUpdate.setAmount(300.90);
          managementService.calculateBudgetsOnUpdateExpanseService(expanseToBeUpdate);
           */
 
+
+
          /* Update an expanse that DOES NOT correspond to common budget(s) : */
-         Expanse expanseToBeUpdate = expanseRepository.findById(11L).get();
+         /*
+          Expanse expanseToBeUpdate = expanseRepository.findById(11L).get();
          expanseToBeUpdate.setAmount(599.90); expanseToBeUpdate.setTitle("Hitman 2 Game");
          managementService.calculateBudgetsOnUpdateExpanseService(expanseToBeUpdate);
+          */
+         /**Testing On Update a new Budget, if we compute common expanses well if they exist: */
+         Budget budgetToBeUpdated = budgetRepository.findById(22).get();
+         budgetToBeUpdated.setAmount(100.0);
+         managementService.updateBudgetService(budgetToBeUpdated);
+
      };
     }
 }

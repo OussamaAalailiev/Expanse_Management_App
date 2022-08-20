@@ -25,6 +25,7 @@ public interface BudgetExpanseManagementService {
      * The following function works well! :) */
     public void calculateBudgetsOnUpdateExpanseService(Expanse expanse);
     public void calculateBudgetsOnAddExpanseService(Expanse expanse);
+    public void calculateBudgetsOnDeleteExpanseService(Expanse expanse);
     /**Inner Joint that get all common Expanses(if exists) with one new Budget added
      *  by a user at each query:
      *  */

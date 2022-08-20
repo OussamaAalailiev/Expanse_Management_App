@@ -12,10 +12,7 @@ import org.enset.budget_expanse_management.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Transactional
 @Service
@@ -106,6 +103,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     /** Function is completed! */
     @Override
     public void calculateBudgetsOnUpdateExpanseService(Expanse expanse) {
+        List<Budget> ListBudgetsToUpdate=new ArrayList<>();
         List<ResultDTOExpansesBudgets> expanseBudgetsDTO = expanseRepository
                 .onAddOrUpdateExpanseComputeOnCommonBudgets(expanse.getCategoryExpanse().getId(),
                         expanse.getId());
@@ -128,22 +126,26 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                     budget.setAmountSpent(budget.getAmountSpent() + amountExpanseInterval);
                     budget.setAmountRemains(budget.getAmountRemains() - amountExpanseInterval);//Always add amountExpanseInterval
                     // (amRemains-(-amExp)) => (amRemains + amExp))
-                    budgetRepository.save(budget);
+                    ListBudgetsToUpdate.add(budget);
+                    //budgetRepository.save(budget);
                     expanseRepository.save(expanse);
                 } else if (expanse.getAmount() > oldAmountExpanseFromDB && amountSpent !=null) {//In case Of update with new amountExp Greater than the Old one:
                     Budget budget = budgetRepository.findById(budgetId).get();
                     amountExpanseInterval = expanse.getAmount() - oldAmountExpanseFromDB;// Inverse Calc In comparison of the above interval:
                     budget.setAmountSpent(budget.getAmountSpent() + amountExpanseInterval);//(-(-)) => (+())
                     budget.setAmountRemains(budget.getAmountRemains() - amountExpanseInterval);
-                    budgetRepository.save(budget);
+                    ListBudgetsToUpdate.add(budget);
+                    //budgetRepository.save(budget);
                     expanseRepository.save(expanse);
                 } else if (amountSpent == null) {
                     Budget budget = budgetRepository.findById(budgetId).get();
                     budget.setAmountSpent(expanse.getAmount());
-                    budgetRepository.save(budget);
+                    ListBudgetsToUpdate.add(budget);
+                    //budgetRepository.save(budget);
                     expanseRepository.save(expanse);
                 }
             }
+                budgetRepository.saveAll(ListBudgetsToUpdate);
           }
 
         }else {//In case there is NO common Budgets, we only save the expanse:
@@ -295,6 +297,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     /** Function is completed! */
     @Override
     public void calculateBudgetsOnAddExpanseService(Expanse expanse) {
+        List<Budget> listBudgetsToUpdateOnAddExp=new ArrayList<>();
         //Expanse Object is not used yet:
         expanseRepository.save(expanse);
         List<ResultDTOExpansesBudgets> expanseBudgetsDTO = expanseRepository
@@ -313,18 +316,27 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                         Budget budget = budgetRepository.findById(budgetId).get();
                         budget.setAmountSpent(amountExpanse);
                         budget.setAmountRemains(amountRemains - amountExpanse);
-                        budgetRepository.save(budget);
+                       // budgetRepository.save(budget);
+                        listBudgetsToUpdateOnAddExp.add(budget);
                     } else {
                         Budget budget = budgetRepository.findById(budgetId).get();
                         budget.setAmountSpent(amountSpent + amountExpanse);
                         budget.setAmountRemains(amountRemains - amountExpanse);
-                        budgetRepository.save(budget);
+                        //budgetRepository.save(budget);
+                        listBudgetsToUpdateOnAddExp.add(budget);
                     }
                 }
+                budgetRepository.saveAll(listBudgetsToUpdateOnAddExp);
             }
         }else {//In case there is NO common Budgets, we only save the expanse:
-            expanseRepository.save(expanse);
+          //  expanseRepository.save(expanse);
+            System.out.println("No Budget(s) related to this expanse! ");
         }
+    }
+
+    @Override
+    public void calculateBudgetsOnDeleteExpanseService(Expanse expanse) {
+        
     }
 
 
@@ -365,9 +377,22 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     @Override
     public void updateBudgetService(Budget budget) {
         if (budgetRepository.findById(budget.getId()).isPresent()){
-//            Double newAmountUpdate = budget.getAmount();
-//            budget.setAmount(newAmountUpdate);
-            budgetRepository.save(budget);
+            Budget budgetToUpdateFromDB = budgetRepository.findById(budget.getId()).get();
+            Double oldBudgetAmount = budgetToUpdateFromDB.getAmount();
+            Double oldBudgetAmountRemains = budgetToUpdateFromDB.getAmountRemains();
+            Double newAmountUpdated = budget.getAmount();
+            if (newAmountUpdated > oldBudgetAmount){//In case user Increase the amount Budget, the
+                budget.setAmount(newAmountUpdated); // amountRemains should be increased too.
+                budget.setAmountRemains(oldBudgetAmountRemains
+                        + (newAmountUpdated - oldBudgetAmount));
+                budgetRepository.save(budget);
+            } else if (newAmountUpdated < oldBudgetAmount) {//amountRemains will be decreased in case user update amountBudget < than the old amount budget:
+                budget.setAmount(newAmountUpdated);
+                budget.setAmountRemains(oldBudgetAmountRemains - (oldBudgetAmount - newAmountUpdated));
+                budgetRepository.save(budget);
+            }else {//In case: Nothing is changed:
+                budgetRepository.save(budget);
+            }
         }
     }
 

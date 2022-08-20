@@ -55,6 +55,7 @@ public class ExpanseRestController {
         }
         expanse.setId(Long.valueOf(id));
         Expanse savedExpanse = expanseRepository.save(expanse);
+        managementService.calculateBudgetsOnUpdateExpanseService(expanse);
        // managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
         return savedExpanse;
     }
