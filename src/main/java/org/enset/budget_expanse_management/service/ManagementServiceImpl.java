@@ -2,9 +2,7 @@ package org.enset.budget_expanse_management.service;
 
 import org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets;
 import org.enset.budget_expanse_management.model.Budget;
-import org.enset.budget_expanse_management.model.CategoryExpanse;
 import org.enset.budget_expanse_management.model.Expanse;
-import org.enset.budget_expanse_management.model.User;
 import org.enset.budget_expanse_management.repositories.BudgetRepository;
 import org.enset.budget_expanse_management.repositories.CategoryExpanseRepository;
 import org.enset.budget_expanse_management.repositories.ExpanseRepository;
@@ -12,6 +10,7 @@ import org.enset.budget_expanse_management.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Transactional
@@ -105,7 +104,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     public void calculateBudgetsOnUpdateExpanseService(Expanse expanse) {
         List<Budget> ListBudgetsToUpdate=new ArrayList<>();
         List<ResultDTOExpansesBudgets> expanseBudgetsDTO = expanseRepository
-                .onAddOrUpdateExpanseComputeOnCommonBudgets(expanse.getCategoryExpanse().getId(),
+                .onOneExpanseComputeOnCommonBudgets(expanse.getCategoryExpanse().getId(),
                         expanse.getId());
         //In case for Expanse Update, before update, I'll get the Old amountExp from DB
         // THEN I'll do a comparison between the old value and new value entered to be updated:
@@ -301,7 +300,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         //Expanse Object is not used yet:
         expanseRepository.save(expanse);
         List<ResultDTOExpansesBudgets> expanseBudgetsDTO = expanseRepository
-                .onAddOrUpdateExpanseComputeOnCommonBudgets(expanse.getCategoryExpanse().getId(),
+                .onOneExpanseComputeOnCommonBudgets(expanse.getCategoryExpanse().getId(),
                         expanse.getId());
         if (expanseBudgetsDTO.get(0).getIdBudget()!=null ){
             if (expanseRepository.findById(expanse.getId()).isPresent()){
@@ -336,7 +335,40 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
     @Override
     public void calculateBudgetsOnDeleteExpanseService(Expanse expanse) {
-        
+        List<Budget> listBudgetsToUpdateOnDeleteExp=new ArrayList<>();
+//        List<Budget> listBudgetsNotUpdateOnDeleteExp
+//                =new ArrayList<>();//For Fresh Budgets added in DB that has no previous computation on 'amountSpent':
+        try {
+            List<ResultDTOExpansesBudgets> dtoExpansesBudgets = expanseRepository
+                    .onOneExpanseComputeOnCommonBudgets
+                            (expanse.getCategoryExpanse().getId(), expanse.getId());
+
+            if (!dtoExpansesBudgets.isEmpty()){
+                for (int i = 0; i < dtoExpansesBudgets.size(); i++) {
+                    Double amountExpToBeDeleted = dtoExpansesBudgets.get(0).getAmountExpanse();
+                    Double amountRemains = dtoExpansesBudgets.get(i).getAmountRemains();
+                    Double amountSpent = dtoExpansesBudgets.get(i).getAmountSpent();
+                    Integer budgetId = dtoExpansesBudgets.get(i).getIdBudget();
+                    if (amountSpent==null){
+                        Budget budget = budgetRepository.findById(budgetId).get();
+                        listBudgetsToUpdateOnDeleteExp.add(budget);
+                    } else { //Meaning: else if (amountSpent != null)
+                        Budget budget = budgetRepository.findById(budgetId).get();
+                        budget.setAmountSpent(amountSpent - amountExpToBeDeleted);
+                        budget.setAmountRemains(amountRemains + amountExpToBeDeleted);
+                        listBudgetsToUpdateOnDeleteExp.add(budget);
+                    }
+                }
+                budgetRepository.saveAll(listBudgetsToUpdateOnDeleteExp);
+                expanseRepository.delete(expanse);
+            }else {// If There is No common Budget(s) on the Expanse:
+                expanseRepository.delete(expanse);
+            }
+
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 
@@ -393,6 +425,15 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             }else {//In case: Nothing is changed:
                 budgetRepository.save(budget);
             }
+        }
+    }
+
+    @Override
+    public void deleteBudgetService(Budget budget) {
+        try {
+            budgetRepository.delete(budget);
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 

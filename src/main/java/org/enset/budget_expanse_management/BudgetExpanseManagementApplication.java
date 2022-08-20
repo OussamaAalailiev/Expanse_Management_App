@@ -288,9 +288,22 @@ public class BudgetExpanseManagementApplication {
          managementService.calculateBudgetsOnUpdateExpanseService(expanseToBeUpdate);
           */
          /**Testing On Update a new Budget, if we compute common expanses well if they exist: */
+         /*
          Budget budgetToBeUpdated = budgetRepository.findById(22).get();
          budgetToBeUpdated.setAmount(100.0);
          managementService.updateBudgetService(budgetToBeUpdated);
+          */
+
+         /**Testing On Delete an Expanse, if we compute common Budget(s) well if they exist: */
+        /*
+         Expanse expanseToDelete = expanseRepository.findById(16L).get();
+         managementService.calculateBudgetsOnDeleteExpanseService(expanseToDelete);
+         */
+
+         /**Testing On Delete a Budget: */
+         Budget budgetToDelete = budgetRepository.findById(24).get();
+         managementService.deleteBudgetService(budgetToDelete);
+
 
      };
     }

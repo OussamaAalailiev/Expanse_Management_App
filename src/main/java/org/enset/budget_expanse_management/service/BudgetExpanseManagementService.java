@@ -31,4 +31,5 @@ public interface BudgetExpanseManagementService {
      *  */
     public void calculateExpansesOnAddBudgetService(Budget budget);
     public void updateBudgetService(Budget budget);
+    public void deleteBudgetService(Budget budget);
 }
