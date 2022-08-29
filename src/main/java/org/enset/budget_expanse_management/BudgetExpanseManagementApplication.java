@@ -301,8 +301,10 @@ public class BudgetExpanseManagementApplication {
          */
 
          /**Testing On Delete a Budget: */
+         /*
          Budget budgetToDelete = budgetRepository.findById(24).get();
          managementService.deleteBudgetService(budgetToDelete);
+          */
 
 
      };

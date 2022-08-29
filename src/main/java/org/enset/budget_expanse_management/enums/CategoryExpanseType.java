@@ -79,6 +79,8 @@ public enum CategoryExpanseType {
     Cell_Phone,
     Apps,
     Games,
+    Drinks,
+    Homemade_Food
 
 
 

@@ -1,12 +1,18 @@
 package org.enset.budget_expanse_management.controllers;
 
+import org.enset.budget_expanse_management.formModel.ExpanseFormSubmission;
+import org.enset.budget_expanse_management.model.CategoryExpanse;
 import org.enset.budget_expanse_management.model.Expanse;
+import org.enset.budget_expanse_management.model.User;
+import org.enset.budget_expanse_management.repositories.CategoryExpanseRepository;
 import org.enset.budget_expanse_management.repositories.ExpanseRepository;
+import org.enset.budget_expanse_management.repositories.UserRepository;
 import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:4090")
 @Transactional
@@ -15,11 +21,17 @@ import java.util.List;
 public class ExpanseRestController {
 
     private final ExpanseRepository expanseRepository;
+    private final CategoryExpanseRepository categoryExpanseRepository;
+    private final UserRepository userRepository;
     private final BudgetExpanseManagementService managementService;
 
     public ExpanseRestController(ExpanseRepository expanseRepository,
+                                 CategoryExpanseRepository categoryExpanseRepository,
+                                 UserRepository userRepository,
                                  BudgetExpanseManagementService managementService) {
         this.expanseRepository = expanseRepository;
+        this.categoryExpanseRepository = categoryExpanseRepository;
+        this.userRepository = userRepository;
         this.managementService = managementService;
     }
 
@@ -36,13 +48,33 @@ public class ExpanseRestController {
         return expanseRepository.findById(Long.valueOf(id)).get();
     }
 
+//    @PostMapping(path = "/expanses/admin")
+//    public Expanse addNewExpanseController(@RequestBody Expanse expanse){
+//        System.out.println(" -----------------------------------");
+//        System.out.println(" ------------- Expanse is added Successfully ----------");
+//        Expanse savedExpanse = expanseRepository.save(expanse);
+//        //managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
+//        return savedExpanse;
+//    }
+
     @PostMapping(path = "/expanses/admin")
-    public Expanse addNewExpanseController(@RequestBody Expanse expanse){
+    public void addNewExpanseController2(@RequestBody ExpanseFormSubmission expanseFormSubmission){
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Expanse is added Successfully ----------");
-        Expanse savedExpanse = expanseRepository.save(expanse);
-        //managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
-        return savedExpanse;
+        Expanse expanse = new Expanse();
+        //expanse.setId(null);
+        expanse.setTitle(expanseFormSubmission.getTitle());
+        expanse.setAmount(expanseFormSubmission.getAmount());
+        expanse.setCreatedDate(expanseFormSubmission.getCreatedDate());
+        CategoryExpanse categoryExpanse = categoryExpanseRepository.findById(expanseFormSubmission.getCategoryExpanse()).get();
+        User user = userRepository.findById(UUID.fromString(expanseFormSubmission.getUserId())).get();
+        expanse.setCategoryExpanse(categoryExpanse);
+        expanse.setUser(user);
+
+//        Expanse savedExpanse = expanseRepository.save(expanse);
+//        //managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
+//        return savedExpanse;
+        managementService.calculateBudgetsOnAddExpanseService(expanse);
     }
 
     @PutMapping(path = "/expanses/admin/{id}")

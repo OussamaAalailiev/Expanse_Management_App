@@ -3,14 +3,11 @@ package org.enset.budget_expanse_management.service;
 import org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets;
 import org.enset.budget_expanse_management.model.Budget;
 import org.enset.budget_expanse_management.model.Expanse;
-import org.enset.budget_expanse_management.repositories.BudgetRepository;
-import org.enset.budget_expanse_management.repositories.CategoryExpanseRepository;
-import org.enset.budget_expanse_management.repositories.ExpanseRepository;
-import org.enset.budget_expanse_management.repositories.UserRepository;
+import org.enset.budget_expanse_management.model.Income;
+import org.enset.budget_expanse_management.repositories.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Transactional
@@ -20,16 +17,25 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     private final ExpanseRepository expanseRepository;
     private final BudgetRepository budgetRepository;
     private final CategoryExpanseRepository categoryExpanseRepository;
+    private final IncomeRepository incomeRepository;
+    private final GoalRepository goalRepository;
+    private final CategoryIncomeRepository categoryIncomeRepository;
 
     private final UserRepository userRepository;
 
     public ManagementServiceImpl(ExpanseRepository expanseRepository,
                                  BudgetRepository budgetRepository,
                                  CategoryExpanseRepository categoryExpanseRepository,
+                                 IncomeRepository incomeRepository,
+                                 GoalRepository goalRepository,
+                                 CategoryIncomeRepository categoryIncomeRepository,
                                  UserRepository userRepository) {
         this.expanseRepository = expanseRepository;
         this.budgetRepository = budgetRepository;
         this.categoryExpanseRepository = categoryExpanseRepository;
+        this.incomeRepository = incomeRepository;
+        this.goalRepository = goalRepository;
+        this.categoryIncomeRepository = categoryIncomeRepository;
         this.userRepository = userRepository;
     }
 
@@ -302,7 +308,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         List<ResultDTOExpansesBudgets> expanseBudgetsDTO = expanseRepository
                 .onOneExpanseComputeOnCommonBudgets(expanse.getCategoryExpanse().getId(),
                         expanse.getId());
-        if (expanseBudgetsDTO.get(0).getIdBudget()!=null ){
+        if (!expanseBudgetsDTO.isEmpty() ){
             if (expanseRepository.findById(expanse.getId()).isPresent()){
                 for (int i = 0; i < expanseBudgetsDTO.size()
                     //  && expanseRepository.findById(expanse.getId()).isEmpty()
@@ -391,7 +397,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         /**AFTER Saving a new Budget to DB: */
         List<ResultDTOExpansesBudgets> expansesBudgets = budgetRepository.onAddBudgetComputeOnCommonExpanses
                 (newSavedBudgetToDB.getId(), newSavedBudgetToDB.getCategoryExpanse().getId());
-        if (expansesBudgets.get(0).getId()==null){//If the budget have no common expanses, means the List above will be empty then we save the budget without calculation:
+        if (expansesBudgets.isEmpty()){//If the budget have no common expanses, means the List above will be empty then we save the budget without calculation:
             budgetRepository.save(budget);
         } else{
             //Do some Calculation...
@@ -435,6 +441,12 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    // TODO: Incomplete Algorithm to compute Goals On add a new Income.
+    @Override
+    public void calculateGoalsOnAddIncomeService(Income income) {
+
     }
 
 //    @Override

@@ -2,6 +2,7 @@ package org.enset.budget_expanse_management.service;
 
 import org.enset.budget_expanse_management.model.Budget;
 import org.enset.budget_expanse_management.model.Expanse;
+import org.enset.budget_expanse_management.model.Income;
 
 import java.util.List;
 
@@ -32,4 +33,8 @@ public interface BudgetExpanseManagementService {
     public void calculateExpansesOnAddBudgetService(Budget budget);
     public void updateBudgetService(Budget budget);
     public void deleteBudgetService(Budget budget);
+
+    /**Inner Joint that get all common Goals(if exists) with one new Income added
+     *  by a user at each query:*/
+    public void calculateGoalsOnAddIncomeService(Income income);
 }
