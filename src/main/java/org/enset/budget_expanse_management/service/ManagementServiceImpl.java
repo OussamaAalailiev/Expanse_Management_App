@@ -113,8 +113,8 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                 .onOneExpanseComputeOnCommonBudgets(expanse.getCategoryExpanse().getId(),
                         expanse.getId());
         //In case for Expanse Update, before update, I'll get the Old amountExp from DB
-        // THEN I'll do a comparison between the old value and new value entered to be updated:
-        // Then I'll UPDATE the Expanse by re-save it:
+        // THEN I'll do a comparison between the old value and new value entered to be updated
+        // to calculate commonBudgets Then I'll UPDATE the Expanse by re-save it:
         if (!expanseBudgetsDTO.isEmpty()){
 
             if (expanseRepository.findById(expanse.getId()).isPresent()){
@@ -133,7 +133,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                     // (amRemains-(-amExp)) => (amRemains + amExp))
                     ListBudgetsToUpdate.add(budget);
                     //budgetRepository.save(budget);
-                    expanseRepository.save(expanse);
+                    //expanseRepository.save(expanse);
                 } else if (expanse.getAmount() > oldAmountExpanseFromDB && amountSpent !=null) {//In case Of update with new amountExp Greater than the Old one:
                     Budget budget = budgetRepository.findById(budgetId).get();
                     amountExpanseInterval = expanse.getAmount() - oldAmountExpanseFromDB;// Inverse Calc In comparison of the above interval:
@@ -141,15 +141,17 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                     budget.setAmountRemains(budget.getAmountRemains() - amountExpanseInterval);
                     ListBudgetsToUpdate.add(budget);
                     //budgetRepository.save(budget);
-                    expanseRepository.save(expanse);
+                    //expanseRepository.save(expanse);
                 } else if (amountSpent == null) {
                     Budget budget = budgetRepository.findById(budgetId).get();
                     budget.setAmountSpent(expanse.getAmount());
                     ListBudgetsToUpdate.add(budget);
                     //budgetRepository.save(budget);
-                    expanseRepository.save(expanse);
+//                    expanseRepository.save(expanse);
                 }
+
             }
+                expanseRepository.save(expanse);
                 budgetRepository.saveAll(ListBudgetsToUpdate);
           }
 
@@ -341,16 +343,15 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
     @Override
     public void calculateBudgetsOnDeleteExpanseService(Expanse expanse) {
-        List<Budget> listBudgetsToUpdateOnDeleteExp=new ArrayList<>();
-//        List<Budget> listBudgetsNotUpdateOnDeleteExp
-//                =new ArrayList<>();//For Fresh Budgets added in DB that has no previous computation on 'amountSpent':
         try {
+            List<Budget> listBudgetsToUpdateOnDeleteExp=new ArrayList<>();
             List<ResultDTOExpansesBudgets> dtoExpansesBudgets = expanseRepository
                     .onOneExpanseComputeOnCommonBudgets
                             (expanse.getCategoryExpanse().getId(), expanse.getId());
 
             if (!dtoExpansesBudgets.isEmpty()){
                 for (int i = 0; i < dtoExpansesBudgets.size(); i++) {
+                    System.out.println("Delete Expanse + Common Budget(s) Update");
                     Double amountExpToBeDeleted = dtoExpansesBudgets.get(0).getAmountExpanse();
                     Double amountRemains = dtoExpansesBudgets.get(i).getAmountRemains();
                     Double amountSpent = dtoExpansesBudgets.get(i).getAmountSpent();
@@ -370,11 +371,11 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             }else {// If There is No common Budget(s) on the Expanse:
                 expanseRepository.delete(expanse);
             }
-
         }catch (Exception e){
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
+
     }
 
 

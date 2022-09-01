@@ -1,6 +1,7 @@
 package org.enset.budget_expanse_management.repositories;
 
 import org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets;
+import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
 import org.enset.budget_expanse_management.model.Expanse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -33,5 +34,18 @@ public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
             "   AND ( e.createdDate BETWEEN b.dateDebut AND b.endDate)")
     public List<ResultDTOExpansesBudgets> onOneExpanseComputeOnCommonBudgets(
             @Param("x") Integer categoryOfExpanseId, @Param("y") Long expanseId);
+//    @Query("SELECT YEAR(e.createdDate) AS year, MONTH(e.createdDate) AS month, SUM(e.amount) As totalExpanse\n" +
+//            "FROM Expanse e\n" +
+//            "GROUP BY YEAR(e.createdDate), MONTH(e.createdDate)")
+
+    /**-- Query to get Total Amount of Expanses per Month: */
+ /*
+    @Query("SELECT NEW org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO(" +
+            "                      YEAR(e.createdDate), MONTH(e.createdDate), SUM(e.amount))" +
+            "FROM Expanse e \n" +
+            "GROUP BY YEAR(e.createdDate), MONTH(e.createdDate)")
+    public List<TotalExpansePerMonthDTO> getTotalAmountExpansesOnEveryMonth();
+  */
+
 
 }

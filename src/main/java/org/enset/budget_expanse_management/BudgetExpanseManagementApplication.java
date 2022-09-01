@@ -306,6 +306,19 @@ public class BudgetExpanseManagementApplication {
          managementService.deleteBudgetService(budgetToDelete);
           */
 
+         /**Get Total Amount of Expanses per Month: */
+
+         /*
+                  expanseRepository.getTotalAmountExpansesOnEveryMonth().forEach(totalExpansePerMonthDTO -> {
+             System.out.println();
+             System.out.println(totalExpansePerMonthDTO.getYear());
+             System.out.println(totalExpansePerMonthDTO.getMonth());
+             System.out.println(totalExpansePerMonthDTO.getTotalExpanse());
+             System.out.println("-----------------------------");
+         });
+          */
+
+
 
      };
     }

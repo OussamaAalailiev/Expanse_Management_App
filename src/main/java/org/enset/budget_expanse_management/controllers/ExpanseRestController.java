@@ -66,8 +66,10 @@ public class ExpanseRestController {
         expanse.setTitle(expanseFormSubmission.getTitle());
         expanse.setAmount(expanseFormSubmission.getAmount());
         expanse.setCreatedDate(expanseFormSubmission.getCreatedDate());
-        CategoryExpanse categoryExpanse = categoryExpanseRepository.findById(expanseFormSubmission.getCategoryExpanse()).get();
-        User user = userRepository.findById(UUID.fromString(expanseFormSubmission.getUserId())).get();
+        CategoryExpanse categoryExpanse = categoryExpanseRepository
+                .findById(expanseFormSubmission.getCategoryExpanse()).get();
+        User user = userRepository
+                .findById(UUID.fromString(expanseFormSubmission.getUserId())).get();
         expanse.setCategoryExpanse(categoryExpanse);
         expanse.setUser(user);
 
@@ -78,7 +80,7 @@ public class ExpanseRestController {
     }
 
     @PutMapping(path = "/expanses/admin/{id}")
-    public Expanse editExpanseController(@PathVariable(name = "id") String id ,@RequestBody Expanse expanse){
+    public void editExpanseController(@PathVariable(name = "id") String id ,@RequestBody Expanse expanse){
         boolean isExpansePresent = expanseRepository.findById(Long.valueOf(id)).isPresent();
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Expanse is updated Successfully ----------");
@@ -86,10 +88,10 @@ public class ExpanseRestController {
             throw new RuntimeException("Expanse is not found, please edit an existing Expanse!");
         }
         expanse.setId(Long.valueOf(id));
-        Expanse savedExpanse = expanseRepository.save(expanse);
+       // Expanse savedExpanse = expanseRepository.save(expanse);
         managementService.calculateBudgetsOnUpdateExpanseService(expanse);
        // managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
-        return savedExpanse;
+        //return savedExpanse;
     }
 
     @DeleteMapping(path = "/expanses/admin/delete/{id}")
@@ -101,7 +103,8 @@ public class ExpanseRestController {
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Expanse is deleted Successfully ----------");
         Expanse expanseToBeDeleted = expanseRepository.findById(Long.valueOf(id)).get();
-        expanseRepository.delete(expanseToBeDeleted);
+//        expanseRepository.delete(expanseToBeDeleted);
+        managementService.calculateBudgetsOnDeleteExpanseService(expanseToBeDeleted);
     }
 
 
