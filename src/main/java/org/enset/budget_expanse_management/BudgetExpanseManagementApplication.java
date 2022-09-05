@@ -281,12 +281,14 @@ public class BudgetExpanseManagementApplication {
 
 
 
-         /* Update an expanse that DOES NOT correspond to common budget(s) : */
+         /**Update an expanse that DOES correspond to common budget(s) : */
+
          /*
-          Expanse expanseToBeUpdate = expanseRepository.findById(11L).get();
-         expanseToBeUpdate.setAmount(599.90); expanseToBeUpdate.setTitle("Hitman 2 Game");
+         Expanse expanseToBeUpdate = expanseRepository.findById(34L).get();
+         expanseToBeUpdate.setAmount(1.0); //expanseToBeUpdate.setTitle("Hitman 2 Game");
          managementService.calculateBudgetsOnUpdateExpanseService(expanseToBeUpdate);
           */
+
          /**Testing On Update a new Budget, if we compute common expanses well if they exist: */
          /*
          Budget budgetToBeUpdated = budgetRepository.findById(22).get();

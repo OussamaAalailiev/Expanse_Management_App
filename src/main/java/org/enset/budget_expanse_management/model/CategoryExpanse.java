@@ -14,7 +14,8 @@ import java.util.List;
 
 
 //@Data
-@NoArgsConstructor @AllArgsConstructor
+//@NoArgsConstructor
+ //@AllArgsConstructor
 @Entity
 public class CategoryExpanse {
 
@@ -85,6 +86,19 @@ public class CategoryExpanse {
     }
 
     public void setBudgets(List<Budget> budgets) {
+        this.budgets = budgets;
+    }
+
+    public CategoryExpanse() {
+
+    }
+
+    public CategoryExpanse(Integer id, CategoryExpanseType categoryExpanseType,
+                           CategoryGroup categoryGroup, List<Expanse> expanses, List<Budget> budgets) {
+        this.id = id;
+        this.categoryExpanseType = categoryExpanseType;
+        this.categoryGroup = categoryGroup;
+        this.expanses = expanses;
         this.budgets = budgets;
     }
 }

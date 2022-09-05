@@ -102,7 +102,8 @@ public class BudgetRestController {
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Budget is deleted Successfully ----------");
         Budget budgetToBeDeleted = budgetRepository.findById(Integer.parseInt(id)).get();
-        budgetRepository.delete(budgetToBeDeleted);
+       // budgetRepository.delete(budgetToBeDeleted);
+        managementService.deleteBudgetService(budgetToBeDeleted);
     }
 
 

@@ -8,10 +8,12 @@ import org.enset.budget_expanse_management.repositories.CategoryExpanseRepositor
 import org.enset.budget_expanse_management.repositories.ExpanseRepository;
 import org.enset.budget_expanse_management.repositories.UserRepository;
 import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:4090")
@@ -35,9 +37,19 @@ public class ExpanseRestController {
         this.managementService = managementService;
     }
 
+//    @GetMapping(path = "/expanses")
+//    public List<Expanse> getAllExpansesControllerV1(){
+//        return expanseRepository.findAll();
+//    }
+
     @GetMapping(path = "/expanses")
-    public List<Expanse> getAllExpansesController(){
-        return expanseRepository.findAll();
+    public Page<Expanse> getExpansesByPageAndSizeControllerV2(@RequestParam Optional<String> title,
+                                                            @RequestParam Optional<Integer> page,
+                                                            @RequestParam Optional<Integer> size){
+        return managementService
+                .getExpansesByPageAndSizeAndTitleService(
+                        title.orElse(""), page.orElse(0), size.orElse(5)
+                                                        );
     }
 
     @GetMapping(path = "/expanses/{id}")
@@ -49,7 +61,7 @@ public class ExpanseRestController {
     }
 
 //    @PostMapping(path = "/expanses/admin")
-//    public Expanse addNewExpanseController(@RequestBody Expanse expanse){
+//    public Expanse addNewExpanseControllerV1(@RequestBody Expanse expanse){
 //        System.out.println(" -----------------------------------");
 //        System.out.println(" ------------- Expanse is added Successfully ----------");
 //        Expanse savedExpanse = expanseRepository.save(expanse);
@@ -58,11 +70,10 @@ public class ExpanseRestController {
 //    }
 
     @PostMapping(path = "/expanses/admin")
-    public void addNewExpanseController2(@RequestBody ExpanseFormSubmission expanseFormSubmission){
+    public void addNewExpanseControllerV2(@RequestBody ExpanseFormSubmission expanseFormSubmission){
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Expanse is added Successfully ----------");
         Expanse expanse = new Expanse();
-        //expanse.setId(null);
         expanse.setTitle(expanseFormSubmission.getTitle());
         expanse.setAmount(expanseFormSubmission.getAmount());
         expanse.setCreatedDate(expanseFormSubmission.getCreatedDate());
@@ -73,25 +84,39 @@ public class ExpanseRestController {
         expanse.setCategoryExpanse(categoryExpanse);
         expanse.setUser(user);
 
-//        Expanse savedExpanse = expanseRepository.save(expanse);
-//        //managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
-//        return savedExpanse;
         managementService.calculateBudgetsOnAddExpanseService(expanse);
     }
 
     @PutMapping(path = "/expanses/admin/{id}")
-    public void editExpanseController(@PathVariable(name = "id") String id ,@RequestBody Expanse expanse){
+    public void editExpanseController(@PathVariable(name = "id") String id ,
+                                      @RequestBody Expanse expanseUpdated) {
+
+
         boolean isExpansePresent = expanseRepository.findById(Long.valueOf(id)).isPresent();
+        Expanse expanseFromDB = expanseRepository.findById(Long.valueOf(id)).get();
+        expanseUpdated.setCategoryExpanse(expanseFromDB.getCategoryExpanse());
+        expanseUpdated.setUser(expanseFromDB.getUser());
+        expanseUpdated.setCreatedDate(expanseFromDB.getCreatedDate());
+        //expanseFromDB.setId(Long.valueOf(id));
+//        expanseFromDB.setTitle(expanseUpdated.getTitle());
+//        expanseFromDB.setAmount(expanseUpdated.getAmount());
+/*        ObjectMapper objectMapper = new ObjectMapper();
+        CategoryExpanseType categoryExpanseTypeMapped = objectMapper.readValue(expanseUpdateFormSubmission.getCategoryExpanse(),
+                CategoryExpanseType.class);
+        CategoryExpanse categoryExpanse = categoryExpanseRepository
+                .findByCategoryExpanseTypeContains(categoryExpanseTypeMapped);
+        User user = userRepository
+                .findById(UUID.fromString(expanseUpdateFormSubmission.getUserId())).get();
+*/
+//        expanseFromDB.setCategoryExpanse(expanseFromDB.getCategoryExpanse());
+//        expanseFromDB.setUser(expanseFromDB.getUser());
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Expanse is updated Successfully ----------");
         if (!isExpansePresent){
             throw new RuntimeException("Expanse is not found, please edit an existing Expanse!");
         }
-        expanse.setId(Long.valueOf(id));
-       // Expanse savedExpanse = expanseRepository.save(expanse);
-        managementService.calculateBudgetsOnUpdateExpanseService(expanse);
-       // managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
-        //return savedExpanse;
+        expanseUpdated.setId(Long.valueOf(id));
+        managementService.calculateBudgetsOnUpdateExpanseService(expanseUpdated);
     }
 
     @DeleteMapping(path = "/expanses/admin/delete/{id}")
@@ -103,7 +128,6 @@ public class ExpanseRestController {
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Expanse is deleted Successfully ----------");
         Expanse expanseToBeDeleted = expanseRepository.findById(Long.valueOf(id)).get();
-//        expanseRepository.delete(expanseToBeDeleted);
         managementService.calculateBudgetsOnDeleteExpanseService(expanseToBeDeleted);
     }
 

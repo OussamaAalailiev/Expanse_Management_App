@@ -3,6 +3,8 @@ package org.enset.budget_expanse_management.repositories;
 import org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets;
 import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
 import org.enset.budget_expanse_management.model.Expanse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -46,6 +48,9 @@ public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
             "GROUP BY YEAR(e.createdDate), MONTH(e.createdDate)")
     public List<TotalExpansePerMonthDTO> getTotalAmountExpansesOnEveryMonth();
   */
+
+    /**Get Expanses By Page based on title of expanse + page N° + Size N°: */
+    Page<Expanse> findByTitleContaining(String title, Pageable pageable);
 
 
 }
