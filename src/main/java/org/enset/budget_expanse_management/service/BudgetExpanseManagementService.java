@@ -8,20 +8,8 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface BudgetExpanseManagementService {
-  //  public void addExpanseToOneOrZeroBudgetService(Expanse expanse, Budget budget);
-   // public void addExpanseToBudgetServiceInit();
 
     public void getAllExpAndBudWithSameUserDateAndCatExpService();
-
-    //return type changed from 'Budget' To 'void':
-
-   // public void checkIfBudgetIsRespectedOnAddExpanse(Expanse expanse);
-   // public void checkIfBudgetIsRespectedOnAddExpanse2(Expanse expanse, Budget budget);
-
-    //public List<Budget> getAllBudgetsFromDBService();
-    //public Budget checkIfBudgetIsRespectedByCalculation();
-  //  public void checkIfBudgetIsRespectedByCalculation();
-   // public void checkIfBudgetIsRespectedByCalculationSumAmountExp();
 
     /**Inner Joint that get all common Budgets with one Expanse at each query:
      * The following function works well! :) */
@@ -36,6 +24,8 @@ public interface BudgetExpanseManagementService {
     public void calculateExpansesOnAddBudgetService(Budget budget);
     public void updateBudgetService(Budget budget);
     public void deleteBudgetService(Budget budget);
+    /**Get Budgets By Page based on title of budget + page N° + Size N° from Service: */
+    public Page<Budget> getBudgetsByPageAndSizeAndTitleService(String title, int page, int size);
 
     /**Inner Joint that get all common Goals(if exists) with one new Income added
      *  by a user at each query:*/

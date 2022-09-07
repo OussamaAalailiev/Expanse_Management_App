@@ -90,26 +90,14 @@ public class ExpanseRestController {
     @PutMapping(path = "/expanses/admin/{id}")
     public void editExpanseController(@PathVariable(name = "id") String id ,
                                       @RequestBody Expanse expanseUpdated) {
-
-
+        /**I sent just 'Id, Amount, Title of the 'expanseUpdated' from Frontend THEN
+         *   i get the other Fields from DB THEN I set them to 'expanseUpdated' object before
+         *   calling the Service Method: */
         boolean isExpansePresent = expanseRepository.findById(Long.valueOf(id)).isPresent();
         Expanse expanseFromDB = expanseRepository.findById(Long.valueOf(id)).get();
         expanseUpdated.setCategoryExpanse(expanseFromDB.getCategoryExpanse());
         expanseUpdated.setUser(expanseFromDB.getUser());
         expanseUpdated.setCreatedDate(expanseFromDB.getCreatedDate());
-        //expanseFromDB.setId(Long.valueOf(id));
-//        expanseFromDB.setTitle(expanseUpdated.getTitle());
-//        expanseFromDB.setAmount(expanseUpdated.getAmount());
-/*        ObjectMapper objectMapper = new ObjectMapper();
-        CategoryExpanseType categoryExpanseTypeMapped = objectMapper.readValue(expanseUpdateFormSubmission.getCategoryExpanse(),
-                CategoryExpanseType.class);
-        CategoryExpanse categoryExpanse = categoryExpanseRepository
-                .findByCategoryExpanseTypeContains(categoryExpanseTypeMapped);
-        User user = userRepository
-                .findById(UUID.fromString(expanseUpdateFormSubmission.getUserId())).get();
-*/
-//        expanseFromDB.setCategoryExpanse(expanseFromDB.getCategoryExpanse());
-//        expanseFromDB.setUser(expanseFromDB.getUser());
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Expanse is updated Successfully ----------");
         if (!isExpansePresent){

@@ -1,12 +1,21 @@
 package org.enset.budget_expanse_management.controllers;
 
+import org.enset.budget_expanse_management.formModel.BudgetFormSubmission;
 import org.enset.budget_expanse_management.model.Budget;
+import org.enset.budget_expanse_management.model.CategoryExpanse;
+import org.enset.budget_expanse_management.model.Expanse;
+import org.enset.budget_expanse_management.model.User;
 import org.enset.budget_expanse_management.repositories.BudgetRepository;
+import org.enset.budget_expanse_management.repositories.CategoryExpanseRepository;
+import org.enset.budget_expanse_management.repositories.UserRepository;
 import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:4090")
 @Transactional
@@ -15,11 +24,19 @@ import java.util.List;
 public class BudgetRestController {
 
     private final BudgetRepository budgetRepository;
+
+    private final CategoryExpanseRepository categoryExpanseRepository;
+
+    private final UserRepository userRepository;
     private final BudgetExpanseManagementService managementService;
 
     public BudgetRestController(BudgetRepository budgetRepository,
+                                CategoryExpanseRepository categoryExpanseRepository,
+                                UserRepository userRepository,
                                 BudgetExpanseManagementService managementService) {
         this.budgetRepository = budgetRepository;
+        this.categoryExpanseRepository = categoryExpanseRepository;
+        this.userRepository = userRepository;
         this.managementService = managementService;
     }
 
@@ -58,11 +75,24 @@ public class BudgetRestController {
 //        return budgetRepository.findAll();
 //    }
 
+    /*
     @GetMapping(path = "/budgets")
     public List<Budget> getAllBudgetsController(){
         //managementService.checkIfBudgetIsRespectedByCalculation();//this triggers a Budgets Amount spent Calculation:
         //managementService.checkIfBudgetIsRespectedByCalculationSumAmountExp();
         return budgetRepository.findAll();
+    }
+     */
+
+    /**Get Budgets By 'page', 'size' and 'title': */
+    @GetMapping(path = "/budgets")
+    public Page<Budget> getBudgetsByPageAndSizeControllerV2(@RequestParam Optional<String> title,
+                                                              @RequestParam Optional<Integer> page,
+                                                              @RequestParam Optional<Integer> size){
+        return managementService
+                .getBudgetsByPageAndSizeAndTitleService(
+                        title.orElse(""), page.orElse(0), size.orElse(4)
+                );
     }
 
     @GetMapping(path = "/budgets/{id}")
@@ -73,24 +103,54 @@ public class BudgetRestController {
         return budgetRepository.findById(Integer.parseInt(id)).get();
     }
 
+//    @PostMapping(path = "/budgets/admin")
+//    public Budget addNewBudgetController(@RequestBody Budget budget){
+//        System.out.println(" -----------------------------------");
+//        System.out.println(" ------------- Budget is added Successfully ----------");
+//        Budget budgetSaved = budgetRepository.save(budget);
+//        return budgetSaved;
+//    }
     @PostMapping(path = "/budgets/admin")
-    public Budget addNewBudgetController(@RequestBody Budget budget){
-        System.out.println(" -----------------------------------");
-        System.out.println(" ------------- Budget is added Successfully ----------");
-        Budget budgetSaved = budgetRepository.save(budget);
-        return budgetSaved;
+    public void addNewBudgetController(@RequestBody BudgetFormSubmission budgetFormSubmission){
+       System.out.println(" -----------------------------------");
+       System.out.println(" ------------- Budget is added Successfully ----------");
+       Budget budget = new Budget();
+       budget.setAmount(budgetFormSubmission.getAmount());
+       budget.setTitle(budgetFormSubmission.getTitle());
+       budget.setDescription(budgetFormSubmission.getDescription());
+       budget.setDateDebut(budgetFormSubmission.getDateDebut());
+       budget.setEndDate(budgetFormSubmission.getEndDate());
+        CategoryExpanse categoryExpanse = categoryExpanseRepository
+                .findById(budgetFormSubmission.getCategoryExpanse()).get();
+        User user = userRepository.findById(UUID.fromString(budgetFormSubmission.getUserId())).get();
+        budget.setCategoryExpanse(categoryExpanse);
+       budget.setUser(user);
+       managementService.calculateExpansesOnAddBudgetService(budget);
     }
 
+
     @PutMapping(path = "/budgets/admin/{id}")
-    public Budget editBudgetController(@PathVariable(name = "id") String id ,@RequestBody Budget budget){
+    public void editBudgetController(@PathVariable(name = "id") String id ,@RequestBody Budget budgetUpdated){
         boolean isBudgetPresent = budgetRepository.findById(Integer.parseInt(id)).isPresent();
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Budget is updated Successfully ----------");
         if (!isBudgetPresent){
             throw new RuntimeException("Budget is not found, please edit an existing Budget!");
         }
-        budget.setId(Integer.parseInt(id));
-        return budgetRepository.save(budget);
+        /**I sent just 'Id, Amount, Title & Description of the 'budgetUpdated' from Frontend THEN
+         *   i get the other Fields from DB THEN I set them to 'budgetUpdated' object
+         *   before calling the Service Method: */
+        Budget budgetFromDB = budgetRepository.findById(Integer.parseInt(id)).get();
+        budgetUpdated.setDateDebut(budgetFromDB.getDateDebut());
+        budgetUpdated.setEndDate(budgetFromDB.getEndDate());
+        budgetUpdated.setAmountRemains(budgetFromDB.getAmountRemains());
+        budgetUpdated.setAmountSpent(budgetFromDB.getAmountSpent());
+        User user = userRepository.findById(budgetFromDB.getUser().getId()).get();
+        budgetUpdated.setUser(user);
+        CategoryExpanse categoryExpanse = categoryExpanseRepository.findById(budgetFromDB.getCategoryExpanse().getId()).get();
+        budgetUpdated.setCategoryExpanse(categoryExpanse);
+        budgetUpdated.setId(Integer.parseInt(id));
+        managementService.updateBudgetService(budgetUpdated);
     }
 
     @DeleteMapping(path = "/budgets/admin/delete/{id}")

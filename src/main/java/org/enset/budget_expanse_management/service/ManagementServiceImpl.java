@@ -117,13 +117,11 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                             expanse.getId());
             //In case for Expanse Update, before update, I'll get the Old amountExp from DB
             // THEN I'll do a comparison between the old value and new value entered to be updated
-            // to calculate commonBudgets Then I'll UPDATE the Expanse by re-save it:
+            // to calculate commonBudgets Then I'll UPDATE the Expanse & (common Budgets if exists) by re-save it or them:
             if (!expanseBudgetsDTO.isEmpty()){
-                //List<Budget> ListBudgetsToUpdate=new ArrayList<>();
                 if (expanseRepository.findById(expanse.getId()).isPresent()){
 //                //Before Expanse Update Algorithm Calculation:
                     for (int i = 0; i < expanseBudgetsDTO.size(); i++) {
-                        //List<Budget> ListBudgetsToUpdate=new ArrayList<>();
                         System.out.println("Inside Loop ....");
                         Integer budgetId= expanseBudgetsDTO.get(i).getIdBudget();
                         Double amountSpent = expanseBudgetsDTO.get(i).getAmountSpent();
@@ -152,7 +150,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                             ListBudgetsToUpdate.add(budget);
                             //budgetRepository.save(budget);
                             //expanseRepository.save(expanse);
-                        } else if (amountSpent == null) {
+                        } else if (amountSpent == null || amountSpent==0.0) {
                             System.out.println("Inside Loop & IF(amountSpent == null){...} ");
                             Budget budget = budgetRepository.findById(budgetId).get();
                             budget.setAmountSpent(expanse.getAmount());
@@ -164,7 +162,6 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                     }
                     System.out.println("Expanse saved with Common Budget(s)...");
                     expanseRepository.save(expanse);
-                    //List DOESN'T update above so Cannot perform 'saveAll()':
                     System.out.println("List of Budget(s)...: " + ListBudgetsToUpdate.size());
                     budgetRepository.saveAll(ListBudgetsToUpdate);
                 }
@@ -337,7 +334,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                     Double amountSpent = expanseBudgetsDTO.get(i).getAmountSpent();
                     Double amountRemains = expanseBudgetsDTO.get(i).getAmountRemains();
                     Double amountExpanse = expanseBudgetsDTO.get(i).getAmountExpanse();
-                    if (amountSpent==null){
+                    if (amountSpent==null || amountSpent==0){
                         Budget budget = budgetRepository.findById(budgetId).get();
                         budget.setAmountSpent(amountExpanse);
                         budget.setAmountRemains(amountRemains - amountExpanse);
@@ -369,12 +366,12 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
             if (!dtoExpansesBudgets.isEmpty()){
                 for (int i = 0; i < dtoExpansesBudgets.size(); i++) {
-                    System.out.println("Delete Expanse + Common Budget(s) Update");
+                    System.out.println("Delete Expanse + Update Common Budget(s)");
                     Double amountExpToBeDeleted = dtoExpansesBudgets.get(0).getAmountExpanse();
                     Double amountRemains = dtoExpansesBudgets.get(i).getAmountRemains();
                     Double amountSpent = dtoExpansesBudgets.get(i).getAmountSpent();
                     Integer budgetId = dtoExpansesBudgets.get(i).getIdBudget();
-                    if (amountSpent==null){
+                    if (amountSpent==null || amountSpent==0.0){
                         Budget budget = budgetRepository.findById(budgetId).get();
                         listBudgetsToUpdateOnDeleteExp.add(budget);
                     } else { //Meaning: else if (amountSpent != null)
@@ -407,14 +404,18 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     public void calculateExpansesOnAddBudgetService(Budget budget) {
         /**BEFORE Saving a new Budget: */
         budget.setAmountRemains(budget.getAmount());
+        budget.setAmountSpent(0.0);
         Budget newSavedBudgetToDB = budgetRepository.save(budget);
         /**AFTER Saving a new Budget to DB: */
         List<ResultDTOExpansesBudgets> expansesBudgets = budgetRepository.onAddBudgetComputeOnCommonExpanses
                 (newSavedBudgetToDB.getId(), newSavedBudgetToDB.getCategoryExpanse().getId());
         if (expansesBudgets.isEmpty()){//If the budget have no common expanses, means the List above will be empty then we save the budget without calculation:
-            budgetRepository.save(budget);
-        } else{
+            //budgetRepository.save(budget);
+            System.out.println("No Common Expanses with the recently saved Budget...");
+        } else if (!expansesBudgets.isEmpty() && expansesBudgets.get(0).getAmountExpanseSum()!=null){
             //Do some Calculation...
+            System.out.println("amountRemains: " + newSavedBudgetToDB.getAmountRemains());
+            System.out.println("getAmountExpanseSum: " + expansesBudgets.get(0).getAmountExpanseSum());
             Double amountRemainsCalculated = newSavedBudgetToDB.getAmountRemains()
                     - expansesBudgets.get(0).getAmountExpanseSum();
             newSavedBudgetToDB.setAmountSpent(expansesBudgets.get(0).getAmountExpanseSum());
@@ -426,6 +427,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
     /** Function 'updateBudgetService(..)' is not yet completed! */
     /**The user cannot update 'amountSpent' & 'amountRemains' & also Probably 'CategoryExId' of Budget for now: */
+    
     @Override
     public void updateBudgetService(Budget budget) {
         if (budgetRepository.findById(budget.getId()).isPresent()){
@@ -457,32 +459,16 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }
     }
 
+    @Override
+    public Page<Budget> getBudgetsByPageAndSizeAndTitleService(String title, int page, int size) {
+        return budgetRepository.findByTitleContaining(title, PageRequest.of(page, size));
+    }
+
     // TODO: Incomplete Algorithm to compute Goals On add a new Income.
     @Override
     public void calculateGoalsOnAddIncomeService(Income income) {
 
     }
-
-//    @Override
-//    public void checkIfBudgetIsRespectedOnAddExpanse2(Expanse expanse, Budget budget) {
-//        if (expanse!=null && budget==null){//Case 1: user add an Expanse that doesn't belong to any Budget.
-//            //Do some data validations:
-//            expanseRepository.save(expanse);
-//        }
-//        if (expanse!=null && budget!=null){//Case 2: user add an Expanse that belongs to a Budget chosen from a list.
-//            //Do some data validations:
-//            expanse.setBudget(budget);
-//            expanseRepository.save(expanse);
-//            budgetRepository.save(budget);
-//
-//        }
-//    }
-
-//    @Override
-//    public List<Budget> getAllBudgetsFromDBService() {
-//        return budgetRepository.findAll();
-//    }
-
 
 }
 

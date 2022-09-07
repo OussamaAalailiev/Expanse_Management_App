@@ -80,7 +80,8 @@ public enum CategoryExpanseType {
     Apps,
     Games,
     Drinks,
-    Homemade_Food
+    Homemade_Food,
+    Computer_PC
 
 
 

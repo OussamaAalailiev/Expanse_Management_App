@@ -319,6 +319,13 @@ public class BudgetExpanseManagementApplication {
              System.out.println("-----------------------------");
          });
           */
+         /**Initiate AmountSpent of all old Budgets in DB to '0' if AmountSpent==null*/
+//         budgetRepository.findAll().forEach(budget -> {
+//             if (budget.getAmountSpent()==null){
+//                 budget.setAmountSpent(0.0);
+//                 budgetRepository.save(budget);
+//             }
+//         });
 
 
 
