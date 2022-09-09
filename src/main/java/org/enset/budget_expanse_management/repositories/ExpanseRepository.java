@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.UUID;
 
 //@Transactional
 public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
@@ -51,6 +52,9 @@ public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
 
     /**Get Expanses By Page based on title of expanse + page N° + Size N°: */
     Page<Expanse> findByTitleContaining(String title, Pageable pageable);
+
+    /**Get Expanses By Page based on title of expanse + page N° + Size N° && UserID: */
+    public Page<Expanse> findByTitleContainingAndUserId(String title, UUID userId, Pageable pageable);
 
 
 }

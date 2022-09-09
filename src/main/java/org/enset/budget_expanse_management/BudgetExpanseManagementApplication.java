@@ -12,6 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -326,6 +327,34 @@ public class BudgetExpanseManagementApplication {
 //                 budgetRepository.save(budget);
 //             }
 //         });
+         /**Get Expanses By Page based on title of expanse + page N° + Size N° && UserID: */
+         System.out.println("Expanses For Oussama");
+         expanseRepository.findByTitleContainingAndUserId("",
+                 UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1"), PageRequest.of(0,20))
+                 .forEach(expanse -> {
+                     System.out.println("************* ********** ***************");
+                     System.out.println("Expanse Id: " + expanse.getId());
+                     System.out.println("Expanse Title: " + expanse.getTitle());
+                     System.out.println("Expanse Category: " + expanse.getCategoryExpanse().getCategoryExpanseType());
+                     System.out.println("Expanse CreatedDate: " + expanse.getCreatedDate());
+                     System.out.println("User Id: " + expanse.getUser().getId());
+                     System.out.println("User Name: " + expanse.getUser().getName());
+                 });
+         System.out.println();
+         System.out.println();
+         System.out.println("Budgets By Oussama....");
+         /**Get Budgets By Page based on title of expanse + page N° + Size N° && UserID: */
+         budgetRepository.findByTitleContainingAndUserId("",
+                         UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1"), PageRequest.of(0,20))
+                 .forEach(budget -> {
+                     System.out.println("************* ********** ***************");
+                     System.out.println("Budget Id: " + budget.getId());
+                     System.out.println("Budget Title: " + budget.getTitle());
+                     System.out.println("Budget Category: " + budget.getCategoryExpanse().getCategoryExpanseType());
+                     System.out.println("Budget CreatedDate: " + budget.getAmount());
+                     System.out.println("User Id: " + budget.getUser().getId());
+                     System.out.println("User Name: " + budget.getUser().getName());
+                 });
 
 
 

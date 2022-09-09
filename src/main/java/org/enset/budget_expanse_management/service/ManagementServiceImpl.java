@@ -18,27 +18,28 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
     private final ExpanseRepository expanseRepository;
     private final BudgetRepository budgetRepository;
-    private final CategoryExpanseRepository categoryExpanseRepository;
-    private final IncomeRepository incomeRepository;
-    private final GoalRepository goalRepository;
-    private final CategoryIncomeRepository categoryIncomeRepository;
-
-    private final UserRepository userRepository;
+//    private final CategoryExpanseRepository categoryExpanseRepository;
+//    private final IncomeRepository incomeRepository;
+//    private final GoalRepository goalRepository;
+//    private final CategoryIncomeRepository categoryIncomeRepository;
+//
+//    private final UserRepository userRepository;
 
     public ManagementServiceImpl(ExpanseRepository expanseRepository,
-                                 BudgetRepository budgetRepository,
-                                 CategoryExpanseRepository categoryExpanseRepository,
-                                 IncomeRepository incomeRepository,
-                                 GoalRepository goalRepository,
-                                 CategoryIncomeRepository categoryIncomeRepository,
-                                 UserRepository userRepository) {
+                                 BudgetRepository budgetRepository
+//                                 ,CategoryExpanseRepository categoryExpanseRepository,
+//                                 IncomeRepository incomeRepository,
+//                                 GoalRepository goalRepository,
+//                                 CategoryIncomeRepository categoryIncomeRepository,
+//                                 UserRepository userRepository
+    ) {
         this.expanseRepository = expanseRepository;
         this.budgetRepository = budgetRepository;
-        this.categoryExpanseRepository = categoryExpanseRepository;
-        this.incomeRepository = incomeRepository;
-        this.goalRepository = goalRepository;
-        this.categoryIncomeRepository = categoryIncomeRepository;
-        this.userRepository = userRepository;
+//        this.categoryExpanseRepository = categoryExpanseRepository;
+//        this.incomeRepository = incomeRepository;
+//        this.goalRepository = goalRepository;
+//        this.categoryIncomeRepository = categoryIncomeRepository;
+//        this.userRepository = userRepository;
     }
 
 //    @Override
@@ -78,6 +79,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 //
 //    }
 
+  /*
     public void getAllExpAndBudWithSameUserDateAndCatExpService(){
 
         List<Object> objectList = expanseRepository
@@ -104,6 +106,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 //            }
 //        }
     }
+   */
 
     //User can update Only the 'amount' of Expanse, but if user want to update
     // other fields he/she better delete the expanse and create a new one expanse:
@@ -125,14 +128,13 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                         System.out.println("Inside Loop ....");
                         Integer budgetId= expanseBudgetsDTO.get(i).getIdBudget();
                         Double amountSpent = expanseBudgetsDTO.get(i).getAmountSpent();
-                        Double amountRemains = expanseBudgetsDTO.get(i).getAmountRemains();
+                        //Double amountRemains = expanseBudgetsDTO.get(i).getAmountRemains();
                         Double oldAmountExpanseFromDB = expanseBudgetsDTO.get(i).getAmountExpanse();
                         Double amountExpanseInterval = 0.0;
                         System.out.println("expanse.getAmount(): "+expanse.getAmount());
                         System.out.println("oldAmountExpanseFromDB: "+oldAmountExpanseFromDB);
                         System.out.println("amountSpent: "+amountSpent);
                         if (expanse.getAmount() < oldAmountExpanseFromDB && amountSpent !=null){//In case Of update with Less new amountExp than the Old one:
-                            System.out.println("Inside Loop & IF(){...} ....");
                             Budget budget = budgetRepository.findById(budgetId).get();
                             amountExpanseInterval = expanse.getAmount() - oldAmountExpanseFromDB;// -(someNumber) -> means less amountExpanse
                             budget.setAmountSpent(budget.getAmountSpent() + amountExpanseInterval);
@@ -142,7 +144,6 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                             //budgetRepository.save(budget);
                             //expanseRepository.save(expanse);
                         } else if (expanse.getAmount() > oldAmountExpanseFromDB && amountSpent !=null) {//In case Of update with new amountExp Greater than the Old one:
-                            System.out.println("Inside Loop & IF(){...} ....");
                             Budget budget = budgetRepository.findById(budgetId).get();
                             amountExpanseInterval = expanse.getAmount() - oldAmountExpanseFromDB;// Inverse Calc In comparison of the above interval:
                             budget.setAmountSpent(budget.getAmountSpent() + amountExpanseInterval);//(-(-)) => (+())
@@ -151,7 +152,6 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                             //budgetRepository.save(budget);
                             //expanseRepository.save(expanse);
                         } else if (amountSpent == null || amountSpent==0.0) {
-                            System.out.println("Inside Loop & IF(amountSpent == null){...} ");
                             Budget budget = budgetRepository.findById(budgetId).get();
                             budget.setAmountSpent(expanse.getAmount());
                             ListBudgetsToUpdate.add(budget);
@@ -398,6 +398,18 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         return expanseRepository.findByTitleContaining(title, PageRequest.of(page, size));
     }
 
+    @Override
+    public Page<Expanse> getExpansesByPageAndSizeAndTitleAndUserIdService(String title, String userId,
+                                                                          int page, int size) {
+        try {
+            return expanseRepository
+                    .findByTitleContainingAndUserId(title, UUID.fromString(userId), PageRequest.of(page, size));
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("User OR Expanse(s) were Not Found!");
+        }
+    }
+
 
     /** Function 'updateBudgetService(..)' is completed! */
     @Override//In case a user adds a new Budget:
@@ -427,7 +439,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
     /** Function 'updateBudgetService(..)' is not yet completed! */
     /**The user cannot update 'amountSpent' & 'amountRemains' & also Probably 'CategoryExId' of Budget for now: */
-    
+
     @Override
     public void updateBudgetService(Budget budget) {
         if (budgetRepository.findById(budget.getId()).isPresent()){
@@ -462,6 +474,17 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     @Override
     public Page<Budget> getBudgetsByPageAndSizeAndTitleService(String title, int page, int size) {
         return budgetRepository.findByTitleContaining(title, PageRequest.of(page, size));
+    }
+
+    @Override
+    public Page<Budget> getBudgetsByPageAndSizeAndTitleAndUserIdService(String title, String userId, int page, int size) {
+        try {
+            return budgetRepository
+                    .findByTitleContainingAndUserId(title, UUID.fromString(userId), PageRequest.of(page, size));
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("User OR Budget(s) were Not Found!");
+        }
     }
 
     // TODO: Incomplete Algorithm to compute Goals On add a new Income.

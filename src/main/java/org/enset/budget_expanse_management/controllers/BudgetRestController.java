@@ -84,6 +84,19 @@ public class BudgetRestController {
     }
      */
 
+    /**Get Budgets By Page based on title of budget + page N° + Size N° && UserID: */
+    @GetMapping(path = "/budgetsByUser")
+    public Page<Budget> getBudgetsByPageAndSizeAndUserIdControllerV3(
+            @RequestParam Optional<String> title,
+            @RequestParam Optional<String> userId,
+            @RequestParam Optional<Integer> page,
+            @RequestParam Optional<Integer> size){
+        return managementService
+                .getBudgetsByPageAndSizeAndTitleAndUserIdService(
+                        title.orElse(""), userId.orElse(""),page.orElse(0), size.orElse(5)
+                );
+    }
+
     /**Get Budgets By 'page', 'size' and 'title': */
     @GetMapping(path = "/budgets")
     public Page<Budget> getBudgetsByPageAndSizeControllerV2(@RequestParam Optional<String> title,

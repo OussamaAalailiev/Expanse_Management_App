@@ -3,6 +3,7 @@ package org.enset.budget_expanse_management.repositories;
 import org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets;
 import org.enset.budget_expanse_management.enums.CategoryExpanseType;
 import org.enset.budget_expanse_management.model.Budget;
+import org.enset.budget_expanse_management.model.Expanse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface BudgetRepository extends JpaRepository<Budget, Integer> {
     //Find budgets that have the 'same categoryExpanse' and
@@ -68,6 +70,9 @@ public interface BudgetRepository extends JpaRepository<Budget, Integer> {
     ///**Get Budgets By Page based on title of expanse + page N° + Size N°: */
     //    Page<Expanse> findByTitleContaining(String title, Pageable pageable);
     Page<Budget> findByTitleContaining(String titleBudget, Pageable page);
+
+    /**Get Budgets By Page based on title of Budget + page N° + Size N° && UserID: */
+    public Page<Budget> findByTitleContainingAndUserId(String title, UUID userId, Pageable pageable);
 
 
 

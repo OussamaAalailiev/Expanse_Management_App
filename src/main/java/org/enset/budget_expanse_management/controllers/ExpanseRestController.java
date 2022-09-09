@@ -41,7 +41,18 @@ public class ExpanseRestController {
 //    public List<Expanse> getAllExpansesControllerV1(){
 //        return expanseRepository.findAll();
 //    }
-
+    /**Get Expanses By Page based on title of expanse + page N° + Size N° && UserID: */
+    @GetMapping(path = "/expansesByUser")
+    public Page<Expanse> getExpansesByPageAndSizeAndUserIdControllerV3(
+                                                              @RequestParam Optional<String> title,
+                                                              @RequestParam Optional<String> userId,
+                                                              @RequestParam Optional<Integer> page,
+                                                              @RequestParam Optional<Integer> size){
+        return managementService
+                .getExpansesByPageAndSizeAndTitleAndUserIdService(
+                        title.orElse(""), userId.orElse(""),page.orElse(0), size.orElse(5)
+                );
+    }
     @GetMapping(path = "/expanses")
     public Page<Expanse> getExpansesByPageAndSizeControllerV2(@RequestParam Optional<String> title,
                                                             @RequestParam Optional<Integer> page,
