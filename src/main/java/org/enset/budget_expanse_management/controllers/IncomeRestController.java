@@ -1,13 +1,14 @@
 package org.enset.budget_expanse_management.controllers;
 
 import org.enset.budget_expanse_management.model.Income;
-import org.enset.budget_expanse_management.model.User;
 import org.enset.budget_expanse_management.repositories.IncomeRepository;
+import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:4090")
 @Transactional
@@ -16,14 +17,27 @@ import java.util.UUID;
 public class IncomeRestController {
 
     private final IncomeRepository incomeRepository;
+    private final BudgetExpanseManagementService managementService;
 
-    public IncomeRestController(IncomeRepository incomeRepository) {
+    public IncomeRestController(IncomeRepository incomeRepository, BudgetExpanseManagementService managementService) {
         this.incomeRepository = incomeRepository;
+        this.managementService = managementService;
     }
 
     @GetMapping(path = "/incomes")
     public List<Income> getAllIncomesController(){
         return incomeRepository.findAll();
+    }
+
+    @GetMapping(path = "/incomesByUserId")
+    public Page<Income> getGoalsByPageAndSizeAndUserIdControllerV2(@RequestParam Optional<String> title,
+                                                                 @RequestParam Optional<String> userId,
+                                                                 @RequestParam Optional<Integer> page,
+                                                                 @RequestParam Optional<Integer> size){
+        return managementService
+                .getIncomesByPageAndSizeAndTitleAndUserIdService(
+                        title.orElse(""), userId.orElse(""),
+                        page.orElse(0), size.orElse(2));
     }
 
     @GetMapping(path = "/incomes/{id}")

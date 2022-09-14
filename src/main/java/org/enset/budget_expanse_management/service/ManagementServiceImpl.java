@@ -1,8 +1,10 @@
 package org.enset.budget_expanse_management.service;
 
 import org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets;
+import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
 import org.enset.budget_expanse_management.model.Budget;
 import org.enset.budget_expanse_management.model.Expanse;
+import org.enset.budget_expanse_management.model.Goal;
 import org.enset.budget_expanse_management.model.Income;
 import org.enset.budget_expanse_management.repositories.*;
 import org.springframework.data.domain.Page;
@@ -19,25 +21,25 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     private final ExpanseRepository expanseRepository;
     private final BudgetRepository budgetRepository;
 //    private final CategoryExpanseRepository categoryExpanseRepository;
-//    private final IncomeRepository incomeRepository;
-//    private final GoalRepository goalRepository;
+    private final IncomeRepository incomeRepository;
+    private final GoalRepository goalRepository;
 //    private final CategoryIncomeRepository categoryIncomeRepository;
 //
 //    private final UserRepository userRepository;
 
     public ManagementServiceImpl(ExpanseRepository expanseRepository,
-                                 BudgetRepository budgetRepository
+                                 BudgetRepository budgetRepository,
 //                                 ,CategoryExpanseRepository categoryExpanseRepository,
-//                                 IncomeRepository incomeRepository,
-//                                 GoalRepository goalRepository,
+                                 IncomeRepository incomeRepository,
+                                 GoalRepository goalRepository
 //                                 CategoryIncomeRepository categoryIncomeRepository,
 //                                 UserRepository userRepository
     ) {
         this.expanseRepository = expanseRepository;
         this.budgetRepository = budgetRepository;
 //        this.categoryExpanseRepository = categoryExpanseRepository;
-//        this.incomeRepository = incomeRepository;
-//        this.goalRepository = goalRepository;
+        this.incomeRepository = incomeRepository;
+        this.goalRepository = goalRepository;
 //        this.categoryIncomeRepository = categoryIncomeRepository;
 //        this.userRepository = userRepository;
     }
@@ -437,6 +439,31 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
     }
 
+    @Override
+    public List<TotalExpansePerMonthDTO> getTotalExpansesPerYearMonthAndUserService(String userId) {
+        try {
+            return expanseRepository.getTotalAmountExpansesOnEveryMonthV2(UUID.fromString(userId));
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Error while getting Expanse Sum by user!");
+        }
+    }
+
+    /**-- Query to get Total Amount of Expanses per Month By UserID: */
+   /*
+    @Override
+    public Page<TotalExpansePerMonthDTO> getTotalExpansesPerYearMonthAndUserService(String userId,
+                                                                                    int page,
+                                                                                    int size) {
+        try {
+            return expanseRepository.getTotalAmountExpansesOnEveryMonthV2(UUID.fromString(userId), PageRequest.of(page, size));
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Error while getting Expanse Sum by user!");
+        }
+    }
+    */
+
     /** Function 'updateBudgetService(..)' is not yet completed! */
     /**The user cannot update 'amountSpent' & 'amountRemains' & also Probably 'CategoryExId' of Budget for now: */
 
@@ -484,6 +511,30 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("User OR Budget(s) were Not Found!");
+        }
+    }
+
+    @Override
+    public Page<Goal> getGoalsByPageAndSizeAndTitleAndUserIdService(String title, String userId, int page, int size) {
+        try {
+            return goalRepository.findByTitleContainingAndUserId(title,
+                    UUID.fromString(userId),
+                    PageRequest.of(page, size));
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("User OR Goal(s) were Not Found!");
+        }
+    }
+
+    @Override
+    public Page<Income> getIncomesByPageAndSizeAndTitleAndUserIdService(String incomeTitle, String userId,
+                                                                        int page, int size) {
+        try {
+            return incomeRepository.
+                    findByTitleContainingAndUserId(incomeTitle, UUID.fromString(userId), PageRequest.of(page, size));
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("User OR Income(s) were Not Found!");
         }
     }
 

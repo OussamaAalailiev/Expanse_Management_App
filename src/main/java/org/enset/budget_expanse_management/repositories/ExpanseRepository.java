@@ -8,10 +8,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 import java.util.UUID;
 
+//@CrossOrigin(origins = "http://localhost:4090/")
 //@Transactional
 public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
 
@@ -48,7 +50,18 @@ public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
             "FROM Expanse e \n" +
             "GROUP BY YEAR(e.createdDate), MONTH(e.createdDate)")
     public List<TotalExpansePerMonthDTO> getTotalAmountExpansesOnEveryMonth();
+
   */
+
+   /**-- Query to get Total Amount of Expanses per Month By UserID: */
+    @Query("SELECT NEW org.enset.budget_expanse_management.mapping" +
+            ".TotalExpansePerMonthDTO(DATE_FORMAT(e.createdDate, '%Y')," +
+            " DATE_FORMAT(e.createdDate, '%m'), SUM(e.amount), e.user.id, e.user.name)" +
+            "FROM Expanse e WHERE e.user.id=:x " +
+            "GROUP BY DATE_FORMAT(e.createdDate, '%Y'), DATE_FORMAT(e.createdDate, '%m') " +
+            "ORDER BY DATE_FORMAT(e.createdDate, '%Y'), DATE_FORMAT(e.createdDate, '%m') DESC")
+   // public Page<TotalExpansePerMonthDTO> getTotalAmountExpansesOnEveryMonthV2(@Param("x") UUID userId, Pageable pageable);
+    public List<TotalExpansePerMonthDTO> getTotalAmountExpansesOnEveryMonthV2(@Param("x") UUID userId);
 
     /**Get Expanses By Page based on title of expanse + page N° + Size N°: */
     Page<Expanse> findByTitleContaining(String title, Pageable pageable);

@@ -1,13 +1,14 @@
 package org.enset.budget_expanse_management.controllers;
 
-import org.enset.budget_expanse_management.model.Budget;
 import org.enset.budget_expanse_management.model.Goal;
-import org.enset.budget_expanse_management.model.Income;
 import org.enset.budget_expanse_management.repositories.GoalRepository;
+import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:4090")
 @Transactional
@@ -16,14 +17,28 @@ import java.util.List;
 public class GoalRestController {
 
     private final GoalRepository goalRepository;
+    private final BudgetExpanseManagementService managementService;
 
-    public GoalRestController(GoalRepository goalRepository) {
+    public GoalRestController(GoalRepository goalRepository,
+                              BudgetExpanseManagementService managementService) {
         this.goalRepository = goalRepository;
+        this.managementService = managementService;
     }
 
     @GetMapping(path = "/goals")
     public List<Goal> getAllGoalsController(){
         return goalRepository.findAll();
+    }
+
+    @GetMapping(path = "/goalsByUserId")
+    public Page<Goal> getGoalsByPageAndSizeAndUserIdControllerV2(@RequestParam Optional<String> title,
+                                                                 @RequestParam Optional<String> userId,
+                                                                 @RequestParam Optional<Integer> page,
+                                                                 @RequestParam Optional<Integer> size){
+        return managementService
+                .getGoalsByPageAndSizeAndTitleAndUserIdService(
+                        title.orElse(""), userId.orElse(""),
+                        page.orElse(0), size.orElse(2));
     }
 
     @GetMapping(path = "/goals/{id}")

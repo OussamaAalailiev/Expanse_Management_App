@@ -5,25 +5,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Data //@NoArgsConstructor //@AllArgsConstructor
 public class TotalExpansePerMonthDTO {
 //    private Date year;
 //    private Date month;
-    private short year;
-    private short month;
-    private Long totalExpanse;
+    private String year;
+    private String month;
+    private Double totalExpanses;
+    private UUID userId;
+    private String userName;
 
-//    public TotalExpansePerMonthDTO(Date year, Date month, Long totalExpanse) {
-//        this.year = year;
-//        this.month = month;
-//        this.totalExpanse = totalExpanse;
-//    }
 
-    public TotalExpansePerMonthDTO(short year, byte month, Long totalExpanse) {
+    public TotalExpansePerMonthDTO(String year, String month, Double totalExpanses, UUID userId, String userName) {
         this.year = year;
         this.month = month;
-        this.totalExpanse = totalExpanse;
+        this.totalExpanses = totalExpanses;
+        this.userId = userId;
+        this.userName = userName;
     }
 
     public TotalExpansePerMonthDTO() {

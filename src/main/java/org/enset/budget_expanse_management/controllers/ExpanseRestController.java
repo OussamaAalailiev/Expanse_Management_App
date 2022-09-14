@@ -1,6 +1,7 @@
 package org.enset.budget_expanse_management.controllers;
 
 import org.enset.budget_expanse_management.formModel.ExpanseFormSubmission;
+import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
 import org.enset.budget_expanse_management.model.CategoryExpanse;
 import org.enset.budget_expanse_management.model.Expanse;
 import org.enset.budget_expanse_management.model.User;
@@ -53,6 +54,25 @@ public class ExpanseRestController {
                         title.orElse(""), userId.orElse(""),page.orElse(0), size.orElse(5)
                 );
     }
+
+//    @GetMapping(path = "/expansesSumByUser")
+//    public Page<TotalExpansePerMonthDTO> getSumOfExpansesByYearMonthUserIdPageAndSize(
+//            @RequestParam Optional<String> userId,
+//            @RequestParam Optional<Integer> page,
+//            @RequestParam Optional<Integer> size){
+//        return managementService
+//                .getTotalExpansesPerYearMonthAndUserService(
+//                        userId.orElse(""),page.orElse(0), size.orElse(2)
+//                );
+//    }
+
+    @GetMapping(path = "/expansesSumByUser")
+    public List<TotalExpansePerMonthDTO> getSumOfExpansesByYearMonthUserIdPageAndSize(
+            @RequestParam(defaultValue = "") String userId){
+        System.out.println("Inside Controller -> expansesSumByUser");
+        return managementService.getTotalExpansesPerYearMonthAndUserService(userId);
+    }
+
     @GetMapping(path = "/expanses")
     public Page<Expanse> getExpansesByPageAndSizeControllerV2(@RequestParam Optional<String> title,
                                                             @RequestParam Optional<Integer> page,

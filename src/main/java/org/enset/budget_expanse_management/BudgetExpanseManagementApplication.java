@@ -12,20 +12,39 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @SpringBootApplication
 public class BudgetExpanseManagementApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(BudgetExpanseManagementApplication.class, args);
+    }
+
+    /**CORS Global Configuration: */
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:4090"));
+        //corsConfiguration.setAllowedOrigins(Arrays.asList("*"));
+        corsConfiguration.setAllowedHeaders(Arrays.asList("Origin", "Access-Control-Allow-Origin", "Content-Type",
+                "Accept", "Jwt-Token", "Authorization", "Origin, Accept", "X-Requested-With",
+                "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+        corsConfiguration.setExposedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Jwt-Token", "Authorization",
+                "Access-Control-Allow-Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "File-Name"));
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+        return new CorsFilter(urlBasedCorsConfigurationSource);
     }
 
     @Bean
@@ -298,7 +317,7 @@ public class BudgetExpanseManagementApplication {
           */
 
          /**Testing On Delete an Expanse, if we compute common Budget(s) well if they exist: */
-        /*
+         /*
          Expanse expanseToDelete = expanseRepository.findById(16L).get();
          managementService.calculateBudgetsOnDeleteExpanseService(expanseToDelete);
          */
@@ -320,7 +339,7 @@ public class BudgetExpanseManagementApplication {
              System.out.println("-----------------------------");
          });
           */
-         /**Initiate AmountSpent of all old Budgets in DB to '0' if AmountSpent==null*/
+         /**Initiate AmountSpent of all old Budgets in DB to '0' if AmountSpent==null: */
 //         budgetRepository.findAll().forEach(budget -> {
 //             if (budget.getAmountSpent()==null){
 //                 budget.setAmountSpent(0.0);
@@ -328,6 +347,8 @@ public class BudgetExpanseManagementApplication {
 //             }
 //         });
          /**Get Expanses By Page based on title of expanse + page N° + Size N° && UserID: */
+
+         /*
          System.out.println("Expanses For Oussama");
          expanseRepository.findByTitleContainingAndUserId("",
                  UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1"), PageRequest.of(0,20))
@@ -342,8 +363,12 @@ public class BudgetExpanseManagementApplication {
                  });
          System.out.println();
          System.out.println();
-         System.out.println("Budgets By Oussama....");
+          */
+
          /**Get Budgets By Page based on title of expanse + page N° + Size N° && UserID: */
+
+         /*
+         System.out.println("Budgets By Oussama....");
          budgetRepository.findByTitleContainingAndUserId("",
                          UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1"), PageRequest.of(0,20))
                  .forEach(budget -> {
@@ -355,8 +380,29 @@ public class BudgetExpanseManagementApplication {
                      System.out.println("User Id: " + budget.getUser().getId());
                      System.out.println("User Name: " + budget.getUser().getName());
                  });
+          */
 
+         /**Insert Goal & Income to 'Zakaria' User: */
+//         Goal goal = new Goal();
+//         goal.setAmount(5000.0); goal.setTitle("Triathlon Africa Cup 2022."); goal.setDateDebut(new Date());
+//         goal.setEndDate(LocalDate.of(2022, 12, 12)); goal.setUser();
+//         goal.setCategoryIncome();
+//         goalRepository.save()
 
+         /**-- Query to get Total Amount of Expanses per Month By UserID: */
+         System.out.println("Query to get Total Amount of Expanses per Month By UserID: ");
+//         expanseRepository.getTotalAmountExpansesOnEveryMonthV2(UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1"),
+//                         PageRequest.of(0,3))
+         expanseRepository.getTotalAmountExpansesOnEveryMonthV2(UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1"))
+                 .forEach(totalExpansePerMonthDTO -> {
+                     System.out.println("Year "+"   "+" Month "+ "  "+ "Expanse Sum"+"   "+ "User ID"+"   "+ "User Name");
+                     System.out.print(totalExpansePerMonthDTO.getYear()+"  ");
+                     System.out.print(totalExpansePerMonthDTO.getMonth()+"  ");
+                     System.out.print(totalExpansePerMonthDTO.getTotalExpanses()+"   ");
+                     System.out.print(totalExpansePerMonthDTO.getUserId()+"   ");
+                     System.out.print(totalExpansePerMonthDTO.getUserName());
+                     System.out.println(); System.out.println();
+                 });
 
      };
     }
