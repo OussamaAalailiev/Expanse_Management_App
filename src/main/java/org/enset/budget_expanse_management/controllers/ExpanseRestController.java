@@ -66,11 +66,11 @@ public class ExpanseRestController {
 //                );
 //    }
 
-    @GetMapping(path = "/expansesSumByUser")
+    @GetMapping(path = "/expansesSumByUser/{id}")
     public List<TotalExpansePerMonthDTO> getSumOfExpansesByYearMonthUserIdPageAndSize(
-            @RequestParam(defaultValue = "") String userId){
+            @PathVariable(name = "id") Optional<String> userId){
         System.out.println("Inside Controller -> expansesSumByUser");
-        return managementService.getTotalExpansesPerYearMonthAndUserService(userId);
+        return managementService.getTotalExpansesPerYearMonthAndUserService(userId.orElse(""));
     }
 
     @GetMapping(path = "/expanses")

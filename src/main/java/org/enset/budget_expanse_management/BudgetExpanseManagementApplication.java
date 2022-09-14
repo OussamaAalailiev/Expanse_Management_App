@@ -395,10 +395,10 @@ public class BudgetExpanseManagementApplication {
 //                         PageRequest.of(0,3))
          expanseRepository.getTotalAmountExpansesOnEveryMonthV2(UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1"))
                  .forEach(totalExpansePerMonthDTO -> {
-                     System.out.println("Year "+"   "+" Month "+ "  "+ "Expanse Sum"+"   "+ "User ID"+"   "+ "User Name");
-                     System.out.print(totalExpansePerMonthDTO.getYear()+"  ");
+                     System.out.println("Year "+"        "+" Month "+ "  "+ "Expanse Sum"+"   "+ "    User ID"+"   "+ "                   User Name");
+                     System.out.print(totalExpansePerMonthDTO.getYear()+"            ");
                      System.out.print(totalExpansePerMonthDTO.getMonth()+"  ");
-                     System.out.print(totalExpansePerMonthDTO.getTotalExpanses()+"   ");
+                     System.out.print(totalExpansePerMonthDTO.getTotalExpanses()+"            ");
                      System.out.print(totalExpansePerMonthDTO.getUserId()+"   ");
                      System.out.print(totalExpansePerMonthDTO.getUserName());
                      System.out.println(); System.out.println();

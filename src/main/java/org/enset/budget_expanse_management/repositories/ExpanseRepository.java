@@ -61,7 +61,7 @@ public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
             "GROUP BY DATE_FORMAT(e.createdDate, '%Y'), DATE_FORMAT(e.createdDate, '%m') " +
             "ORDER BY DATE_FORMAT(e.createdDate, '%Y'), DATE_FORMAT(e.createdDate, '%m') DESC")
    // public Page<TotalExpansePerMonthDTO> getTotalAmountExpansesOnEveryMonthV2(@Param("x") UUID userId, Pageable pageable);
-    public List<TotalExpansePerMonthDTO> getTotalAmountExpansesOnEveryMonthV2(@Param("x") UUID userId);
+    List<TotalExpansePerMonthDTO> getTotalAmountExpansesOnEveryMonthV2(@Param("x") UUID userId);
 
     /**Get Expanses By Page based on title of expanse + page N° + Size N°: */
     Page<Expanse> findByTitleContaining(String title, Pageable pageable);
