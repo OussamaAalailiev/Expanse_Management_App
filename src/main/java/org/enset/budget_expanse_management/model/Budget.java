@@ -2,10 +2,7 @@ package org.enset.budget_expanse_management.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.enset.budget_expanse_management.enums.CategoryExpanseType;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -40,9 +37,9 @@ public class Budget {
     @ManyToOne
     //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private User user;
-    @OneToMany(mappedBy = "budget")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private List<Expanse> expanses;
+//    @OneToMany(mappedBy = "budget")
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    private List<Expanse> expanses;
 
     public Budget(Integer id, String title, String description, Date dateDebut, LocalDate endDate, Double amount) {
         this.id = id;
@@ -133,11 +130,11 @@ public class Budget {
         this.user = user;
     }
 
-    public List<Expanse> getExpanses() {
-        return expanses;
-    }
-
-    public void setExpanses(List<Expanse> expanses) {
-        this.expanses = expanses;
-    }
+//    public List<Expanse> getExpanses() {
+//        return expanses;
+//    }
+//
+//    public void setExpanses(List<Expanse> expanses) {
+//        this.expanses = expanses;
+//    }
 }

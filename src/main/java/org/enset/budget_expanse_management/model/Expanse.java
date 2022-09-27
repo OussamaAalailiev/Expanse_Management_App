@@ -28,9 +28,9 @@ public class Expanse {
 //    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     private User user;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne
-    private Budget budget;
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @ManyToOne
+//    private Budget budget;
 
     public Expanse(Long id, Double amount, String title, Date createdDate){
         this.id = id;

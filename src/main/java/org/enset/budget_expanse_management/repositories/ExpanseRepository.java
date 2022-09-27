@@ -31,7 +31,7 @@ public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
 
     /**Inner Joint: the following function works well! :) */
     @Query("SELECT NEW org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets(" +
-            "e.id, e.amount, e.createdDate, e.title, e.budget.id, e.categoryExpanse.id, e.user.id," +
+            "e.id, e.amount, e.createdDate, e.title, e.categoryExpanse.id, e.user.id," +
             "b.id, b.amount, b.amountRemains, b.amountSpent, b.dateDebut, b.description," +
             "b.endDate, b.title, b.categoryExpanse.id, b.user.id)" +
             "FROM Expanse e INNER JOIN Budget b " +

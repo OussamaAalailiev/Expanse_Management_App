@@ -15,7 +15,7 @@ public class ResultDTOExpansesBudgets {
     private Double amountExpanse;
     private Date createdDate;
     private String title;
-    private Integer budgetIdExp;
+//    private Integer budgetIdExp;
     private Integer category_expanse_idEXP;
     private UUID userIdEXP;
 
@@ -32,8 +32,8 @@ public class ResultDTOExpansesBudgets {
     private Double amountExpanseSum;
 
     public ResultDTOExpansesBudgets(Long id, Double amountExpanse, Date createdDate,
-                                    String title, Integer budgetIdExp, Integer category_expanse_idEXP,
-                                    UUID userIdEXP, Integer idBudget, Double amountBudget,
+                                    String title, Integer category_expanse_idEXP,
+                                    UUID userIdEXP, Integer idBudget,Double amountBudget,
                                     Double amountRemains, Double amountSpent, Date dateDebut,
                                     String description, LocalDate endDate, String titleBudget,
                                     Integer category_expanse_idBUD, UUID userIdBUD) {
@@ -41,7 +41,7 @@ public class ResultDTOExpansesBudgets {
         this.amountExpanse = amountExpanse;
         this.createdDate = createdDate;
         this.title = title;
-        this.budgetIdExp = budgetIdExp;
+//        this.budgetIdExp = budgetIdExp;
         this.category_expanse_idEXP = category_expanse_idEXP;
         this.userIdEXP = userIdEXP;
         this.idBudget = idBudget;

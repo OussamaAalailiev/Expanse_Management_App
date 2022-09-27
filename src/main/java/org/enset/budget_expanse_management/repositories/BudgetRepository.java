@@ -43,7 +43,7 @@ public interface BudgetRepository extends JpaRepository<Budget, Integer> {
     @Query("SELECT new " +
             "org.enset.budget_expanse_management.mapping." +
             "ResultDTOExpansesBudgets( " +
-            "e.id, e.amount, e.createdDate, e.title, e.budget.id, e.categoryExpanse.id, e.user.id," +
+            "e.id, e.amount, e.createdDate, e.title, e.categoryExpanse.id, e.user.id," +
             "b.id, b.amount, b.amountRemains, b.amountSpent, b.dateDebut, b.description," +
             "b.endDate, b.title, b.categoryExpanse.id, b.user.id, SUM(e.amount)) " +
             "FROM Expanse e, Budget b " +
@@ -56,7 +56,7 @@ public interface BudgetRepository extends JpaRepository<Budget, Integer> {
     @Query("SELECT new " +
             "org.enset.budget_expanse_management.mapping." +
             "ResultDTOExpansesBudgets( " +
-            "e.id, e.amount, e.createdDate, e.title, e.budget.id, e.categoryExpanse.id, e.user.id," +
+            "e.id, e.amount, e.createdDate, e.title, e.categoryExpanse.id, e.user.id," +
             "b.id, b.amount, b.amountRemains, b.amountSpent, b.dateDebut, b.description," +
             "b.endDate, b.title, b.categoryExpanse.id, b.user.id, SUM(e.amount)) " +
             "FROM Budget b " +
