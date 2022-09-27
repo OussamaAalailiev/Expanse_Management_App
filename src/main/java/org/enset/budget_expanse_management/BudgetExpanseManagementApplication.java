@@ -404,6 +404,25 @@ public class BudgetExpanseManagementApplication {
                      System.out.println(); System.out.println();
                  });
 
+         /**Test On Getting Common Income(s) WITH Common Goal(s):   */
+         goalRepository.onOneIncomeComputeOnCommonGoals(2L)
+                 .forEach(resultDTOIncomesGoals -> {
+                     System.out.println("----------- Common Income --------------");
+                     System.out.println(resultDTOIncomesGoals.getIdIncome());
+                     System.out.println(resultDTOIncomesGoals.getAmountIncome());
+                     System.out.println(resultDTOIncomesGoals.getCreatedDate());
+                     System.out.println(resultDTOIncomesGoals.getCategory_income_id_Income());
+                     System.out.println(resultDTOIncomesGoals.getUserIdIncome());
+                     System.out.println("----------- Common Goal --------------");
+                     System.out.println(resultDTOIncomesGoals.getIdGoal());
+                     System.out.println(resultDTOIncomesGoals.getAmountGoal());
+                     System.out.println(resultDTOIncomesGoals.getDateDebut());
+                     System.out.println(resultDTOIncomesGoals.getEndDate());
+                     System.out.println(resultDTOIncomesGoals.getCategory_income_id_Goal());
+                     System.out.println(resultDTOIncomesGoals.getUserIdGoal());
+
+                 });
+
      };
     }
 }

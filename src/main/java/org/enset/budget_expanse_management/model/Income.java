@@ -30,9 +30,9 @@ public class Income {
    // @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     private User user;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToOne
-    private Goal goal;
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @ManyToOne
+//    private Goal goal;
 
     public Income(Long id, Double amount, String title, Date createdDate){
         this.id = id;

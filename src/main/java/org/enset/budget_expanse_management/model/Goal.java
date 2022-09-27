@@ -37,9 +37,9 @@ public class Goal {
    // @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     private User user;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @OneToMany(mappedBy = "goal")
-    private List<Income> incomes;
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @OneToMany(mappedBy = "goal")
+//    private List<Income> incomes;
 
     public Goal(Integer id, String title, String description, Date dateDebut, LocalDate endDate) {
         this.id = id;
