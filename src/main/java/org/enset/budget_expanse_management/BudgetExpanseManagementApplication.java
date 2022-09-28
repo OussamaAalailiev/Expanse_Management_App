@@ -54,6 +54,7 @@ public class BudgetExpanseManagementApplication {
                             GoalRepository goalRepository,
                             BudgetRepository budgetRepository,
                             CategoryExpanseRepository categoryExpanseRepository,
+                            CategoryIncomeRepository categoryIncomeRepository,
                             DataInitiation dataInitiation,
                             BudgetExpanseManagementService managementService
     ){
@@ -405,7 +406,8 @@ public class BudgetExpanseManagementApplication {
                  });
 
          /**Test On Getting Common Income(s) WITH Common Goal(s):   */
-         goalRepository.onOneIncomeComputeOnCommonGoals(2L)
+        /*
+         incomeRepository.onOneIncomeComputeOnCommonGoals(2L)
                  .forEach(resultDTOIncomesGoals -> {
                      System.out.println("----------- Common Income --------------");
                      System.out.println(resultDTOIncomesGoals.getIdIncome());
@@ -422,6 +424,19 @@ public class BudgetExpanseManagementApplication {
                      System.out.println(resultDTOIncomesGoals.getUserIdGoal());
 
                  });
+         */
+
+         /**Test On Add Income Compute Common Goals: */
+         Income income = new Income();
+         income.setTitle("Save 19500 DH"); income.setAmount(19500.0); income.setCreatedDate(new Date());
+         User user = userRepository.findById(UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1")).get();
+         income.setUser(user);
+         CategoryIncome categoryIncome = categoryIncomeRepository.findById(10).get();
+         income.setCategoryIncome(categoryIncome);
+         managementService.calculateGoalsOnAddIncomeService(income);
+
+
+
 
      };
     }

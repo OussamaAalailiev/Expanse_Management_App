@@ -1,6 +1,7 @@
 package org.enset.budget_expanse_management.service;
 
 import org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets;
+import org.enset.budget_expanse_management.mapping.ResultDTOIncomesGoals;
 import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
 import org.enset.budget_expanse_management.model.Budget;
 import org.enset.budget_expanse_management.model.Expanse;
@@ -337,6 +338,48 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     // TODO: Incomplete Algorithm to compute Goals On add a new Income.
     @Override
     public void calculateGoalsOnAddIncomeService(Income income) {
+        //Compute 'amountAchieved' of Goal & is 'goalAchieved':
+        //Check for Nulls:
+        //Check If the Common List Of "ResultDTOIncomesGoals" is Empty OR Not:
+        incomeRepository.save(income);
+        List<ResultDTOIncomesGoals> resultDTOIncomesGoals = incomeRepository
+                .onOneIncomeComputeOnCommonGoals(income.getId());
+        List<Goal> listGoalsToUpdateOnAddIncome=new ArrayList<>();
+        try {
+            if (!resultDTOIncomesGoals.isEmpty()){//If Common Goals were founds:
+                for (ResultDTOIncomesGoals resultDTOIncomeGoal: resultDTOIncomesGoals){
+                    System.out.println("Inside Common Goals & Income For LOOP:");
+                    Goal goal = goalRepository.findById(resultDTOIncomeGoal.getIdGoal())
+                            .orElseThrow(() -> {
+                                throw new RuntimeException("Error, Cannot get Goal from Database!");
+                            });
+                    if (goal!=null && (goal.getAmountAchieved()==null || goal.getAmountAchieved()==0) ){
+                        goal.setAmountAchieved(resultDTOIncomeGoal.getAmountIncome());
+                        //if (goal.getGoalAchieved()==null){
+                         if (goal.getAmount() > goal.getAmountAchieved()){
+                                goal.setGoalAchieved(false);
+                         }else if (goal.getAmount() <= goal.getAmountAchieved()){
+                                goal.setGoalAchieved(true);
+                         }
+                        listGoalsToUpdateOnAddIncome.add(goal);
+                    }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
+                        goal.setAmountAchieved(goal.getAmountAchieved() + income.getAmount());
+                        if (goal.getAmount() > goal.getAmountAchieved()){
+                            goal.setGoalAchieved(false);
+                        }else if (goal.getAmount() <= goal.getAmountAchieved()){
+                            goal.setGoalAchieved(true);
+                        }
+                        listGoalsToUpdateOnAddIncome.add(goal);
+                    }
+                }
+                goalRepository.saveAll(listGoalsToUpdateOnAddIncome);
+            }else {//Means No Common Goals were founds:
+                System.out.println("No Common Goals were founds For Income Added ....");
+            }
+
+        }catch (Exception e){
+            throw new RuntimeException("An error Occurred while getting Common Income(s) & Common Goal(s)");
+        }
 
     }
 
