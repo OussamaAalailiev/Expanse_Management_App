@@ -394,6 +394,8 @@ public class BudgetExpanseManagementApplication {
          System.out.println("Query to get Total Amount of Expanses per Month By UserID: ");
 //         expanseRepository.getTotalAmountExpansesOnEveryMonthV2(UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1"),
 //                         PageRequest.of(0,3))
+
+         /*
          expanseRepository.getTotalAmountExpansesOnEveryMonthV2(UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1"))
                  .forEach(totalExpansePerMonthDTO -> {
                      System.out.println("Year "+"        "+" Month "+ "  "+ "Expanse Sum"+"   "+ "    User ID"+"   "+ "                   User Name");
@@ -404,6 +406,7 @@ public class BudgetExpanseManagementApplication {
                      System.out.print(totalExpansePerMonthDTO.getUserName());
                      System.out.println(); System.out.println();
                  });
+          */
 
          /**Test On Getting Common Income(s) WITH Common Goal(s):   */
         /*
@@ -427,13 +430,25 @@ public class BudgetExpanseManagementApplication {
          */
 
          /**Test On Add Income Compute Common Goals: */
+
+
+
          Income income = new Income();
-         income.setTitle("Save 19500 DH"); income.setAmount(19500.0); income.setCreatedDate(new Date());
+         income.setTitle("Wall Construction 300 DH"); income.setAmount(300.0); income.setCreatedDate(new Date());
          User user = userRepository.findById(UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1")).get();
          income.setUser(user);
-         CategoryIncome categoryIncome = categoryIncomeRepository.findById(10).get();
+         CategoryIncome categoryIncome = categoryIncomeRepository.findById(12).get();
          income.setCategoryIncome(categoryIncome);
          managementService.calculateGoalsOnAddIncomeService(income);
+
+
+
+         /**Test On Update Income Compute Common Goals: */
+         /*
+         Income incomeFromDB = incomeRepository.findById(8L).get();
+         incomeFromDB.setAmount(18400.0); incomeFromDB.setTitle("Save 18999.0 Instead of 19500 DH");
+         managementService.calculateGoalsOnUpdateIncomeService(incomeFromDB);
+          */
 
 
 

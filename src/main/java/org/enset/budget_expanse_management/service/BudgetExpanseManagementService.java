@@ -44,7 +44,10 @@ public interface BudgetExpanseManagementService {
     /**Get Income By Page based on title of Income + page N° + Size N° from Service: */
     public Page<Income> getIncomesByPageAndSizeAndTitleAndUserIdService(String incomeTitle, String userId, int page, int size);
 
-    /**Inner Joint that get all common Goals(if exists) with one new Income added
+    /**Inner Joint that get all common Goals(if exists) with Add new Income
      *  by a user at each query:*/
     public void calculateGoalsOnAddIncomeService(Income income);
+    /**Compute all common Goals(if exists) with one Update Income
+     *  by a user at each query:*/
+    public void calculateGoalsOnUpdateIncomeService(Income income);
 }

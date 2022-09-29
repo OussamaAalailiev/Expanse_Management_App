@@ -335,7 +335,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }
     }
 
-    // TODO: Incomplete Algorithm to compute Goals On add a new Income.
+    /**Algorithm Works well :) */
     @Override
     public void calculateGoalsOnAddIncomeService(Income income) {
         //Compute 'amountAchieved' of Goal & is 'goalAchieved':
@@ -378,7 +378,57 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             }
 
         }catch (Exception e){
-            throw new RuntimeException("An error Occurred while getting Common Income(s) & Common Goal(s)");
+            e.printStackTrace();
+            throw new RuntimeException("An error Occurred while Compute Common Income & Common Goal(s)");
+        }
+
+    }
+
+    // TODO: Incomplete Algorithm to compute Goals On Update an Income.
+    @Override
+    public void calculateGoalsOnUpdateIncomeService(Income income) {
+        //Compute 'amountAchieved' of Goal & is 'goalAchieved':
+        //Check for Nulls:
+        //Check If the Common List Of "ResultDTOIncomesGoals" is Empty OR Not:
+        List<Goal> goalListToBeUpdated = new ArrayList<>();
+        List<ResultDTOIncomesGoals> resultDTOIncomesGoals =
+                incomeRepository.onOneIncomeComputeOnCommonGoals(income.getId());
+        try {
+            if (!resultDTOIncomesGoals.isEmpty()){
+
+                Double oldIncomeAmount = resultDTOIncomesGoals.get(0).getAmountIncome();
+                Double newIncomeAmount = income.getAmount();
+                Double intervalNewOldAmountIncome = newIncomeAmount - oldIncomeAmount;
+                for (ResultDTOIncomesGoals resultDTOIncomeGoal: resultDTOIncomesGoals) {
+                    Goal goalFromDBToUpdate = goalRepository.findById(resultDTOIncomeGoal.getIdGoal())
+                            .orElseThrow(() -> {
+                               throw new RuntimeException("Error On get Goal From DB");
+                            });
+                    if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()==null || goalFromDBToUpdate.getAmountAchieved()==0)){
+                        goalFromDBToUpdate.setAmountAchieved(newIncomeAmount);
+                        if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+                            goalFromDBToUpdate.setGoalAchieved(false);
+                        } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
+                            goalFromDBToUpdate.setGoalAchieved(true);
+                        }
+                        goalListToBeUpdated.add(goalFromDBToUpdate);
+                    } else if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()!=null || goalFromDBToUpdate.getAmountAchieved()>=0)) {
+                        goalFromDBToUpdate.setAmountAchieved(goalFromDBToUpdate.getAmountAchieved() + intervalNewOldAmountIncome);
+                        if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+                            goalFromDBToUpdate.setGoalAchieved(false);
+                        } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
+                            goalFromDBToUpdate.setGoalAchieved(true);
+                        }
+                        goalListToBeUpdated.add(goalFromDBToUpdate);
+                    }
+                }
+                incomeRepository.save(income);
+                goalRepository.saveAll(goalListToBeUpdated);
+            }else {//Normal Update If there is No common goals:
+                incomeRepository.save(income);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
     }
