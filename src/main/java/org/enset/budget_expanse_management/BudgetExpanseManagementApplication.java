@@ -391,7 +391,7 @@ public class BudgetExpanseManagementApplication {
 //         goalRepository.save()
 
          /**-- Query to get Total Amount of Expanses per Month By UserID: */
-         System.out.println("Query to get Total Amount of Expanses per Month By UserID: ");
+//         System.out.println("Query to get Total Amount of Expanses per Month By UserID: ");
 //         expanseRepository.getTotalAmountExpansesOnEveryMonthV2(UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1"),
 //                         PageRequest.of(0,3))
 
@@ -430,17 +430,15 @@ public class BudgetExpanseManagementApplication {
          */
 
          /**Test On Add Income Compute Common Goals: */
-
-
-
-         Income income = new Income();
+         /*
+          Income income = new Income();
          income.setTitle("Wall Construction 300 DH"); income.setAmount(300.0); income.setCreatedDate(new Date());
          User user = userRepository.findById(UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1")).get();
          income.setUser(user);
          CategoryIncome categoryIncome = categoryIncomeRepository.findById(12).get();
          income.setCategoryIncome(categoryIncome);
          managementService.calculateGoalsOnAddIncomeService(income);
-
+          */
 
 
          /**Test On Update Income Compute Common Goals: */
@@ -449,6 +447,10 @@ public class BudgetExpanseManagementApplication {
          incomeFromDB.setAmount(18400.0); incomeFromDB.setTitle("Save 18999.0 Instead of 19500 DH");
          managementService.calculateGoalsOnUpdateIncomeService(incomeFromDB);
           */
+
+         /**Test On Delete Income Compute Common Goals: */
+         Income incomeToBeDeleted = incomeRepository.findById(14L).get();
+         managementService.calculateGoalsOnDeleteIncomeService(incomeToBeDeleted);
 
 
 

@@ -384,13 +384,13 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
     }
 
-    // TODO: Incomplete Algorithm to compute Goals On Update an Income.
+    // Completed Algorithm to compute Goals On Update Only 'AMOUNT' of Income.
     @Override
     public void calculateGoalsOnUpdateIncomeService(Income income) {
         //Compute 'amountAchieved' of Goal & is 'goalAchieved':
         //Check for Nulls:
         //Check If the Common List Of "ResultDTOIncomesGoals" is Empty OR Not:
-        List<Goal> goalListToBeUpdated = new ArrayList<>();
+        List<Goal> goalListUpdatedOnUpdateIncome = new ArrayList<>();
         List<ResultDTOIncomesGoals> resultDTOIncomesGoals =
                 incomeRepository.onOneIncomeComputeOnCommonGoals(income.getId());
         try {
@@ -411,7 +411,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                         } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
                             goalFromDBToUpdate.setGoalAchieved(true);
                         }
-                        goalListToBeUpdated.add(goalFromDBToUpdate);
+                        goalListUpdatedOnUpdateIncome.add(goalFromDBToUpdate);
                     } else if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()!=null || goalFromDBToUpdate.getAmountAchieved()>=0)) {
                         goalFromDBToUpdate.setAmountAchieved(goalFromDBToUpdate.getAmountAchieved() + intervalNewOldAmountIncome);
                         if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
@@ -419,11 +419,11 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                         } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
                             goalFromDBToUpdate.setGoalAchieved(true);
                         }
-                        goalListToBeUpdated.add(goalFromDBToUpdate);
+                        goalListUpdatedOnUpdateIncome.add(goalFromDBToUpdate);
                     }
                 }
                 incomeRepository.save(income);
-                goalRepository.saveAll(goalListToBeUpdated);
+                goalRepository.saveAll(goalListUpdatedOnUpdateIncome);
             }else {//Normal Update If there is No common goals:
                 incomeRepository.save(income);
             }
@@ -431,6 +431,50 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void calculateGoalsOnDeleteIncomeService(Income income) {
+        //Compute 'amountAchieved' of Goal & is 'goalAchieved':
+        //Check for Nulls:
+        //Check If the Common List Of "ResultDTOIncomesGoals" is Empty OR Not:
+        List<Goal> goalListUpdatedOnDeleteIncome = new ArrayList<>();
+        List<ResultDTOIncomesGoals> resultDTOIncomesGoals =
+                incomeRepository.onOneIncomeComputeOnCommonGoals(income.getId());
+        try {
+            if (!resultDTOIncomesGoals.isEmpty()){
+                for (ResultDTOIncomesGoals resultDTOIncomeGoal : resultDTOIncomesGoals){
+                    Goal goalFromDBToUpdate = goalRepository.findById(resultDTOIncomeGoal.getIdGoal())
+                            .orElseThrow(() -> {
+                                throw new RuntimeException("Error On get Goal From DB");
+                            });
+                        if (goalFromDBToUpdate.getAmountAchieved()==null || goalFromDBToUpdate.getAmountAchieved()==0){//I was setting 'amountAchieved' to 0.0 & 'goalAchieved' to false THEN add the 'Goal' to 'listGoalUpd'..
+                            System.out.println("'AmountAchieved' OR 'goalAchieved' is NULL, No Computation Needed..");
+                            continue;
+                        }
+                        else if (goalFromDBToUpdate.getAmountAchieved() != null || goalFromDBToUpdate.getAmountAchieved() > 0) {
+
+                            goalFromDBToUpdate.setAmountAchieved(goalFromDBToUpdate.getAmountAchieved() - income.getAmount());
+                            if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+                                goalFromDBToUpdate.setGoalAchieved(false);
+                            } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
+                                goalFromDBToUpdate.setGoalAchieved(true);
+                            }
+                            goalListUpdatedOnDeleteIncome.add(goalFromDBToUpdate);
+
+                        }
+                }
+                goalRepository.saveAll(goalListUpdatedOnDeleteIncome);
+                incomeRepository.delete(income);
+
+            }else {//If there is No Common Goals with Income:
+                incomeRepository.delete(income);
+                System.out.println("No Common Goals were founds For Income Delete ....");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Unexpected Error Occurred while Delete Income!");
+        }
     }
 
 }
