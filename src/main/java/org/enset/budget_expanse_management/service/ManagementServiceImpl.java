@@ -434,6 +434,119 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     }
 
     @Override
+    public void calculateGoalsOnUpdateFullIncomeService(Income incomeUpdated) {
+        //Check IF Income has Common Goals:
+        List<ResultDTOIncomesGoals> oldResultDTOIncomesGoals
+                = incomeRepository.onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
+        List<Goal> goalListToUpdate = new ArrayList<>();
+//        Income incomeBeforeUpdate = incomeRepository.findById(incomeUpdated.getId()).orElseThrow(() -> {
+//            throw new RuntimeException("Cannot find Old Income from DB");
+//        });
+        incomeRepository.save(incomeUpdated);
+        List<ResultDTOIncomesGoals> newResultDTOIncomesGoals
+                = incomeRepository.onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
+        try {
+            //Case 1: Income has Common old Goals already:
+            if (!oldResultDTOIncomesGoals.isEmpty()){
+                //Case 1.1: 'newResultDTOIncomesGoals' is Empty:
+                // Recalculate Old Common Goals same as IF just Income's Amount is Modified.
+                if (newResultDTOIncomesGoals.isEmpty()){
+
+                    //BEGIN OF Duplicate Code In this Function:
+                    Double oldIncomeAmount = oldResultDTOIncomesGoals.get(0).getAmountIncome();
+                    Double newIncomeAmount = incomeUpdated.getAmount();
+                    Double intervalNewOldAmountIncome = newIncomeAmount - oldIncomeAmount;
+                    for (ResultDTOIncomesGoals resultDTOIncomeGoal: newResultDTOIncomesGoals) {
+                        Goal goalFromDBToUpdate = goalRepository.findById(resultDTOIncomeGoal.getIdGoal())
+                                .orElseThrow(() -> {
+                                    throw new RuntimeException("Error On get Goal From DB");
+                                });
+                        if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()==null || goalFromDBToUpdate.getAmountAchieved()==0)){
+                            goalFromDBToUpdate.setAmountAchieved(newIncomeAmount);
+                            if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+                                goalFromDBToUpdate.setGoalAchieved(false);
+                            } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
+                                goalFromDBToUpdate.setGoalAchieved(true);
+                            }
+                            goalListToUpdate.add(goalFromDBToUpdate);
+                        } else if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()!=null || goalFromDBToUpdate.getAmountAchieved()>=0)) {
+                            goalFromDBToUpdate.setAmountAchieved(goalFromDBToUpdate.getAmountAchieved() + intervalNewOldAmountIncome);
+                            if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+                                goalFromDBToUpdate.setGoalAchieved(false);
+                            } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
+                                goalFromDBToUpdate.setGoalAchieved(true);
+                            }
+                            goalListToUpdate.add(goalFromDBToUpdate);
+                        }
+                    }
+                    //incomeRepository.save(income);
+                    goalRepository.saveAll(goalListToUpdate);
+                    //END OF Duplicate Code In this Function:
+
+                }else {//Case 1.2: 'newResultDTOIncomesGoals' is Not Empty:
+                    // TODO: I should loop on 'newResultDTOIncomesGoals' List THEN
+                    //  CHECK If There is NO Old Common Goals in it
+                    //Case 1.2.1: 'newResultDTOIncomesGoals' is Not Empty & Old Common Goals Exist in New Joint:
+                    //Case 1.2.2: 'newResultDTOIncomesGoals' is Not Empty & Old Common Goals Not Exist in New Joint:
+                   // if()
+                    /*
+                    List<Goal> oldGoalListToEraseAmountInc = new ArrayList<>();
+                    for (ResultDTOIncomesGoals oldResultDTOIncomesGoal : oldResultDTOIncomesGoals) {
+                        for (ResultDTOIncomesGoals newResultDTOIncomesGoal : newResultDTOIncomesGoals) {
+                            if (Objects.equals(oldResultDTOIncomesGoal.getIdGoal(), newResultDTOIncomesGoal.getIdGoal())) {
+
+                            }
+                        }
+                    }
+                     */
+
+                    // Loop On The new Joint:
+                    //  THEN Check IF Old Goal(s) exist we add them to a separate List To erase 'Amount' of IncomeUpdated from them:
+                    //  ELSE we calculate Normally.
+                }
+
+            } else {//Case 2: Income has NO old Common Goals:
+                 if (!newResultDTOIncomesGoals.isEmpty()){
+
+                    //BEGIN OF Duplicate Code In this Function:
+                    Double oldIncomeAmount = oldResultDTOIncomesGoals.get(0).getAmountIncome();
+                    Double newIncomeAmount = incomeUpdated.getAmount();
+                    Double intervalNewOldAmountIncome = newIncomeAmount - oldIncomeAmount;
+                    for (ResultDTOIncomesGoals resultDTOIncomeGoal: newResultDTOIncomesGoals) {
+                        Goal goalFromDBToUpdate = goalRepository.findById(resultDTOIncomeGoal.getIdGoal())
+                                .orElseThrow(() -> {
+                                    throw new RuntimeException("Error On get Goal From DB");
+                                });
+                        if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()==null || goalFromDBToUpdate.getAmountAchieved()==0)){
+                            goalFromDBToUpdate.setAmountAchieved(newIncomeAmount);
+                            if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+                                goalFromDBToUpdate.setGoalAchieved(false);
+                            } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
+                                goalFromDBToUpdate.setGoalAchieved(true);
+                            }
+                            goalListToUpdate.add(goalFromDBToUpdate);
+                        } else if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()!=null || goalFromDBToUpdate.getAmountAchieved()>=0)) {
+                            goalFromDBToUpdate.setAmountAchieved(goalFromDBToUpdate.getAmountAchieved() + intervalNewOldAmountIncome);
+                            if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+                                goalFromDBToUpdate.setGoalAchieved(false);
+                            } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
+                                goalFromDBToUpdate.setGoalAchieved(true);
+                            }
+                            goalListToUpdate.add(goalFromDBToUpdate);
+                        }
+                    }
+                    //incomeRepository.save(income);
+                    goalRepository.saveAll(goalListToUpdate);
+                     //END OF Duplicate Code In this Function:
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace(); throw new RuntimeException("Some Error Occurred On Update Full Income!");
+        }
+
+    }
+
+    @Override
     public void calculateGoalsOnDeleteIncomeService(Income income) {
         //Compute 'amountAchieved' of Goal & is 'goalAchieved':
         //Check for Nulls:

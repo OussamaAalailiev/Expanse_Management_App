@@ -52,6 +52,9 @@ public interface BudgetExpanseManagementService {
      *  Completed Algorithm to compute Goals On Update Only 'AMOUNT' of Income.*/
     public void calculateGoalsOnUpdateIncomeService(Income income);
 
+    // TODO: Update All fields (of an Income) On Update Income Algorithm:
+    public void calculateGoalsOnUpdateFullIncomeService(Income income);
+
     /**Compute all common Goals(if exists) ON Delete an Income
      *  by a user at each query:*/
     public void calculateGoalsOnDeleteIncomeService(Income income);

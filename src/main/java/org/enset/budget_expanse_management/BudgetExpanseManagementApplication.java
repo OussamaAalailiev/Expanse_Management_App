@@ -234,7 +234,7 @@ public class BudgetExpanseManagementApplication {
           */
 
 
-         /**Testing On Add or Update an expanse, if we compute common budgets well: Not sure*/
+         /**Testing On Add or Update 'Amount' expanse, if we compute common budgets well: Not sure*/
 //         Expanse expanseN7 = expanseRepository.findById(8L).get();
 //         expanseN7.setAmount(10000.00);
 //
@@ -291,7 +291,7 @@ public class BudgetExpanseManagementApplication {
          managementService.calculateBudgetsOnAddExpanseService(newExpanse);
           */
 
-         /**Testing On Update an Expanse, and if we compute common budgets well if they exist: */
+         /**Testing On Update 'Amount' Expanse, and if we compute common budgets well if they exist: */
          // Update an expanse that correspond to common budget(s) :
 
          /*
@@ -302,7 +302,7 @@ public class BudgetExpanseManagementApplication {
 
 
 
-         /**Update an expanse that DOES correspond to common budget(s) : */
+         /**Update 'Amount' expanse that DOES Not correspond to common budget(s) : */
 
          /*
          Expanse expanseToBeUpdate = expanseRepository.findById(34L).get();
@@ -310,7 +310,7 @@ public class BudgetExpanseManagementApplication {
          managementService.calculateBudgetsOnUpdateExpanseService(expanseToBeUpdate);
           */
 
-         /**Testing On Update a new Budget, if we compute common expanses well if they exist: */
+         /**Testing On Update 'Amount' Budget, if we compute common expanses well if they exist: */
          /*
          Budget budgetToBeUpdated = budgetRepository.findById(22).get();
          budgetToBeUpdated.setAmount(100.0);
@@ -441,7 +441,7 @@ public class BudgetExpanseManagementApplication {
           */
 
 
-         /**Test On Update Income Compute Common Goals: */
+         /**Test On Update 'Amount' Income Compute Common Goals: */
          /*
          Income incomeFromDB = incomeRepository.findById(8L).get();
          incomeFromDB.setAmount(18400.0); incomeFromDB.setTitle("Save 18999.0 Instead of 19500 DH");
@@ -449,8 +449,10 @@ public class BudgetExpanseManagementApplication {
           */
 
          /**Test On Delete Income Compute Common Goals: */
+        /*
          Income incomeToBeDeleted = incomeRepository.findById(14L).get();
          managementService.calculateGoalsOnDeleteIncomeService(incomeToBeDeleted);
+         */
 
 
 
