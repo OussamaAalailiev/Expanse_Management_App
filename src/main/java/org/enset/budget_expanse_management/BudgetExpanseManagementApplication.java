@@ -442,17 +442,27 @@ public class BudgetExpanseManagementApplication {
 
 
          /**Test On Update 'Amount' Income Compute Common Goals: */
-         /*
-         Income incomeFromDB = incomeRepository.findById(8L).get();
-         incomeFromDB.setAmount(18400.0); incomeFromDB.setTitle("Save 18999.0 Instead of 19500 DH");
-         managementService.calculateGoalsOnUpdateIncomeService(incomeFromDB);
-          */
+
+         Income incomeFromDB = incomeRepository.findById(7L).get();
+         incomeFromDB.setAmount(1000.0); incomeFromDB.setTitle("Save 1000.0 DH");
+        // managementService.calculateGoalsOnUpdateIncomeService(incomeFromDB);
+        // managementService.calculateGoalsOnUpdateFullIncomeService(incomeFromDB);
+
 
          /**Test On Delete Income Compute Common Goals: */
         /*
          Income incomeToBeDeleted = incomeRepository.findById(14L).get();
          managementService.calculateGoalsOnDeleteIncomeService(incomeToBeDeleted);
          */
+
+         /**Test On Full Update Of Income Compute Common Goals: */
+
+         /*
+         Income incomeFromDB = incomeRepository.findById(7L).get();
+         incomeFromDB.setAmount(18400.0); incomeFromDB.setTitle("Save 18999.0 Instead of 19500 DH");
+         managementService.calculateGoalsOnUpdateIncomeService(incomeFromDB);
+          */
+
 
 
 

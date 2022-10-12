@@ -436,59 +436,55 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     }
 
     @Override
-    public void calculateGoalsOnUpdateFullIncomeService(Income incomeUpdated) {
+    public void calculateGoalsOnUpdateFullIncomeServiceV2(Income incomeUpdated) {
         //Check IF Income has Common Goals:
         List<ResultDTOIncomesGoals> oldResultDTOIncomesGoals
                 = incomeRepository.onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
         List<Goal> goalListToUpdate = new ArrayList<>();
-        incomeRepository.save(incomeUpdated);
-        List<ResultDTOIncomesGoals> newResultDTOIncomesGoals
-                = incomeRepository.onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
-        try {
-            //Case 1: Income has Common old Goals already:
-            if (!oldResultDTOIncomesGoals.isEmpty()){
-                //Case 1.1: 'newResultDTOIncomesGoals' is Empty:
-                // Recalculate Old Common Goals same as IF just Income's Amount is Modified.
-                if (newResultDTOIncomesGoals.isEmpty()){
-                    includeIncomeAmountToOldGoals(incomeUpdated, oldResultDTOIncomesGoals);
-                }else {//Case 1.2: 'newResultDTOIncomesGoals' is Not Empty:
-                    //Case 1.2.1: 'newResultDTOIncomesGoals' is Not Empty & Old Common Goals Exist in New Joint:
-                    //Case 1.2.2: 'newResultDTOIncomesGoals' is Not Empty & Old Common Goals Not Exist in New Joint:
-//                    refactorWithIncomeFullUpdateOnNewDiffGoals(incomeUpdated, newResultDTOIncomesGoals, oldResultDTOIncomesGoals);
-                    if(!Objects.equals(oldResultDTOIncomesGoals.get(0).getCategory_income_id_Income(),
-                            incomeUpdated.getCategoryIncome().getId())){
-                        /**Case: Income Update CategoryIncome To Another Different Category: */
-                        for (ResultDTOIncomesGoals resultDTOIncomeGoal: oldResultDTOIncomesGoals) {
-                            //Same Debut Block Of Code 2 To exclude Old Goals:
-                            excludeIncomeAmountFromOldGoals(goalListToUpdate, resultDTOIncomeGoal);
-                            includeIncomeAmountToNewDiffGoals(incomeUpdated, newResultDTOIncomesGoals, oldResultDTOIncomesGoals);
-                            //Same End of Block Of Code 2:
-                        }
-                    } else{
-                        /**Case: Income Update Category == Category of Old Common Goals BUT Different Dates! : */
 
-                        for (ResultDTOIncomesGoals resultDTOIncomeGoal: oldResultDTOIncomesGoals) {
-                            Date fromLocalDate = Date.from(resultDTOIncomeGoal.getEndDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-                            boolean dateIncludedFromIncomeNewDate = incomeUpdated.getCreatedDate().compareTo(resultDTOIncomeGoal.getDateDebut()) == 0
-                                    || incomeUpdated.getCreatedDate().compareTo(fromLocalDate) == 0
-                                    || (incomeUpdated.getCreatedDate().compareTo(resultDTOIncomeGoal.getDateDebut())>0 && incomeUpdated.getCreatedDate().compareTo(fromLocalDate)<0);
-                            if (!dateIncludedFromIncomeNewDate){
-                                excludeIncomeAmountFromOldGoals(goalListToUpdate, resultDTOIncomeGoal);
-                                includeIncomeAmountToNewDiffGoals(incomeUpdated, newResultDTOIncomesGoals, oldResultDTOIncomesGoals);
-                            }else {
-                                includeIncomeAmountToOldGoals(incomeUpdated, oldResultDTOIncomesGoals);
-                            }
+        //excludeOldIncomeAmountUpdatedFromAllOldGoals(oldResultDTOIncomesGoals);
+        if (!oldResultDTOIncomesGoals.isEmpty()){
+            boolean sameCategoryIncomeId = Objects.equals(incomeUpdated.getCategoryIncome().getId()
+                    , oldResultDTOIncomesGoals.get(0).getCategory_income_id_Income());
+
+            if (!sameCategoryIncomeId){
+                excludeOldIncomeAmountUpdatedFromAllOldGoals(oldResultDTOIncomesGoals);
+                incomeRepository.save(incomeUpdated);
+                List<ResultDTOIncomesGoals> newResultDTOIncomesGoals = incomeRepository
+                        .onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
+                if (!newResultDTOIncomesGoals.isEmpty()){
+                    includeIncomeAmountToNewDiffGoals(incomeUpdated, newResultDTOIncomesGoals);
+                }
+            } else {
+                // Loop On Old Joint & Check for Date Inclusion:
+                for (ResultDTOIncomesGoals resultDTOIncomeGoal: oldResultDTOIncomesGoals) {
+                    Date fromLocalDate = Date.from(resultDTOIncomeGoal.getEndDate().atStartOfDay()
+                            .atZone(ZoneId.systemDefault()).toInstant());
+                    boolean dateIncludedFromIncomeNewDate = incomeUpdated.getCreatedDate()
+                            .compareTo(resultDTOIncomeGoal.getDateDebut()) == 0
+                      || incomeUpdated.getCreatedDate().compareTo(fromLocalDate) == 0
+                      || (incomeUpdated.getCreatedDate().compareTo(resultDTOIncomeGoal.getDateDebut())>0
+                            && incomeUpdated.getCreatedDate().compareTo(fromLocalDate)<0);
+                    if (dateIncludedFromIncomeNewDate){
+                      //  incomeRepository.save(incomeUpdated);
+                        includeIncomeAmountToOneOldGoal(incomeUpdated, resultDTOIncomeGoal);
+                    }else {
+                        excludeOldIncomeAmountUpdatedFromAllOldGoals(oldResultDTOIncomesGoals);
+                        incomeRepository.save(incomeUpdated);
+                        List<ResultDTOIncomesGoals> newResultDTOIncomesGoals = incomeRepository
+                                .onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
+                        if (!newResultDTOIncomesGoals.isEmpty()){
+                            includeIncomeAmountToNewDiffGoals(incomeUpdated, newResultDTOIncomesGoals);
                         }
                     }
                 }
-            } else {//Case 2: Income has NO old Common Goals:
-                 if (!newResultDTOIncomesGoals.isEmpty()){
-                     includeIncomeAmountToNewDiffGoals(incomeUpdated, newResultDTOIncomesGoals, oldResultDTOIncomesGoals);
-                }
+                //THEN save
             }
-        }catch (Exception e){
-            e.printStackTrace(); throw new RuntimeException("Some Error Occurred On Update Full Income!");
+        }else {//Case Old Joint is Empty:
+            //Normal Update Computations On New Joint if exists... :
         }
+
+
     }
 
     private void includeIncomeAmountToOldGoals(Income incomeUpdated, List<ResultDTOIncomesGoals> oldResultDTOIncomesGoals) {
@@ -523,8 +519,41 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         goalRepository.saveAll(goalListToUpdate);
     }
 
-    /**Case Income Full Update To exclude Old Goals: Income Has Old common Goals. */
-    private void excludeIncomeAmountFromOldGoals(List<Goal> goalListToUpdate,
+    private void includeIncomeAmountToOneOldGoal(Income incomeUpdated, ResultDTOIncomesGoals oldResultDTOIncomeGoal) {
+        List<Goal> goalListToUpdate = new ArrayList<>();
+        Double oldIncomeAmount = oldResultDTOIncomeGoal.getAmountIncome();
+        Double newIncomeAmount = incomeUpdated.getAmount();
+        Double intervalNewOldAmountIncome = newIncomeAmount - oldIncomeAmount;
+
+            Goal goalFromDBToUpdate = goalRepository.findById(oldResultDTOIncomeGoal.getIdGoal())
+                    .orElseThrow(() -> {
+                        throw new RuntimeException("Error On get Goal From DB");
+                    });
+            if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()==null || goalFromDBToUpdate.getAmountAchieved()==0)){
+                goalFromDBToUpdate.setAmountAchieved(newIncomeAmount);
+                if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+                    goalFromDBToUpdate.setGoalAchieved(false);
+                } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
+                    goalFromDBToUpdate.setGoalAchieved(true);
+                }
+                //goalListToUpdate.add(goalFromDBToUpdate);
+                goalRepository.save(goalFromDBToUpdate);
+            } else if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()!=null || goalFromDBToUpdate.getAmountAchieved()>=0)) {
+                goalFromDBToUpdate.setAmountAchieved(goalFromDBToUpdate.getAmountAchieved() + intervalNewOldAmountIncome);
+                if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+                    goalFromDBToUpdate.setGoalAchieved(false);
+                } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
+                    goalFromDBToUpdate.setGoalAchieved(true);
+                }
+                goalRepository.save(goalFromDBToUpdate);
+               // goalListToUpdate.add(goalFromDBToUpdate);
+            }
+        //incomeRepository.save(income);
+        //goalRepository.saveAll(goalListToUpdate);
+    }
+
+    /**Case Income Full Update To exclude 1 Old Goal at a time: Income Has Old common Goals. */
+    private void excludeIncomeAmountFromOldGoal(List<Goal> goalListToUpdate,
                                                         ResultDTOIncomesGoals resultDTOIncomeGoal){
         Goal goalFromDBToUpdate = goalRepository.findById(resultDTOIncomeGoal.getIdGoal())
                 .orElseThrow(() -> {
@@ -543,24 +572,78 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             }
             goalListToUpdate.add(goalFromDBToUpdate);
         }
+        goalRepository.saveAll(goalListToUpdate);
+    }
+
+    /**Case Income Full Update To exclude Old Goals: Income Has Old common Goals. */
+    private void excludeIncomeAmountFromAllOldGoals(List<Goal> goalListToUpdate,
+                                                 List<ResultDTOIncomesGoals> resultDTOIncomesGoals){
+        for (ResultDTOIncomesGoals resultDTOIncomeGoal: resultDTOIncomesGoals) {
+            Goal goalFromDBToUpdate = goalRepository.findById(resultDTOIncomeGoal.getIdGoal())
+                    .orElseThrow(() -> {
+                        throw new RuntimeException("Error On get Goal From DB");
+                    });
+            if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()==null || goalFromDBToUpdate.getAmountAchieved()==0)){
+                goalFromDBToUpdate.setAmountAchieved(0.0);
+                goalFromDBToUpdate.setGoalAchieved(false);
+                goalListToUpdate.add(goalFromDBToUpdate);
+            } else if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()!=null || goalFromDBToUpdate.getAmountAchieved()>=0)) {
+                goalFromDBToUpdate.setAmountAchieved(goalFromDBToUpdate.getAmountAchieved() - resultDTOIncomeGoal.getAmountIncome());
+                if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+                    goalFromDBToUpdate.setGoalAchieved(false);
+                } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
+                    goalFromDBToUpdate.setGoalAchieved(true);
+                }
+                goalListToUpdate.add(goalFromDBToUpdate);
+            }
+
+        }
+        goalRepository.saveAll(goalListToUpdate);
+    }
+
+    /**Case Income Full Update To exclude Income Amount's Interval From All Old Goals: Income Has Old common Goals. */
+    private void excludeOldIncomeAmountUpdatedFromAllOldGoals(
+                                                    List<ResultDTOIncomesGoals> resultDTOIncomesGoals){
+        List<Goal> goalListToUpdate = new ArrayList<>();
+        for (ResultDTOIncomesGoals resultDTOIncomeGoal: resultDTOIncomesGoals) {
+            Goal goalFromDBToUpdate = goalRepository.findById(resultDTOIncomeGoal.getIdGoal())
+                    .orElseThrow(() -> {
+                        throw new RuntimeException("Error On get Goal From DB");
+                    });
+            if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()==null || goalFromDBToUpdate.getAmountAchieved()==0)){
+                goalFromDBToUpdate.setAmountAchieved(0.0);
+                goalFromDBToUpdate.setGoalAchieved(false);
+                goalListToUpdate.add(goalFromDBToUpdate);
+            } else if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()!=null || goalFromDBToUpdate.getAmountAchieved()>=0)) {
+                //Double incomeUpdatedAmount = incomeUpdated.getAmount();
+                Double oldIncomeAmount = resultDTOIncomeGoal.getAmountIncome();
+//                Double intervalAmountIncome = newIncomeAmount - oldIncomeAmount;
+                goalFromDBToUpdate.setAmountAchieved(goalFromDBToUpdate.getAmountAchieved() - oldIncomeAmount);
+                if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+                    goalFromDBToUpdate.setGoalAchieved(false);
+                } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
+                    goalFromDBToUpdate.setGoalAchieved(true);
+                }
+                goalListToUpdate.add(goalFromDBToUpdate);
+            }
+
+        }
+        goalRepository.saveAll(goalListToUpdate);
     }
 
     /**Case Income Full Update: Income Has No Old common Goals.*/
     private void includeIncomeAmountToNewDiffGoals(Income incomeUpdated,
-                                         List<ResultDTOIncomesGoals> newResultDTOIncomesGoals,
-                                         List<ResultDTOIncomesGoals> oldResultDTOIncomesGoals
+                                         List<ResultDTOIncomesGoals> newResultDTOIncomesGoals
                                          ){
         List<Goal> goalListToUpdate = new ArrayList<>();
-        Double oldIncomeAmount = oldResultDTOIncomesGoals.get(0).getAmountIncome();
-        Double newIncomeAmount = incomeUpdated.getAmount();
-        Double intervalNewOldAmountIncome = newIncomeAmount - oldIncomeAmount;
+        Double incomeUpdatedAmount = incomeUpdated.getAmount();
         for (ResultDTOIncomesGoals resultDTOIncomeGoal: newResultDTOIncomesGoals) {
             Goal goalFromDBToUpdate = goalRepository.findById(resultDTOIncomeGoal.getIdGoal())
                     .orElseThrow(() -> {
                         throw new RuntimeException("Error On get Goal From DB");
                     });
             if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()==null || goalFromDBToUpdate.getAmountAchieved()==0)){
-                goalFromDBToUpdate.setAmountAchieved(newIncomeAmount);
+                goalFromDBToUpdate.setAmountAchieved(incomeUpdatedAmount);
                 if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
                     goalFromDBToUpdate.setGoalAchieved(false);
                 } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
@@ -568,7 +651,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                 }
                 goalListToUpdate.add(goalFromDBToUpdate);
             } else if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()!=null || goalFromDBToUpdate.getAmountAchieved()>=0)) {
-                goalFromDBToUpdate.setAmountAchieved(goalFromDBToUpdate.getAmountAchieved() + intervalNewOldAmountIncome);
+                goalFromDBToUpdate.setAmountAchieved(goalFromDBToUpdate.getAmountAchieved() + incomeUpdatedAmount);
                 if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
                     goalFromDBToUpdate.setGoalAchieved(false);
                 } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
