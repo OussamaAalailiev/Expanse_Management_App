@@ -642,26 +642,41 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                     .orElseThrow(() -> {
                         throw new RuntimeException("Error On get Goal From DB");
                     });
-            if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()==null || goalFromDBToUpdate.getAmountAchieved()==0)){
-                goalFromDBToUpdate.setAmountAchieved(incomeUpdatedAmount);
-                if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+            goalFromDBToUpdate.setAmountAchieved(0.0);
+            goalFromDBToUpdate.setGoalAchieved(false);
+            goalListToUpdate.add(goalFromDBToUpdate);
+        }
+        goalRepository.saveAll(goalListToUpdate);
+        incomeRepository.save(incomeUpdated);
+        /**New Joint for every Goal with its Incomes below : */
+        List<Goal> newGoalListToUpdate = new ArrayList<>();
+        for (ResultDTOIncomesGoals resultDTOIncomeGoal: newResultDTOIncomesGoals) {
+            //Get the New Joint Result for Every Goal:
+            Goal goalFromDBToUpdate = goalRepository.findById(resultDTOIncomeGoal.getIdGoal())
+                    .orElseThrow(() -> {
+                        throw new RuntimeException("Error On get Goal From DB");
+                    });
+            Double incomeAmountFromNewJoint=0.0;//TODO: temporarily 0.0, It should be changed later!
+            if (goalFromDBToUpdate != null && (goalFromDBToUpdate.getAmountAchieved() == null || goalFromDBToUpdate.getAmountAchieved() == 0)) {
+                goalFromDBToUpdate.setAmountAchieved(incomeAmountFromNewJoint);
+                if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()) {
                     goalFromDBToUpdate.setGoalAchieved(false);
                 } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
                     goalFromDBToUpdate.setGoalAchieved(true);
                 }
-                goalListToUpdate.add(goalFromDBToUpdate);
-            } else if (goalFromDBToUpdate!=null && (goalFromDBToUpdate.getAmountAchieved()!=null || goalFromDBToUpdate.getAmountAchieved()>=0)) {
-                goalFromDBToUpdate.setAmountAchieved(goalFromDBToUpdate.getAmountAchieved() + incomeUpdatedAmount);
-                if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()){
+                newGoalListToUpdate.add(goalFromDBToUpdate);
+            } else if (goalFromDBToUpdate != null && (goalFromDBToUpdate.getAmountAchieved() != null || goalFromDBToUpdate.getAmountAchieved() >= 0)) {
+                goalFromDBToUpdate.setAmountAchieved(goalFromDBToUpdate.getAmountAchieved() + incomeAmountFromNewJoint);
+                if (goalFromDBToUpdate.getAmount() > goalFromDBToUpdate.getAmountAchieved()) {
                     goalFromDBToUpdate.setGoalAchieved(false);
                 } else if (goalFromDBToUpdate.getAmount() <= goalFromDBToUpdate.getAmountAchieved()) {
                     goalFromDBToUpdate.setGoalAchieved(true);
                 }
-                goalListToUpdate.add(goalFromDBToUpdate);
+                newGoalListToUpdate.add(goalFromDBToUpdate);
             }
         }
-        //incomeRepository.save(income);
-        goalRepository.saveAll(goalListToUpdate);
+        //save again 2nd Update of All Goals After the second New Joint of every Goal to Incomes:
+        goalRepository.saveAll(newGoalListToUpdate);
     }
 
     @Override
