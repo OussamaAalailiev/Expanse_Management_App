@@ -1,5 +1,6 @@
 package org.enset.budget_expanse_management.repositories;
 
+import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
 import org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets;
 import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
 import org.enset.budget_expanse_management.model.Expanse;
@@ -68,6 +69,13 @@ public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
 
     /**Get Expanses By Page based on title of expanse + page N° + Size N° && UserID: */
     public Page<Expanse> findByTitleContainingAndUserId(String title, UUID userId, Pageable pageable);
+
+    /** Select Total Expanses By Category & UserID :*/
+    @Query("SELECT NEW org.enset.budget_expanse_management.mapping" +
+            ".ExpensesByCategory(e.id, e.amount, e.createdDate, e.title, " +
+            " e.categoryExpanse.id, e.user.id, SUM(e.amount)) FROM Expanse e " +
+            "WHERE e.user.id=:x GROUP BY e.categoryExpanse.id ORDER BY SUM(e.amount)")
+    List<ExpensesByCategory> getTotalExpensesByCategoryAndUser(@Param("x") UUID userId);
 
 
 }

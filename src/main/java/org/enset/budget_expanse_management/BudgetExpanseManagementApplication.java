@@ -5,6 +5,7 @@ import org.enset.budget_expanse_management.enums.CategoryExpanseType;
 import org.enset.budget_expanse_management.enums.CategoryIncomeType;
 import org.enset.budget_expanse_management.enums.GoalCategoryType;
 import org.enset.budget_expanse_management.enums.UserCurrency;
+import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
 import org.enset.budget_expanse_management.model.*;
 import org.enset.budget_expanse_management.repositories.*;
 import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
@@ -171,6 +172,7 @@ public class BudgetExpanseManagementApplication {
          /** Check if budgets were Respected: */
          System.out.println("************************************");
          System.out.println("**************** Check if budgets were Respected: ********************");
+
          budgetRepository.getAllExpansesAndBudgetsWithSameUserDateAndCategoryExp3()
                  .forEach(resultDTOExpansesBudgets -> {
                      System.out.println(resultDTOExpansesBudgets.toString());
@@ -443,8 +445,11 @@ public class BudgetExpanseManagementApplication {
 
          /**Test On Update 'Amount' Income Compute Common Goals: */
 
+         /*
          Income incomeFromDB = incomeRepository.findById(7L).get();
          incomeFromDB.setAmount(1000.0); incomeFromDB.setTitle("Save 1000.0 DH");
+          */
+
         // managementService.calculateGoalsOnUpdateIncomeService(incomeFromDB);
         // managementService.calculateGoalsOnUpdateFullIncomeService(incomeFromDB);
 
@@ -463,6 +468,49 @@ public class BudgetExpanseManagementApplication {
          managementService.calculateGoalsOnUpdateIncomeService(incomeFromDB);
           */
 
+         System.out.println();
+         System.out.println("Select Total Expanses By Category & UserID : ");
+         System.out.println();
+         /** Select Total Expanses By Category & UserID :*/
+
+        /*
+                 expanseRepository.getTotalExpensesByCategoryAndUser(
+                 UUID.fromString("653eb6f2-a817-4184-af31-4cff631692f8"))
+                 .forEach(expensesByCategory -> {
+                     System.out.println("Id: " + expensesByCategory.getId()+"\t");
+                     System.out.println("Amount: " + expensesByCategory.getAmount()+"\t");
+                     System.out.println("CreatedDate: " + expensesByCategory.getCreatedDate()+"\t");
+                     System.out.println("Title: " + expensesByCategory.getTitle()+"\t");
+                     System.out.println("CategoryExpenseId: " + expensesByCategory.getCategory_expanse_id()+"\t");
+                     System.out.println("UserID: " + expensesByCategory.getUserId()+"\t");
+                     System.out.println("SumExpensesByCategory: " + expensesByCategory.getSumExpensesByCategory()+"\t");
+                     //totalSumsOfExp+=expensesByCategory.getSumExpensesByCategory();
+                     System.out.println("PercentOfExpensesPerMonth: " + expensesByCategory.getSumExpensesByCategory()+"\t");
+                     System.out.println("---------------------------------------------");
+                 });
+         */
+
+         List<ExpensesByCategory> expensesByCategoryAndUser = expanseRepository
+                 .getTotalExpensesByCategoryAndUser(
+                         UUID.fromString("653eb6f2-a817-4184-af31-4cff631692f8"));
+         Double totalSumsOfExp = 0.0;
+         for (ExpensesByCategory expensesByCategory: expensesByCategoryAndUser) {
+             totalSumsOfExp+=expensesByCategory.getSumExpensesByCategory();
+         }
+         double percentOfExpensesPerMonth = 0.0;
+         for (ExpensesByCategory expensesByCategory: expensesByCategoryAndUser) {
+             System.out.println("Id: " + expensesByCategory.getId()+"\t");
+             System.out.println("Amount: " + expensesByCategory.getAmount()+"\t");
+             System.out.println("CreatedDate: " + expensesByCategory.getCreatedDate()+"\t");
+             System.out.println("Title: " + expensesByCategory.getTitle()+"\t");
+             System.out.println("CategoryExpenseId: " + expensesByCategory.getCategory_expanse_id()+"\t");
+             System.out.println("UserID: " + expensesByCategory.getUserId()+"\t");
+             System.out.println("SumExpensesByCategory: " + expensesByCategory.getSumExpensesByCategory()+"\t");
+             percentOfExpensesPerMonth =  ((expensesByCategory.getSumExpensesByCategory() / totalSumsOfExp) * 100);
+             expensesByCategory.setPercentOfExpensesPerMonth(percentOfExpensesPerMonth);
+             System.out.println("PercentOfExpensesPerMonth: " + Math.round(expensesByCategory.getPercentOfExpensesPerMonth()) +"%\t");
+             System.out.println("---------------------------------------------");
+         }
 
 
 
