@@ -1,6 +1,7 @@
 package org.enset.budget_expanse_management.controllers;
 
 import org.enset.budget_expanse_management.formModel.ExpanseFormSubmission;
+import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
 import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
 import org.enset.budget_expanse_management.model.CategoryExpanse;
 import org.enset.budget_expanse_management.model.Expanse;
@@ -71,6 +72,12 @@ public class ExpanseRestController {
             @PathVariable(name = "id") Optional<String> userId){
         System.out.println("Inside Controller -> expansesSumByUser");
         return managementService.getTotalExpansesPerYearMonthAndUserService(userId.orElse(""));
+    }
+
+    @GetMapping(path = "/expensesSumByCategoryAndUserId/{id}")
+    public List<ExpensesByCategory> getExpensesByCategoryAndUserId(
+            @PathVariable(name = "id") Optional<String> userId){
+        return managementService.getExpensesSumByCategoryAndUserIdService(userId.orElse(""));
     }
 
     @GetMapping(path = "/expanses")

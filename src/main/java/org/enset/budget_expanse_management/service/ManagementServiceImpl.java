@@ -1,6 +1,7 @@
 package org.enset.budget_expanse_management.service;
 
 import jdk.jfr.RecordingState;
+import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
 import org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets;
 import org.enset.budget_expanse_management.mapping.ResultDTOIncomesGoals;
 import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
@@ -209,6 +210,38 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             e.printStackTrace();
             throw new RuntimeException("User OR Expanse(s) were Not Found!");
         }
+    }
+
+    @Override
+    public List<ExpensesByCategory> getExpensesSumByCategoryAndUserIdService(String userId) {
+        try {
+            List<ExpensesByCategory> expensesByCategoryAndUser = expanseRepository
+                    .getTotalExpensesByCategoryAndUser(
+                            UUID.fromString("653eb6f2-a817-4184-af31-4cff631692f8"));
+            Double totalSumsOfExp = 0.0;
+            for (ExpensesByCategory expensesByCategory: expensesByCategoryAndUser) {
+                totalSumsOfExp+=expensesByCategory.getSumExpensesByCategory();
+            }
+            double percentOfExpensesPerMonth;
+            for (ExpensesByCategory expensesByCategory: expensesByCategoryAndUser) {
+                System.out.println("Id: " + expensesByCategory.getId()+"\t");
+                System.out.println("Amount: " + expensesByCategory.getAmount()+"\t");
+                System.out.println("CreatedDate: " + expensesByCategory.getCreatedDate()+"\t");
+                System.out.println("Title: " + expensesByCategory.getTitle()+"\t");
+                System.out.println("CategoryExpenseId: " + expensesByCategory.getCategory_expanse_id()+"\t");
+                System.out.println("UserID: " + expensesByCategory.getUserId()+"\t");
+                System.out.println("SumExpensesByCategory: " + expensesByCategory.getSumExpensesByCategory()+"\t");
+                percentOfExpensesPerMonth =  ((expensesByCategory.getSumExpensesByCategory() / totalSumsOfExp) * 100);
+                expensesByCategory.setPercentOfExpensesPerMonth(percentOfExpensesPerMonth);
+                System.out.println("PercentOfExpensesPerMonth: " + Math.round(expensesByCategory.getPercentOfExpensesPerMonth()) +"%\t");
+                System.out.println("---------------------------------------------");
+            }
+            return expensesByCategoryAndUser;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Something Went wrong on Getting Sum of Expenses By Category & userId!...");
+        }
+       // return null;
     }
 
 

@@ -490,6 +490,7 @@ public class BudgetExpanseManagementApplication {
                  });
          */
 
+         /*
          List<ExpensesByCategory> expensesByCategoryAndUser = expanseRepository
                  .getTotalExpensesByCategoryAndUser(
                          UUID.fromString("653eb6f2-a817-4184-af31-4cff631692f8"));
@@ -511,6 +512,7 @@ public class BudgetExpanseManagementApplication {
              System.out.println("PercentOfExpensesPerMonth: " + Math.round(expensesByCategory.getPercentOfExpensesPerMonth()) +"%\t");
              System.out.println("---------------------------------------------");
          }
+          */
 
 
 
