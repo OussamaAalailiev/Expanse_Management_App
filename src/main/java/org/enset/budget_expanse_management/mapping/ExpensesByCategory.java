@@ -10,7 +10,7 @@ public class ExpensesByCategory {
     private String title;
     private Integer category_expanse_id;
     private UUID userId;
-    private Double SumExpensesByCategory;
+    private Double sumExpensesByCategory;
     //private Integer NumberOfExpenses;
     private Double percentOfExpensesPerMonth;
 
@@ -24,7 +24,7 @@ public class ExpensesByCategory {
         this.title = title;
         this.category_expanse_id = category_expanse_id;
         this.userId = userId;
-        SumExpensesByCategory = sumExpensesByCategory;
+        this.sumExpensesByCategory = sumExpensesByCategory;
         //NumberOfExpenses = numberOfExpenses;
         this.percentOfExpensesPerMonth = percentOfExpensesPerMonth;
     }
@@ -39,7 +39,7 @@ public class ExpensesByCategory {
         this.title = title;
         this.category_expanse_id = category_expanse_id;
         this.userId = userId;
-        SumExpensesByCategory = sumExpensesByCategory;
+        this.sumExpensesByCategory = sumExpensesByCategory;
       //  NumberOfExpenses = numberOfExpenses;
     }
 
@@ -86,7 +86,7 @@ public class ExpensesByCategory {
     }
 
     public Double getSumExpensesByCategory() {
-        return SumExpensesByCategory;
+        return sumExpensesByCategory;
     }
 
     public Double getPercentOfExpensesPerMonth() {
