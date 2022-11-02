@@ -16,6 +16,8 @@ public class TotalExpansePerMonthDTO {
     private Double totalExpanses;
     private UUID userId;
     private String userName;
+    private Double amountInterval;
+    private Double percentOfAmountInterval;
 
 
     public TotalExpansePerMonthDTO(String year, String month, Double totalExpanses, UUID userId, String userName) {

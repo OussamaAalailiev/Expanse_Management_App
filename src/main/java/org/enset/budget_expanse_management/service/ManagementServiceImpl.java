@@ -274,7 +274,26 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     @Override
     public List<TotalExpansePerMonthDTO> getTotalExpansesPerYearMonthAndUserService(String userId) {
         try {
-            return expanseRepository.getTotalAmountExpansesOnEveryMonthV2(UUID.fromString(userId));
+            List<TotalExpansePerMonthDTO> totalExpansePerMonthDTOS
+                    = expanseRepository.getTotalAmountExpansesOnEveryMonthV2(UUID.fromString(userId));
+
+            for (int i = 0; i < totalExpansePerMonthDTOS.size()-1; i++) {
+                double amountInterval;
+                double percentOfAmountInterval;
+//                if (totalExpansePerMonthDTOS.get(i).getAmountInterval()==null){
+//                    totalExpansePerMonthDTOS.get(i).setAmountInterval(0.0);
+//                }
+//                if (totalExpansePerMonthDTOS.get(i).getPercentOfAmountInterval()==null){
+//                    totalExpansePerMonthDTOS.get(i).setPercentOfAmountInterval(0.0);
+//                }
+                amountInterval = totalExpansePerMonthDTOS.get(i).getTotalExpanses()
+                        - totalExpansePerMonthDTOS.get(i+1).getTotalExpanses();
+                percentOfAmountInterval = (amountInterval / totalExpansePerMonthDTOS.get(i).getTotalExpanses()) * 100;
+
+                totalExpansePerMonthDTOS.get(i).setAmountInterval(amountInterval);
+                totalExpansePerMonthDTOS.get(i).setPercentOfAmountInterval(percentOfAmountInterval);
+            }
+            return totalExpansePerMonthDTOS;
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("Error while getting Expanse Sum by user!");
