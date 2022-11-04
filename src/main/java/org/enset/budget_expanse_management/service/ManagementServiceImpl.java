@@ -224,17 +224,8 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             }
             double percentOfExpensesPerMonth;
             for (ExpensesByCategory expensesByCategory: expensesByCategoryAndUser) {
-                System.out.println("Id: " + expensesByCategory.getId()+"\t");
-                System.out.println("Amount: " + expensesByCategory.getAmount()+"\t");
-                System.out.println("CreatedDate: " + expensesByCategory.getCreatedDate()+"\t");
-                System.out.println("Title: " + expensesByCategory.getTitle()+"\t");
-                System.out.println("CategoryExpenseId: " + expensesByCategory.getCategory_expanse_id()+"\t");
-                System.out.println("UserID: " + expensesByCategory.getUserId()+"\t");
-                System.out.println("SumExpensesByCategory: " + expensesByCategory.getSumExpensesByCategory()+"\t");
                 percentOfExpensesPerMonth =  ((expensesByCategory.getSumExpensesByCategory() / totalSumsOfExp) * 100);
                 expensesByCategory.setPercentOfExpensesPerMonth(percentOfExpensesPerMonth);
-                System.out.println("PercentOfExpensesPerMonth: " + Math.round(expensesByCategory.getPercentOfExpensesPerMonth()) +"%\t");
-                System.out.println("---------------------------------------------");
             }
             return expensesByCategoryAndUser;
         }catch (Exception e){
@@ -276,22 +267,27 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         try {
             List<TotalExpansePerMonthDTO> totalExpansePerMonthDTOS
                     = expanseRepository.getTotalAmountExpansesOnEveryMonthV2(UUID.fromString(userId));
+            for (int i = 0; i < totalExpansePerMonthDTOS.size(); i++) {
 
-            for (int i = 0; i < totalExpansePerMonthDTOS.size()-1; i++) {
                 double amountInterval;
                 double percentOfAmountInterval;
-//                if (totalExpansePerMonthDTOS.get(i).getAmountInterval()==null){
-//                    totalExpansePerMonthDTOS.get(i).setAmountInterval(0.0);
-//                }
-//                if (totalExpansePerMonthDTOS.get(i).getPercentOfAmountInterval()==null){
-//                    totalExpansePerMonthDTOS.get(i).setPercentOfAmountInterval(0.0);
-//                }
-                amountInterval = totalExpansePerMonthDTOS.get(i).getTotalExpanses()
-                        - totalExpansePerMonthDTOS.get(i+1).getTotalExpanses();
-                percentOfAmountInterval = (amountInterval / totalExpansePerMonthDTOS.get(i).getTotalExpanses()) * 100;
+               if (i < totalExpansePerMonthDTOS.size()-1){
+                   amountInterval = ( totalExpansePerMonthDTOS.get(i).getTotalExpanses()
+                           - totalExpansePerMonthDTOS.get(i+1).getTotalExpanses() );
+                   percentOfAmountInterval = ( amountInterval /
+                           totalExpansePerMonthDTOS.get(i).getTotalExpanses() ) * 100;
 
-                totalExpansePerMonthDTOS.get(i).setAmountInterval(amountInterval);
-                totalExpansePerMonthDTOS.get(i).setPercentOfAmountInterval(percentOfAmountInterval);
+                   totalExpansePerMonthDTOS.get(i).setAmountInterval(amountInterval);
+                   totalExpansePerMonthDTOS.get(i).setPercentOfAmountInterval(percentOfAmountInterval);
+               } else if (i== totalExpansePerMonthDTOS.size()-1) {
+                    if (totalExpansePerMonthDTOS.get(i).getAmountInterval()==null){
+                        totalExpansePerMonthDTOS.get(i).setAmountInterval(0.0);
+                    }
+                    if (totalExpansePerMonthDTOS.get(i).getPercentOfAmountInterval()==null){
+                        totalExpansePerMonthDTOS.get(i).setPercentOfAmountInterval(0.0);
+                    }
+               }
+
             }
             return totalExpansePerMonthDTOS;
         }catch (Exception e){
