@@ -1,5 +1,7 @@
 package org.enset.budget_expanse_management.controllers;
 
+import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
+import org.enset.budget_expanse_management.mapping.TotalIncomesPerMonthDTO;
 import org.enset.budget_expanse_management.model.Income;
 import org.enset.budget_expanse_management.repositories.IncomeRepository;
 import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
@@ -78,6 +80,13 @@ public class IncomeRestController {
         System.out.println(" ------------- Income is deleted Successfully ----------");
         Income incomeToBeDeleted = incomeRepository.findById(Long.valueOf(id)).get();
         incomeRepository.delete(incomeToBeDeleted);
+    }
+
+    @GetMapping(path = "/incomes/incomesSumByUser/{id}")
+    public List<TotalIncomesPerMonthDTO> getSumOfIncomesByYearMonthUserIdPageAndSize(
+            @PathVariable(name = "id") Optional<String> userId){
+        System.out.println("Inside Controller -> incomesSumByUser");
+        return managementService.getTotalIncomesPerYearMonthAndUserService(userId.orElse(""));
     }
 
 }

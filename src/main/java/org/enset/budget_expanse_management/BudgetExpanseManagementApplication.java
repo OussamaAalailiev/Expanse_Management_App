@@ -6,6 +6,7 @@ import org.enset.budget_expanse_management.enums.CategoryIncomeType;
 import org.enset.budget_expanse_management.enums.GoalCategoryType;
 import org.enset.budget_expanse_management.enums.UserCurrency;
 import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
+import org.enset.budget_expanse_management.mapping.ResultDTOIncomesGoals;
 import org.enset.budget_expanse_management.model.*;
 import org.enset.budget_expanse_management.repositories.*;
 import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
@@ -20,6 +21,7 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -513,6 +515,111 @@ public class BudgetExpanseManagementApplication {
              System.out.println("---------------------------------------------");
          }
           */
+
+         /** Test for Inner Join Income & Goals On providing 3 Params Instead of 1 (userId): */
+
+        /*
+         System.out.println("-------------------------------------");
+         System.out.println("Test for Inner Join Income & Goals On providing 3 Params Instead of 1 (userId): ");
+         Income incomeUpdated = incomeRepository.findById(2L).get();
+         */
+
+         /*
+          String dateFromStringFormat = "2022-12-31";
+         Date dateUpdatedFormatted = new SimpleDateFormat("yyyy-MM-dd").parse(dateFromStringFormat);
+         //incomeUpdated.setCreatedDate(new Date(2022, 11, 6));
+         incomeUpdated.setCreatedDate(dateUpdatedFormatted);
+         CategoryIncome categoryIncome = categoryIncomeRepository.findById(6).get();
+         incomeUpdated.setCategoryIncome(categoryIncome);
+         //The 'oldResultDTOIncomesGoals' does not take into consideration any info updated
+         // from user's incomeUpdated except (userId) while the incomeUpdated isn't saved yet into DB:
+         List<ResultDTOIncomesGoals> oldResultDTOIncomesGoals =
+                 incomeRepository.onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
+         //The 'newResultDTOIncomesGoals' does take into consideration any info updated
+         // while the user's incomeUpdated isn't saved yet into DB, because we passed 3 Params
+         // (userId, categoryIncomeId and createdDate) instead of just 1 (userId):
+         List<ResultDTOIncomesGoals> newResultDTOIncomesGoals
+                 = incomeRepository.onOneIncomeComputeOnCommonGoalsV2(incomeUpdated.getId(),
+                 incomeUpdated.getCategoryIncome().getId(),
+                 incomeUpdated.getCreatedDate());
+         System.out.println("newResultDTOIncomesGoals .....");
+         if (newResultDTOIncomesGoals.isEmpty()){
+             System.out.println("newResultDTOIncomesGoals is Empty()..... !");
+         }else {
+             newResultDTOIncomesGoals.forEach(resultDTOIncomesGoals -> {
+                 System.out.println("Id Goal: "+resultDTOIncomesGoals.getIdGoal());
+                 System.out.println("Title Goal: "+resultDTOIncomesGoals.getTitleGoal());
+                 System.out.println("Date Debut Goal: "+resultDTOIncomesGoals.getDateDebut());
+                 System.out.println("End Date Goal: "+resultDTOIncomesGoals.getEndDate());
+                 System.out.println("Amount Goal: "+resultDTOIncomesGoals.getAmountGoal());
+                 System.out.println("CategoryIncomeId Goal: "+resultDTOIncomesGoals.getCategory_income_id_Goal());
+                 System.out.println("UserId of Goal: "+resultDTOIncomesGoals.getUserIdGoal());
+                 System.out.println("Id Income: "+resultDTOIncomesGoals.getIdIncome());
+                 System.out.println("Title Income: "+resultDTOIncomesGoals.getTitleIncome());
+                 System.out.println("Date Debut Goal: "+resultDTOIncomesGoals.getCreatedDate());
+                 System.out.println("End Date Goal: "+resultDTOIncomesGoals.getAmountIncome());
+                 System.out.println("CategoryIncomeId Income: "+resultDTOIncomesGoals.getCategory_income_id_Income());
+                 System.out.println("UserId of Income: "+resultDTOIncomesGoals.getUserIdIncome());
+                 System.out.println("------------------------------------");
+             });
+         }
+
+         System.out.println("*********** oldResultDTOIncomesGoals *********** ");
+         oldResultDTOIncomesGoals.forEach(resultDTOIncomesGoals -> {
+             System.out.println("Id Goal: "+resultDTOIncomesGoals.getIdGoal());
+             System.out.println("Title Goal: "+resultDTOIncomesGoals.getTitleGoal());
+             System.out.println("Date Debut Goal: "+resultDTOIncomesGoals.getDateDebut());
+             System.out.println("End Date Goal: "+resultDTOIncomesGoals.getEndDate());
+             System.out.println("Amount Goal: "+resultDTOIncomesGoals.getAmountGoal());
+             System.out.println("CategoryIncomeId Goal: "+resultDTOIncomesGoals.getCategory_income_id_Goal());
+             System.out.println("UserId of Goal: "+resultDTOIncomesGoals.getUserIdGoal());
+             System.out.println("Id Income: "+resultDTOIncomesGoals.getIdIncome());
+             System.out.println("Title Income: "+resultDTOIncomesGoals.getTitleIncome());
+             System.out.println("Date Debut Goal: "+resultDTOIncomesGoals.getCreatedDate());
+             System.out.println("End Date Goal: "+resultDTOIncomesGoals.getAmountIncome());
+             System.out.println("CategoryIncomeId Income: "+resultDTOIncomesGoals.getCategory_income_id_Income());
+             System.out.println("UserId of Income: "+resultDTOIncomesGoals.getUserIdIncome());
+             System.out.println("------------------------------------");
+         });
+          */
+
+//         List<ResultDTOIncomesGoals> oldResultDTOIncomesGoals =
+//                 incomeRepository.onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
+//         System.out.println("*********** oldResultDTOIncomesGoals *********** ");
+//         oldResultDTOIncomesGoals.forEach(resultDTOIncomesGoals -> {
+//             System.out.println("Id Goal: "+resultDTOIncomesGoals.getIdGoal());
+//             System.out.println("Title Goal: "+resultDTOIncomesGoals.getTitleGoal());
+//             System.out.println("Date Debut Goal: "+resultDTOIncomesGoals.getDateDebut());
+//             System.out.println("End Date Goal: "+resultDTOIncomesGoals.getEndDate());
+//             System.out.println("Amount Goal: "+resultDTOIncomesGoals.getAmountGoal());
+//             System.out.println("CategoryIncomeId Goal: "+resultDTOIncomesGoals.getCategory_income_id_Goal());
+//             System.out.println("UserId of Goal: "+resultDTOIncomesGoals.getUserIdGoal());
+//             System.out.println("Id Income: "+resultDTOIncomesGoals.getIdIncome());
+//             System.out.println("Title Income: "+resultDTOIncomesGoals.getTitleIncome());
+//             System.out.println("Date Debut Goal: "+resultDTOIncomesGoals.getCreatedDate());
+//             System.out.println("End Date Goal: "+resultDTOIncomesGoals.getAmountIncome());
+//             System.out.println("CategoryIncomeId Income: "+resultDTOIncomesGoals.getCategory_income_id_Income());
+//             System.out.println("UserId of Income: "+resultDTOIncomesGoals.getUserIdIncome());
+//             System.out.println("------------------------------------");
+//         });
+
+         System.out.println();
+         System.out.println("Select Total Incomes By Month & UserID : ");
+         System.out.println();
+         /** Select Total Incomes By Month & UserID :*/
+
+         incomeRepository.getTotalAmountIncomesOnEveryMonth(
+                 UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1"))
+                 .forEach(totalIncomesPerMonthDTO -> {
+                     System.out.println("Year: " + totalIncomesPerMonthDTO.getYear());
+                     System.out.println("Month: " + totalIncomesPerMonthDTO.getMonth());
+                     System.out.println("Total Incomes: " + totalIncomesPerMonthDTO.getTotalIncomes());
+                     System.out.println("UserName: " + totalIncomesPerMonthDTO.getUserName());
+                     System.out.println("------------------------------------------");
+                 });
+
+
+
 
 
 

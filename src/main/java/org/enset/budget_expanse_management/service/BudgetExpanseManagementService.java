@@ -2,6 +2,7 @@ package org.enset.budget_expanse_management.service;
 
 import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
 import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
+import org.enset.budget_expanse_management.mapping.TotalIncomesPerMonthDTO;
 import org.enset.budget_expanse_management.model.Budget;
 import org.enset.budget_expanse_management.model.Expanse;
 import org.enset.budget_expanse_management.model.Goal;
@@ -62,6 +63,9 @@ public interface BudgetExpanseManagementService {
     /**Compute all common Goals(if exists) ON Delete an Income
      *  by a user at each query:*/
     public void calculateGoalsOnDeleteIncomeService(Income income);
+
+    /** Get Total Amount of Incomes per Month By UserID from Service: */
+    public List<TotalIncomesPerMonthDTO> getTotalIncomesPerYearMonthAndUserService(String userId);
 
 
 }

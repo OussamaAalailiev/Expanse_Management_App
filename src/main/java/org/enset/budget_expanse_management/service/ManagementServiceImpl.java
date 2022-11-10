@@ -1,10 +1,7 @@
 package org.enset.budget_expanse_management.service;
 
 import jdk.jfr.RecordingState;
-import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
-import org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets;
-import org.enset.budget_expanse_management.mapping.ResultDTOIncomesGoals;
-import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
+import org.enset.budget_expanse_management.mapping.*;
 import org.enset.budget_expanse_management.model.Budget;
 import org.enset.budget_expanse_management.model.Expanse;
 import org.enset.budget_expanse_management.model.Goal;
@@ -483,9 +480,14 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
     }
 
+    //TODO: Uncompleted Full Update of Income!
     @Override
     public void calculateGoalsOnUpdateFullIncomeServiceV2(Income incomeUpdated) {
         //Check IF Income has Common Goals:
+        List<ResultDTOIncomesGoals> newResultDTOIncomesGoals
+                = incomeRepository.onOneIncomeComputeOnCommonGoalsV2(incomeUpdated.getId(),
+                                                                     incomeUpdated.getCategoryIncome().getId(),
+                                                                     incomeUpdated.getCreatedDate());
         List<ResultDTOIncomesGoals> oldResultDTOIncomesGoals
                 = incomeRepository.onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
         List<Goal> goalListToUpdate = new ArrayList<>();
@@ -497,9 +499,9 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
             if (!sameCategoryIncomeId){
                 excludeOldIncomeAmountUpdatedFromAllOldGoals(oldResultDTOIncomesGoals);
-                incomeRepository.save(incomeUpdated);
-                List<ResultDTOIncomesGoals> newResultDTOIncomesGoals = incomeRepository
-                        .onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
+                //incomeRepository.save(incomeUpdated);
+//                List<ResultDTOIncomesGoals> newResultDTOIncomesGoals = incomeRepository
+//                        .onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
                 if (!newResultDTOIncomesGoals.isEmpty()){
                     includeIncomeAmountToNewDiffGoals(incomeUpdated, newResultDTOIncomesGoals);
                 }
@@ -518,9 +520,9 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                         includeIncomeAmountToOneOldGoal(incomeUpdated, resultDTOIncomeGoal);
                     }else {
                         excludeOldIncomeAmountUpdatedFromAllOldGoals(oldResultDTOIncomesGoals);
-                        incomeRepository.save(incomeUpdated);
-                        List<ResultDTOIncomesGoals> newResultDTOIncomesGoals = incomeRepository
-                                .onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
+//                        incomeRepository.save(incomeUpdated);
+//                        List<ResultDTOIncomesGoals> newResultDTOIncomesGoals = incomeRepository
+//                                .onOneIncomeComputeOnCommonGoals(incomeUpdated.getId());
                         if (!newResultDTOIncomesGoals.isEmpty()){
                             includeIncomeAmountToNewDiffGoals(incomeUpdated, newResultDTOIncomesGoals);
                         }
@@ -768,6 +770,40 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("Unexpected Error Occurred while Delete Income!");
+        }
+    }
+
+    @Override
+    public List<TotalIncomesPerMonthDTO> getTotalIncomesPerYearMonthAndUserService(String userId) {
+        try {
+            List<TotalIncomesPerMonthDTO> totalIncomesPerMonthDTOS
+                    = incomeRepository.getTotalAmountIncomesOnEveryMonth(UUID.fromString(userId));
+            for (int i = 0; i < totalIncomesPerMonthDTOS.size(); i++) {
+
+                double amountInterval;
+                double percentOfAmountInterval;
+                if (i < totalIncomesPerMonthDTOS.size()-1){
+                    amountInterval = ( totalIncomesPerMonthDTOS.get(i).getTotalIncomes()
+                            - totalIncomesPerMonthDTOS.get(i+1).getTotalIncomes() );
+                    percentOfAmountInterval = ( amountInterval /
+                            totalIncomesPerMonthDTOS.get(i).getTotalIncomes() ) * 100;
+
+                    totalIncomesPerMonthDTOS.get(i).setAmountInterval(amountInterval);
+                    totalIncomesPerMonthDTOS.get(i).setPercentOfAmountInterval(percentOfAmountInterval);
+                } else if (i== totalIncomesPerMonthDTOS.size()-1) {
+                    if (totalIncomesPerMonthDTOS.get(i).getAmountInterval()==null){
+                        totalIncomesPerMonthDTOS.get(i).setAmountInterval(0.0);
+                    }
+                    if (totalIncomesPerMonthDTOS.get(i).getPercentOfAmountInterval()==null){
+                        totalIncomesPerMonthDTOS.get(i).setPercentOfAmountInterval(0.0);
+                    }
+                }
+
+            }
+            return totalIncomesPerMonthDTOS;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Error while getting Incomes Sum by user!");
         }
     }
 
