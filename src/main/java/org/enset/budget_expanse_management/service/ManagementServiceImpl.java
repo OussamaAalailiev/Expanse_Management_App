@@ -807,5 +807,27 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }
     }
 
+    @Override
+    public List<IncomesByCategory> getIncomesSumByCategoryAndUserIdService(String userId) {
+        try {
+            List<IncomesByCategory> incomesByCategoriesAndUser = incomeRepository
+                    .getTotalIncomesByCategoryAndUser(
+                            UUID.fromString(userId));
+            Double totalSumsOfIncome = 0.0;
+            for (IncomesByCategory incomesByCategory: incomesByCategoriesAndUser) {
+                totalSumsOfIncome+=incomesByCategory.getTotalIncomesByCategory();
+            }
+            double percentOfIncomesPerMonth;
+            for (IncomesByCategory incomesByCategory: incomesByCategoriesAndUser) {
+                percentOfIncomesPerMonth =  ((incomesByCategory.getTotalIncomesByCategory() / totalSumsOfIncome) * 100);
+                incomesByCategory.setPercentOfIncomesPerMonth(percentOfIncomesPerMonth);
+            }
+            return incomesByCategoriesAndUser;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Something Went wrong on Getting Sum of Incomes By Category & userId!...");
+        }
+    }
+
 }
 

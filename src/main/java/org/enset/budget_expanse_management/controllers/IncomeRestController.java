@@ -1,6 +1,7 @@
 package org.enset.budget_expanse_management.controllers;
 
-import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
+import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
+import org.enset.budget_expanse_management.mapping.IncomesByCategory;
 import org.enset.budget_expanse_management.mapping.TotalIncomesPerMonthDTO;
 import org.enset.budget_expanse_management.model.Income;
 import org.enset.budget_expanse_management.repositories.IncomeRepository;
@@ -54,8 +55,7 @@ public class IncomeRestController {
     public Income addNewIncomeController(@RequestBody Income income){
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Income is added Successfully ----------");
-        Income savedIncome = incomeRepository.save(income);
-        return savedIncome;
+        return incomeRepository.save(income);
     }
 
     @PutMapping(path = "/incomes/admin/{id}")
@@ -87,6 +87,12 @@ public class IncomeRestController {
             @PathVariable(name = "id") Optional<String> userId){
         System.out.println("Inside Controller -> incomesSumByUser");
         return managementService.getTotalIncomesPerYearMonthAndUserService(userId.orElse(""));
+    }
+
+    @GetMapping(path = "/incomes/incomesByCategoryAndUserId/{id}")
+    public List<IncomesByCategory> getIncomesByCategoryAndUserId(
+            @PathVariable(name = "id") Optional<String> userId){
+        return managementService.getIncomesSumByCategoryAndUserIdService(userId.orElse(""));
     }
 
 }

@@ -603,12 +603,13 @@ public class BudgetExpanseManagementApplication {
 //             System.out.println("------------------------------------");
 //         });
 
+
+         /** Select Total Incomes By Month & UserID :*/
+         /*
          System.out.println();
          System.out.println("Select Total Incomes By Month & UserID : ");
          System.out.println();
-         /** Select Total Incomes By Month & UserID :*/
-
-         incomeRepository.getTotalAmountIncomesOnEveryMonth(
+          incomeRepository.getTotalAmountIncomesOnEveryMonth(
                  UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1"))
                  .forEach(totalIncomesPerMonthDTO -> {
                      System.out.println("Year: " + totalIncomesPerMonthDTO.getYear());
@@ -618,6 +619,19 @@ public class BudgetExpanseManagementApplication {
                      System.out.println("------------------------------------------");
                  });
 
+          */
+
+         /** Select Total Incomes By Category & UserID : */
+         System.out.println("********* Select Total Incomes By Category & UserID ********");
+         incomeRepository.getTotalIncomesByCategoryAndUser(UUID.fromString(
+                 "3a300bc8-8954-4e93-9136-2b11ad2461b1"))
+                 .forEach(incomesByCategory -> {
+                     System.out.println("Created Date: "+ incomesByCategory.getCreatedDate());
+                     System.out.println("CategoryIncome ID: "+ incomesByCategory.getCategory_income_id());
+                     System.out.println("User ID: "+ incomesByCategory.getUserId());
+                     System.out.println("Total Amount by category: "+ incomesByCategory.getTotalIncomesByCategory());
+                     System.out.println("------------------------------");
+                 });
 
 
 

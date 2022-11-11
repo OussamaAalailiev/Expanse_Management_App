@@ -1,6 +1,7 @@
 package org.enset.budget_expanse_management.service;
 
 import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
+import org.enset.budget_expanse_management.mapping.IncomesByCategory;
 import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
 import org.enset.budget_expanse_management.mapping.TotalIncomesPerMonthDTO;
 import org.enset.budget_expanse_management.model.Budget;
@@ -25,8 +26,9 @@ public interface BudgetExpanseManagementService {
     /**Get Expanses By Page based on title of expanse + page N° + Size N° from Service: */
     public Page<Expanse> getExpansesByPageAndSizeAndTitleAndUserIdService(String title, String userId,
                                                                           int page, int size);
-    //TODO : Get Total Expenses Sum By Category & UserId:
+    /** Get Total Expenses Sum By Category & UserId:*/
     public List<ExpensesByCategory> getExpensesSumByCategoryAndUserIdService(String userId);
+
     /**Inner Joint that get all common Expanses(if exists) with one new Budget added
      *  by a user at each query:
      *  */
@@ -67,5 +69,7 @@ public interface BudgetExpanseManagementService {
     /** Get Total Amount of Incomes per Month By UserID from Service: */
     public List<TotalIncomesPerMonthDTO> getTotalIncomesPerYearMonthAndUserService(String userId);
 
+    /** Get Total Incomes Sum By Category & UserId:*/
+    public List<IncomesByCategory> getIncomesSumByCategoryAndUserIdService(String userId);
 
 }
