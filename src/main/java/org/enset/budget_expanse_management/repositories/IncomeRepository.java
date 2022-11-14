@@ -48,10 +48,18 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
             "ORDER BY DATE_FORMAT(i.createdDate, '%Y'), DATE_FORMAT(i.createdDate, '%m') DESC")
     List<TotalIncomesPerMonthDTO> getTotalAmountIncomesOnEveryMonth(@Param("x") UUID userId);
 
-    /** Select Total Incomes By Category & UserID :*/
+    /** Select Total Incomes By Category & UserID Ordered by Amount:*/
     @Query("SELECT NEW org.enset.budget_expanse_management.mapping" +
             ".IncomesByCategory(i.id, i.amount, i.createdDate, i.title, " +
             " i.categoryIncome.id, i.user.id, SUM(i.amount)) FROM Income i" +
             " WHERE i.user.id=:x GROUP BY i.categoryIncome.id ORDER BY SUM(i.amount) DESC")
     List<IncomesByCategory> getTotalIncomesByCategoryAndUser(@Param("x") UUID userId);
+    /** Select Total Incomes By Category & UserID Ordered by Date DESC:*/
+    @Query("SELECT NEW org.enset.budget_expanse_management.mapping" +
+            ".IncomesByCategory(i.id, i.amount, i.createdDate, i.title, " +
+            " i.categoryIncome.id, i.user.id, SUM(i.amount)) FROM Income i" +
+            " WHERE i.user.id=:x " +
+            " GROUP BY i.categoryIncome.id " +
+            " ORDER BY YEAR(i.createdDate) DESC, MONTH(i.createdDate) DESC, DAY(i.createdDate) DESC")
+    List<IncomesByCategory> getTotalIncomesByCategoryAndUserOrderedByDate(@Param("x") UUID userId);
 }
