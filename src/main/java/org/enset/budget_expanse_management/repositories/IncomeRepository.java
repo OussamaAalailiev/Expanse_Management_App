@@ -14,7 +14,8 @@ import java.util.UUID;
 
 public interface IncomeRepository extends JpaRepository<Income, Long> {
     /**Get Incomes By Page based on title of Income + page N° + Size N° && UserID: */
-    public Page<Income> findByTitleContainingAndUserId(String title, UUID userId, Pageable pageable);
+    //public Page<Income> findByTitleContainingAndUserId(String title, UUID userId, Pageable pageable);
+    public Page<Income> findByTitleContainingAndUserIdOrderByCreatedDateDesc(String title, UUID userId, Pageable pageable);
 
     /**Inner Joint 'Income(s) + Goal(s)': the following function works well! :) */
     @Query("SELECT NEW org.enset.budget_expanse_management.mapping.ResultDTOIncomesGoals(" +

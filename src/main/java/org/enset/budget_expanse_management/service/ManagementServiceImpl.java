@@ -194,7 +194,8 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
     @Override
     public Page<Expanse> getExpansesByPageAndSizeAndTitleService(String title, int page, int size) {
-        return expanseRepository.findByTitleContaining(title, PageRequest.of(page, size));
+      //  return expanseRepository.findByTitleContaining(title, PageRequest.of(page, size));
+        return expanseRepository.findByTitleContainingOrderByCreatedDateDesc(title, PageRequest.of(page, size));
     }
 
     @Override
@@ -202,7 +203,8 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                                                                           int page, int size) {
         try {
             return expanseRepository
-                    .findByTitleContainingAndUserId(title, UUID.fromString(userId), PageRequest.of(page, size));
+//                    .findByTitleContainingAndUserId(title, UUID.fromString(userId), PageRequest.of(page, size));
+                    .findByTitleContainingAndUserIdOrderByCreatedDateDesc(title, UUID.fromString(userId), PageRequest.of(page, size));
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("User OR Expanse(s) were Not Found!");
@@ -375,7 +377,8 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                                                                         int page, int size) {
         try {
             return incomeRepository.
-                    findByTitleContainingAndUserId(incomeTitle, UUID.fromString(userId), PageRequest.of(page, size));
+                   // findByTitleContainingAndUserId(incomeTitle, UUID.fromString(userId), PageRequest.of(page, size));
+                    findByTitleContainingAndUserIdOrderByCreatedDateDesc(incomeTitle, UUID.fromString(userId), PageRequest.of(page, size));
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("User OR Income(s) were Not Found!");

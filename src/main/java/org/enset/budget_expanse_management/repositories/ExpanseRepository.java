@@ -65,10 +65,12 @@ public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
     List<TotalExpansePerMonthDTO> getTotalAmountExpansesOnEveryMonthV2(@Param("x") UUID userId);
 
     /**Get Expanses By Page based on title of expanse + page N° + Size N°: */
-    Page<Expanse> findByTitleContaining(String title, Pageable pageable);
+    //Page<Expanse> findByTitleContaining(String title, Pageable pageable);
+    Page<Expanse> findByTitleContainingOrderByCreatedDateDesc(String title, Pageable pageable);
 
     /**Get Expanses By Page based on title of expanse + page N° + Size N° && UserID: */
     public Page<Expanse> findByTitleContainingAndUserId(String title, UUID userId, Pageable pageable);
+    public Page<Expanse> findByTitleContainingAndUserIdOrderByCreatedDateDesc(String title, UUID userId, Pageable pageable);
 
     /** Select Total Expanses By Category & UserID :*/
     @Query("SELECT NEW org.enset.budget_expanse_management.mapping" +
