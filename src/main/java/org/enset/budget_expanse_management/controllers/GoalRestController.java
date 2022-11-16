@@ -38,7 +38,7 @@ public class GoalRestController {
         return managementService
                 .getGoalsByPageAndSizeAndTitleAndUserIdService(
                         title.orElse(""), userId.orElse(""),
-                        page.orElse(0), size.orElse(2));
+                        page.orElse(0), size.orElse(3));
     }
 
     @GetMapping(path = "/goals/{id}")

@@ -70,9 +70,11 @@ public interface BudgetRepository extends JpaRepository<Budget, Integer> {
     ///**Get Budgets By Page based on title of expanse + page N° + Size N°: */
     //    Page<Expanse> findByTitleContaining(String title, Pageable pageable);
     Page<Budget> findByTitleContaining(String titleBudget, Pageable page);
+    Page<Budget> findByTitleContainingOrderByDateDebutDesc(String titleBudget, Pageable page);
 
     /**Get Budgets By Page based on title of Budget + page N° + Size N° && UserID: */
     public Page<Budget> findByTitleContainingAndUserId(String title, UUID userId, Pageable pageable);
+    public Page<Budget> findByTitleContainingAndUserIdOrderByDateDebutDesc(String title, UUID userId, Pageable pageable);
 
 
 

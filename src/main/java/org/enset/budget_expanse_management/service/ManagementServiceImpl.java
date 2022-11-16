@@ -353,7 +353,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     public Page<Budget> getBudgetsByPageAndSizeAndTitleAndUserIdService(String title, String userId, int page, int size) {
         try {
             return budgetRepository
-                    .findByTitleContainingAndUserId(title, UUID.fromString(userId), PageRequest.of(page, size));
+                    .findByTitleContainingAndUserIdOrderByDateDebutDesc(title, UUID.fromString(userId), PageRequest.of(page, size));
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("User OR Budget(s) were Not Found!");
@@ -363,7 +363,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     @Override
     public Page<Goal> getGoalsByPageAndSizeAndTitleAndUserIdService(String title, String userId, int page, int size) {
         try {
-            return goalRepository.findByTitleContainingAndUserId(title,
+            return goalRepository.findByTitleContainingAndUserIdOrderByDateDebutDescEndDateDesc(title,
                     UUID.fromString(userId),
                     PageRequest.of(page, size));
         }catch (Exception e){
