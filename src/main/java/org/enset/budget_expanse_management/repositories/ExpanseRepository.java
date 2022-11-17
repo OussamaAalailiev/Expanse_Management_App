@@ -72,12 +72,21 @@ public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
     public Page<Expanse> findByTitleContainingAndUserId(String title, UUID userId, Pageable pageable);
     public Page<Expanse> findByTitleContainingAndUserIdOrderByCreatedDateDesc(String title, UUID userId, Pageable pageable);
 
-    /** Select Total Expanses By Category & UserID :*/
+    /** Select Total Expanses By Category & UserID Ordered By Date DESC:*/
     @Query("SELECT NEW org.enset.budget_expanse_management.mapping" +
             ".ExpensesByCategory(e.id, e.amount, e.createdDate, e.title, " +
             " e.categoryExpanse.id, e.user.id, SUM(e.amount)) FROM Expanse e " +
-            "WHERE e.user.id=:x GROUP BY e.categoryExpanse.id ORDER BY SUM(e.amount)")
+            " WHERE e.user.id=:x GROUP BY e.categoryExpanse.id " +
+            " ORDER BY YEAR(e.createdDate) DESC, MONTH(e.createdDate) DESC, DAY(e.createdDate) DESC")
     List<ExpensesByCategory> getTotalExpensesByCategoryAndUser(@Param("x") UUID userId);
+
+ /** Select Total Expanses By Category & UserID Ordered By Date DESC:*/
+ @Query("SELECT NEW org.enset.budget_expanse_management.mapping" +
+         ".ExpensesByCategory(e.id, e.amount, e.createdDate, e.title, " +
+         " e.categoryExpanse.id, e.user.id, SUM(e.amount)) FROM Expanse e " +
+         " WHERE e.user.id=:x GROUP BY e.categoryExpanse.id " +
+         " ORDER BY SUM(e.amount) DESC")
+ List<ExpensesByCategory> getTotalExpensesByCategoryAndUserAmountDesc(@Param("x") UUID userId);
 
 
 }

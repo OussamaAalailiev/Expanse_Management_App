@@ -79,6 +79,11 @@ public class ExpanseRestController {
             @PathVariable(name = "id") Optional<String> userId){
         return managementService.getExpensesSumByCategoryAndUserIdService(userId.orElse(""));
     }
+    @GetMapping(path = "/expensesSumByCategoryAndUserIdAmountDesc/{id}")
+    public List<ExpensesByCategory> getExpensesByCategoryAndUserIdAmountDesc(
+            @PathVariable(name = "id") Optional<String> userId){
+        return managementService.getExpensesSumByCategoryAndUserIdAmountDescService(userId.orElse(""));
+    }
 
     @GetMapping(path = "/expanses")
     public Page<Expanse> getExpansesByPageAndSizeControllerV2(@RequestParam Optional<String> title,

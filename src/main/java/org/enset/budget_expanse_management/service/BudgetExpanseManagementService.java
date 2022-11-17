@@ -28,6 +28,7 @@ public interface BudgetExpanseManagementService {
                                                                           int page, int size);
     /** Get Total Expenses Sum By Category & UserId:*/
     public List<ExpensesByCategory> getExpensesSumByCategoryAndUserIdService(String userId);
+    public List<ExpensesByCategory> getExpensesSumByCategoryAndUserIdAmountDescService(String userId);
 
     /**Inner Joint that get all common Expanses(if exists) with one new Budget added
      *  by a user at each query:

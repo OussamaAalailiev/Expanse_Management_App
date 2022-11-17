@@ -217,21 +217,41 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             List<ExpensesByCategory> expensesByCategoryAndUser = expanseRepository
                     .getTotalExpensesByCategoryAndUser(
                             UUID.fromString(userId));
-            Double totalSumsOfExp = 0.0;
-            for (ExpensesByCategory expensesByCategory: expensesByCategoryAndUser) {
-                totalSumsOfExp+=expensesByCategory.getSumExpensesByCategory();
-            }
-            double percentOfExpensesPerMonth;
-            for (ExpensesByCategory expensesByCategory: expensesByCategoryAndUser) {
-                percentOfExpensesPerMonth =  ((expensesByCategory.getSumExpensesByCategory() / totalSumsOfExp) * 100);
-                expensesByCategory.setPercentOfExpensesPerMonth(percentOfExpensesPerMonth);
-            }
-            return expensesByCategoryAndUser;
+            return computeTotalSumAndPercentOnExpCat(expensesByCategoryAndUser);
         }catch (Exception e){
             e.printStackTrace();
-            throw new RuntimeException("Something Went wrong on Getting Sum of Expenses By Category & userId!...");
+            throw new RuntimeException("Something Went wrong on Getting Sum of Expenses By Category Ordered By Date!...");
         }
-       // return null;
+    }
+
+    @Override
+    public List<ExpensesByCategory> getExpensesSumByCategoryAndUserIdAmountDescService(String userId) {
+        try {
+            System.out.println();
+            System.out.println("getExpensesSumByCategoryAndUserIdAmountDescService() ...");
+            List<ExpensesByCategory> expensesByCategoryAndUserAmountDesc = expanseRepository
+                    .getTotalExpensesByCategoryAndUserAmountDesc(
+                            UUID.fromString(userId));
+            return computeTotalSumAndPercentOnExpCat(expensesByCategoryAndUserAmountDesc);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Something Went wrong on Getting Sum of Expenses By Category Ordered By Amount!...");
+        }
+    }
+
+    private List<ExpensesByCategory> computeTotalSumAndPercentOnExpCat(List<ExpensesByCategory> expensesByCategoryAndUser) {
+        System.out.println();
+        System.out.println("Refactored block of code: computeTotalSumAndPercentOnExpCat(...) ");
+        Double totalSumsOfExp = 0.0;
+        for (ExpensesByCategory expensesByCategory: expensesByCategoryAndUser) {
+            totalSumsOfExp+=expensesByCategory.getSumExpensesByCategory();
+        }
+        double percentOfExpensesPerMonth;
+        for (ExpensesByCategory expensesByCategory: expensesByCategoryAndUser) {
+            percentOfExpensesPerMonth =  ((expensesByCategory.getSumExpensesByCategory() / totalSumsOfExp) * 100);
+            expensesByCategory.setPercentOfExpensesPerMonth(percentOfExpensesPerMonth);
+        }
+        return expensesByCategoryAndUser;
     }
 
 
