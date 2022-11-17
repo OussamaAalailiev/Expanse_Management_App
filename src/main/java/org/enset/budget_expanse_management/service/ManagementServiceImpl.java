@@ -836,16 +836,42 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             List<IncomesByCategory> incomesByCategoriesAndUser = incomeRepository
                     .getTotalIncomesByCategoryAndUser(
                             UUID.fromString(userId));
-            Double totalSumsOfIncome = 0.0;
-            for (IncomesByCategory incomesByCategory: incomesByCategoriesAndUser) {
-                totalSumsOfIncome+=incomesByCategory.getTotalIncomesByCategory();
-            }
-            double percentOfIncomesPerMonth;
-            for (IncomesByCategory incomesByCategory: incomesByCategoriesAndUser) {
-                percentOfIncomesPerMonth =  ((incomesByCategory.getTotalIncomesByCategory() / totalSumsOfIncome) * 100);
-                incomesByCategory.setPercentOfIncomesPerMonth(percentOfIncomesPerMonth);
-            }
-            return incomesByCategoriesAndUser;
+//            Double totalSumsOfIncome = 0.0;
+//            for (IncomesByCategory incomesByCategory: incomesByCategoriesAndUser) {
+//                totalSumsOfIncome+=incomesByCategory.getTotalIncomesByCategory();
+//            }
+//            double percentOfIncomesPerMonth;
+//            for (IncomesByCategory incomesByCategory: incomesByCategoriesAndUser) {
+//                percentOfIncomesPerMonth =  ((incomesByCategory.getTotalIncomesByCategory() / totalSumsOfIncome) * 100);
+//                incomesByCategory.setPercentOfIncomesPerMonth(percentOfIncomesPerMonth);
+//            }
+            return computeTotalSumAndPercentOnIncomesCat(incomesByCategoriesAndUser);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Something Went wrong on Getting Sum of Incomes By Category & userId!...");
+        }
+    }
+
+    private List<IncomesByCategory> computeTotalSumAndPercentOnIncomesCat(List<IncomesByCategory> incomesByCategoriesAndUser) {
+        Double totalSumsOfIncome = 0.0;
+        for (IncomesByCategory incomesByCategory: incomesByCategoriesAndUser) {
+            totalSumsOfIncome+=incomesByCategory.getTotalIncomesByCategory();
+        }
+        double percentOfIncomesPerMonth;
+        for (IncomesByCategory incomesByCategory: incomesByCategoriesAndUser) {
+            percentOfIncomesPerMonth =  ((incomesByCategory.getTotalIncomesByCategory() / totalSumsOfIncome) * 100);
+            incomesByCategory.setPercentOfIncomesPerMonth(percentOfIncomesPerMonth);
+        }
+        return incomesByCategoriesAndUser;
+    }
+
+    @Override
+    public List<IncomesByCategory> getIncomesSumByCategoryAndUserIdDateDescService(String userId) {
+        try {
+            List<IncomesByCategory> incomesByCategoriesAndUser = incomeRepository
+                    .getTotalIncomesByCategoryAndUserOrderedByDate(
+                            UUID.fromString(userId));
+            return computeTotalSumAndPercentOnIncomesCat(incomesByCategoriesAndUser);
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("Something Went wrong on Getting Sum of Incomes By Category & userId!...");

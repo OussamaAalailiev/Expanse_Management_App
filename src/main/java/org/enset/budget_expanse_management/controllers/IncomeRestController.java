@@ -89,10 +89,15 @@ public class IncomeRestController {
         return managementService.getTotalIncomesPerYearMonthAndUserService(userId.orElse(""));
     }
 
-    @GetMapping(path = "/incomes/incomesByCategoryAndUserId/{id}")
+    @GetMapping(path = "/incomes/incomesByCategoryAndUserIdAmountDesc/{id}")
     public List<IncomesByCategory> getIncomesByCategoryAndUserId(
             @PathVariable(name = "id") Optional<String> userId){
         return managementService.getIncomesSumByCategoryAndUserIdService(userId.orElse(""));
+    }
+    @GetMapping(path = "/incomes/incomesByCategoryAndUserIdDateDesc/{id}")
+    public List<IncomesByCategory> getIncomesByCategoryAndUserIdDateDesc(
+            @PathVariable(name = "id") Optional<String> userId){
+        return managementService.getIncomesSumByCategoryAndUserIdDateDescService(userId.orElse(""));
     }
 
 }

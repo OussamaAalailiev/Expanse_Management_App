@@ -70,7 +70,9 @@ public interface BudgetExpanseManagementService {
     /** Get Total Amount of Incomes per Month By UserID from Service: */
     public List<TotalIncomesPerMonthDTO> getTotalIncomesPerYearMonthAndUserService(String userId);
 
-    /** Get Total Incomes Sum By Category & UserId:*/
-    public List<IncomesByCategory> getIncomesSumByCategoryAndUserIdService(String userId);
+    /** Get Total Incomes Sum By Category & UserId Ordered by Amount Desc:*/
+    List<IncomesByCategory> getIncomesSumByCategoryAndUserIdService(String userId);
+    /** Get Total Incomes Sum By Category & UserId Ordered by Date Desc:*/
+    List<IncomesByCategory> getIncomesSumByCategoryAndUserIdDateDescService(String userId);
 
 }

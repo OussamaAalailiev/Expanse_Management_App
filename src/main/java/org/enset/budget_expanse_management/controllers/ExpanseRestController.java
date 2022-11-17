@@ -120,10 +120,22 @@ public class ExpanseRestController {
         expanse.setTitle(expanseFormSubmission.getTitle());
         expanse.setAmount(expanseFormSubmission.getAmount());
         expanse.setCreatedDate(expanseFormSubmission.getCreatedDate());
+//        CategoryExpanse categoryExpanse = categoryExpanseRepository
+//                .findById(expanseFormSubmission.getCategoryExpanse()).get();
+//        User user = userRepository
+//                .findById(UUID.fromString(expanseFormSubmission.getUserId())).get();
         CategoryExpanse categoryExpanse = categoryExpanseRepository
-                .findById(expanseFormSubmission.getCategoryExpanse()).get();
+                .findById(expanseFormSubmission.getCategoryExpanse()).orElseThrow(
+                        () -> {
+                            throw new RuntimeException("No such 'CategoryExpanse' was found!");
+                        }
+                );
         User user = userRepository
-                .findById(UUID.fromString(expanseFormSubmission.getUserId())).get();
+                .findById(UUID.fromString(expanseFormSubmission.getUserId())).orElseThrow(
+                        () -> {
+                            throw new RuntimeException("No such 'User' was found!");
+                        }
+                );
         expanse.setCategoryExpanse(categoryExpanse);
         expanse.setUser(user);
 
