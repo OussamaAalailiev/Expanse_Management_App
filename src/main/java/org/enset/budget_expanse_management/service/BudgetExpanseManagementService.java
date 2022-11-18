@@ -39,6 +39,8 @@ public interface BudgetExpanseManagementService {
 //                                                                                    int page,
 //                                                                                    int size);
     public List<TotalExpansePerMonthDTO> getTotalExpansesPerYearMonthAndUserService(String userId);
+    /** Query to get Total Amount of Expenses so far: */
+    public TotalExpansePerMonthDTO getTotalExpansesPerLifeTimeAndUserService(String userId);
     public void updateBudgetService(Budget budget);
     public void deleteBudgetService(Budget budget);
     /**Get Budgets By Page based on title of budget + page N° + Size N° from Service: */
@@ -68,11 +70,15 @@ public interface BudgetExpanseManagementService {
     public void calculateGoalsOnDeleteIncomeService(Income income);
 
     /** Get Total Amount of Incomes per Month By UserID from Service: */
-    public List<TotalIncomesPerMonthDTO> getTotalIncomesPerYearMonthAndUserService(String userId);
+    List<TotalIncomesPerMonthDTO> getTotalIncomesPerYearMonthAndUserService(String userId);
+
+    /** Get Total Amount of Incomes For LifeTime By UserID from Service: */
+    TotalIncomesPerMonthDTO getTotalIncomesPerLifeTimeAndUserService(String userId);
 
     /** Get Total Incomes Sum By Category & UserId Ordered by Amount Desc:*/
     List<IncomesByCategory> getIncomesSumByCategoryAndUserIdService(String userId);
     /** Get Total Incomes Sum By Category & UserId Ordered by Date Desc:*/
     List<IncomesByCategory> getIncomesSumByCategoryAndUserIdDateDescService(String userId);
+
 
 }

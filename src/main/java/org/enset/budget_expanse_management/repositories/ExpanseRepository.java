@@ -88,5 +88,13 @@ public interface ExpanseRepository extends JpaRepository<Expanse, Long> {
          " ORDER BY SUM(e.amount) DESC")
  List<ExpensesByCategory> getTotalExpensesByCategoryAndUserAmountDesc(@Param("x") UUID userId);
 
+ /** Query to get Total Amount of Expenses so far: */
+ @Query("SELECT NEW org.enset.budget_expanse_management.mapping" +
+         ".TotalExpansePerMonthDTO(DATE_FORMAT(e.createdDate, '%Y')," +
+         " DATE_FORMAT(e.createdDate, '%m'), SUM(e.amount), e.user.id, e.user.name)" +
+         "FROM Expanse e WHERE e.user.id=:x ")
+ TotalExpansePerMonthDTO getTotalAmountExpansesOnLifeTimeByUserId(@Param("x") UUID userId);
+
+
 
 }

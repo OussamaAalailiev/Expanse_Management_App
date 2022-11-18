@@ -83,10 +83,17 @@ public class IncomeRestController {
     }
 
     @GetMapping(path = "/incomes/incomesSumByUser/{id}")
-    public List<TotalIncomesPerMonthDTO> getSumOfIncomesByYearMonthUserIdPageAndSize(
+    public List<TotalIncomesPerMonthDTO> getSumOfIncomesByYearMonthUserId(
             @PathVariable(name = "id") Optional<String> userId){
         System.out.println("Inside Controller -> incomesSumByUser");
         return managementService.getTotalIncomesPerYearMonthAndUserService(userId.orElse(""));
+    }
+
+    @GetMapping(path = "/incomes/incomesBalanceByUser/{id}")
+    public TotalIncomesPerMonthDTO getSumOfIncomesForLifeTimeByUserId(
+            @PathVariable(name = "id") Optional<String> userId){
+        System.out.println("Inside Controller -> incomes Balance ByUser");
+        return managementService.getTotalIncomesPerLifeTimeAndUserService(userId.orElse(""));
     }
 
     @GetMapping(path = "/incomes/incomesByCategoryAndUserIdAmountDesc/{id}")

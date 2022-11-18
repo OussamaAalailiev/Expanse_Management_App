@@ -315,7 +315,17 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }
     }
 
-    /**-- Query to get Total Amount of Expanses per Month By UserID: */
+    @Override
+    public TotalExpansePerMonthDTO getTotalExpansesPerLifeTimeAndUserService(String userId) {
+        try {
+            return expanseRepository.getTotalAmountExpansesOnLifeTimeByUserId(UUID.fromString(userId));
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Error while getting Total Expenses for a Life Time by user!");
+        }
+    }
+
+    /** Query to get Total Amount of Expanses per Month By UserID: */
    /*
     @Override
     public Page<TotalExpansePerMonthDTO> getTotalExpansesPerYearMonthAndUserService(String userId,
@@ -827,6 +837,16 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("Error while getting Incomes Sum by user!");
+        }
+    }
+
+    @Override
+    public TotalIncomesPerMonthDTO getTotalIncomesPerLifeTimeAndUserService(String userId) {
+        try {
+            return incomeRepository.getTotalAmountIncomeOnLifeTime(UUID.fromString(userId));
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Error while getting Total Incomes for a Life Time by user!");
         }
     }
 

@@ -73,13 +73,19 @@ public class ExpanseRestController {
         System.out.println("Inside Controller -> expansesSumByUser");
         return managementService.getTotalExpansesPerYearMonthAndUserService(userId.orElse(""));
     }
+    @GetMapping(path = "/expenses/expansesBalanceByUser/{id}")
+    public TotalExpansePerMonthDTO getSumOfExpansesOnLifeTimeByUserIdPageAndSize(
+            @PathVariable(name = "id") Optional<String> userId){
+        System.out.println("Inside Controller -> expanses Balance ByUser");
+        return managementService.getTotalExpansesPerLifeTimeAndUserService(userId.orElse(""));
+    }
 
-    @GetMapping(path = "/expensesSumByCategoryAndUserId/{id}")
+    @GetMapping(path = "/expenses/expensesSumByCategoryAndUserId/{id}")
     public List<ExpensesByCategory> getExpensesByCategoryAndUserId(
             @PathVariable(name = "id") Optional<String> userId){
         return managementService.getExpensesSumByCategoryAndUserIdService(userId.orElse(""));
     }
-    @GetMapping(path = "/expensesSumByCategoryAndUserIdAmountDesc/{id}")
+    @GetMapping(path = "/expenses/expensesSumByCategoryAndUserIdAmountDesc/{id}")
     public List<ExpensesByCategory> getExpensesByCategoryAndUserIdAmountDesc(
             @PathVariable(name = "id") Optional<String> userId){
         return managementService.getExpensesSumByCategoryAndUserIdAmountDescService(userId.orElse(""));

@@ -63,4 +63,12 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
             " GROUP BY i.categoryIncome.id " +
             " ORDER BY YEAR(i.createdDate) DESC, MONTH(i.createdDate) DESC, DAY(i.createdDate) DESC")
     List<IncomesByCategory> getTotalIncomesByCategoryAndUserOrderedByDate(@Param("x") UUID userId);
+
+    /** Query to get Total Amount of Incomes so far: */
+    @Query("SELECT NEW org.enset.budget_expanse_management.mapping" +
+            ".TotalIncomesPerMonthDTO(DATE_FORMAT(i.createdDate, '%Y')," +
+            " DATE_FORMAT(i.createdDate, '%m'), SUM(i.amount), i.user.id, i.user.name)" +
+            " FROM Income i WHERE i.user.id=:x ")
+    TotalIncomesPerMonthDTO getTotalAmountIncomeOnLifeTime(@Param("x") UUID userId);
+
 }
