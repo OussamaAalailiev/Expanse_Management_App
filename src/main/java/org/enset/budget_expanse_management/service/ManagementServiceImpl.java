@@ -227,8 +227,6 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     @Override
     public List<ExpensesByCategory> getExpensesSumByCategoryAndUserIdAmountDescService(String userId) {
         try {
-            System.out.println();
-            System.out.println("getExpensesSumByCategoryAndUserIdAmountDescService() ...");
             List<ExpensesByCategory> expensesByCategoryAndUserAmountDesc = expanseRepository
                     .getTotalExpensesByCategoryAndUserAmountDesc(
                             UUID.fromString(userId));
@@ -318,7 +316,13 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     @Override
     public TotalExpansePerMonthDTO getTotalExpansesPerLifeTimeAndUserService(String userId) {
         try {
-            return expanseRepository.getTotalAmountExpansesOnLifeTimeByUserId(UUID.fromString(userId));
+            TotalExpansePerMonthDTO expansesOnLifeTimeByUserId =
+                    expanseRepository.getTotalAmountExpansesOnLifeTimeByUserId(UUID.fromString(userId));
+            if(expansesOnLifeTimeByUserId.getTotalExpanses()==null){
+                expansesOnLifeTimeByUserId.setTotalExpanses(0.0);
+            }
+            return expansesOnLifeTimeByUserId;
+//            return expanseRepository.getTotalAmountExpansesOnLifeTimeByUserId(UUID.fromString(userId));
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("Error while getting Total Expenses for a Life Time by user!");
@@ -393,9 +397,22 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     @Override
     public Page<Goal> getGoalsByPageAndSizeAndTitleAndUserIdService(String title, String userId, int page, int size) {
         try {
-            return goalRepository.findByTitleContainingAndUserIdOrderByDateDebutDescEndDateDesc(title,
+            Page<Goal> goalPage = goalRepository.findByTitleContainingAndUserIdOrderByDateDebutDescEndDateDesc(title,
                     UUID.fromString(userId),
                     PageRequest.of(page, size));
+            for (Goal goal: goalPage){
+                if (goal.getAmountAchieved()==null){
+                    goal.setAmountAchieved(0.0);
+                }
+                if (goal.getGoalAchieved()==null){
+                    goal.setGoalAchieved(false);
+                }
+            }
+            return goalPage;
+//            return goalRepository.findByTitleContainingAndUserIdOrderByDateDebutDescEndDateDesc(title,
+//                    UUID.fromString(userId),
+//                    PageRequest.of(page, size));
+
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("User OR Goal(s) were Not Found!");
@@ -843,7 +860,13 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     @Override
     public TotalIncomesPerMonthDTO getTotalIncomesPerLifeTimeAndUserService(String userId) {
         try {
-            return incomeRepository.getTotalAmountIncomeOnLifeTime(UUID.fromString(userId));
+            TotalIncomesPerMonthDTO totalAmountIncomeOnLifeTime =
+                    incomeRepository.getTotalAmountIncomeOnLifeTime(UUID.fromString(userId));
+            if(totalAmountIncomeOnLifeTime.getTotalIncomes()==null){
+                totalAmountIncomeOnLifeTime.setTotalIncomes(0.0);
+            }
+            return totalAmountIncomeOnLifeTime;
+//            return incomeRepository.getTotalAmountIncomeOnLifeTime(UUID.fromString(userId));
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("Error while getting Total Incomes for a Life Time by user!");
@@ -856,15 +879,6 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             List<IncomesByCategory> incomesByCategoriesAndUser = incomeRepository
                     .getTotalIncomesByCategoryAndUser(
                             UUID.fromString(userId));
-//            Double totalSumsOfIncome = 0.0;
-//            for (IncomesByCategory incomesByCategory: incomesByCategoriesAndUser) {
-//                totalSumsOfIncome+=incomesByCategory.getTotalIncomesByCategory();
-//            }
-//            double percentOfIncomesPerMonth;
-//            for (IncomesByCategory incomesByCategory: incomesByCategoriesAndUser) {
-//                percentOfIncomesPerMonth =  ((incomesByCategory.getTotalIncomesByCategory() / totalSumsOfIncome) * 100);
-//                incomesByCategory.setPercentOfIncomesPerMonth(percentOfIncomesPerMonth);
-//            }
             return computeTotalSumAndPercentOnIncomesCat(incomesByCategoriesAndUser);
         }catch (Exception e){
             e.printStackTrace();
