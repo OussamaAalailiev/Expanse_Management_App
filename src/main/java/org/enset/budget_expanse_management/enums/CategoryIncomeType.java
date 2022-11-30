@@ -21,6 +21,14 @@ public enum CategoryIncomeType {
     TOURIST_SERVICE,
     SECURITY_SERVICE,
     EDUCATION_SERVICE,
-    OTHER_SERVICE
+    OTHER_SERVICE,
+    //Goal Categories Added down below:
+    NEW_VEHICLE,
+    NEW_HOME,
+    HOLIDAY_TRIP,
+    HEALTH_CARE,
+    PARTY,
+    CHARITY,
+    ZAKAT
 
 }
