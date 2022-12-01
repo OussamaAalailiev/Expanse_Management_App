@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 @SpringBootApplication
@@ -622,6 +623,7 @@ public class BudgetExpanseManagementApplication {
           */
 
          /** Select Total Incomes By Category & UserID : */
+         /*
          System.out.println("********* Select Total Incomes By Category & UserID Ordered By Amount********");
          incomeRepository.getTotalIncomesByCategoryAndUser(UUID.fromString(
                  "3a300bc8-8954-4e93-9136-2b11ad2461b1"))
@@ -632,7 +634,10 @@ public class BudgetExpanseManagementApplication {
                      System.out.println("Total Amount by category: "+ incomesByCategory.getTotalIncomesByCategory());
                      System.out.println("------------------------------");
                  });
+          */
+
          /** Select Total Incomes By Category & UserID : */
+         /*
          System.out.println();
          System.out.println("********* Select Total Incomes By Category & UserID Ordered By Date DESC ********");
          incomeRepository.getTotalIncomesByCategoryAndUserOrderedByDate(UUID.fromString(
@@ -643,6 +648,34 @@ public class BudgetExpanseManagementApplication {
                      System.out.println("User ID: "+ incomesByCategory.getUserId());
                      System.out.println("Total Amount by category: "+ incomesByCategory.getTotalIncomesByCategory());
                      System.out.println("------------------------------");
+                 });
+          */
+
+         /** On add New Goal compute common Incomes: */
+         System.out.println("************** On add New Goal compute common Incomes: ******************");
+         //        Date date = Date.from(localDate.atStartOfDay(defaultZoneId).toInstant());
+         //default time zone
+         ZoneId defaultZoneId = ZoneId.systemDefault();
+         Goal goal = goalRepository.findById(2).get();
+         goalRepository.onAddGoalComputeOnCommonIncomes(goal.getId(), goal.getDateDebut(),
+                         Date.from(goal.getEndDate().atStartOfDay(defaultZoneId).toInstant()))
+                 .forEach(resultDTOGoalAndIncomes -> {
+                     System.out.println();
+                     System.out.println();
+                     System.out.println("Goal ID: " + resultDTOGoalAndIncomes.getIdGoal());
+                     System.out.println("Goal Debut Date: " + resultDTOGoalAndIncomes.getDateDebut());
+                     System.out.println("Goal End Date: " + resultDTOGoalAndIncomes.getEndDate());
+                     System.out.println("Goal Amount: " + resultDTOGoalAndIncomes.getAmountGoal());
+                     System.out.println("Goal AmountAchieved: " + resultDTOGoalAndIncomes.getAmountAchieved());
+                     System.out.println("Goal User's ID: " + resultDTOGoalAndIncomes.getUserIdGoal());
+                     System.out.println("Goal CategoryIncome's ID: " + resultDTOGoalAndIncomes.getCategory_income_id_Goal());
+                     System.out.println();
+                     System.out.println("Income ID: " + resultDTOGoalAndIncomes.getIdIncome());
+                     System.out.println("Income createdDate: " + resultDTOGoalAndIncomes.getCreatedDate());
+                     System.out.println("Income Amount: " + resultDTOGoalAndIncomes.getAmountIncome());
+                     System.out.println("Income User's ID: " + resultDTOGoalAndIncomes.getUserIdIncome());
+                     System.out.println("Income CategoryIncome's ID: " + resultDTOGoalAndIncomes.getCategory_income_id_Income());
+                     System.out.println("Income SUM: " + resultDTOGoalAndIncomes.getAmountIncomeSum());
                  });
 
 

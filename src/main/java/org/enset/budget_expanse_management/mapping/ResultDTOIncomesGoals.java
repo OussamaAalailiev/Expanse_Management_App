@@ -27,7 +27,7 @@ public class ResultDTOIncomesGoals {
     private String titleGoal;
     private Integer category_income_id_Goal;
     private UUID userIdGoal;
-    //private Double amountIncomeSum;
+    private Double amountIncomeSum;
 
     public ResultDTOIncomesGoals(Long idIncome, Double amountIncome, Date createdDate,
                                  String titleIncome, Integer category_income_id_Income,
