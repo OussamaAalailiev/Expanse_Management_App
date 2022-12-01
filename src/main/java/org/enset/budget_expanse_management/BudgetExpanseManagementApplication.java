@@ -6,6 +6,7 @@ import org.enset.budget_expanse_management.enums.CategoryIncomeType;
 import org.enset.budget_expanse_management.enums.GoalCategoryType;
 import org.enset.budget_expanse_management.enums.UserCurrency;
 import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
+import org.enset.budget_expanse_management.mapping.ResultDTOGoalAndIncomes;
 import org.enset.budget_expanse_management.mapping.ResultDTOIncomesGoals;
 import org.enset.budget_expanse_management.model.*;
 import org.enset.budget_expanse_management.repositories.*;
@@ -657,6 +658,7 @@ public class BudgetExpanseManagementApplication {
          //default time zone
          ZoneId defaultZoneId = ZoneId.systemDefault();
          Goal goal = goalRepository.findById(2).get();
+         /*
          goalRepository.onAddGoalComputeOnCommonIncomes(goal.getId(), goal.getDateDebut(),
                          Date.from(goal.getEndDate().atStartOfDay(defaultZoneId).toInstant()))
                  .forEach(resultDTOGoalAndIncomes -> {
@@ -677,6 +679,26 @@ public class BudgetExpanseManagementApplication {
                      System.out.println("Income CategoryIncome's ID: " + resultDTOGoalAndIncomes.getCategory_income_id_Income());
                      System.out.println("Income SUM: " + resultDTOGoalAndIncomes.getAmountIncomeSum());
                  });
+          */
+         ResultDTOGoalAndIncomes resultDTOGoalAndIncomes = goalRepository.onAddGoalComputeOnCommonIncomes(goal.getId(), goal.getDateDebut(),
+                 Date.from(goal.getEndDate().atStartOfDay(defaultZoneId).toInstant()));
+
+                     System.out.println();
+                     System.out.println();
+                     System.out.println("Goal ID: " + resultDTOGoalAndIncomes.getIdGoal());
+                     System.out.println("Goal Debut Date: " + resultDTOGoalAndIncomes.getDateDebut());
+                     System.out.println("Goal End Date: " + resultDTOGoalAndIncomes.getEndDate());
+                     System.out.println("Goal Amount: " + resultDTOGoalAndIncomes.getAmountGoal());
+                     System.out.println("Goal AmountAchieved: " + resultDTOGoalAndIncomes.getAmountAchieved());
+                     System.out.println("Goal User's ID: " + resultDTOGoalAndIncomes.getUserIdGoal());
+                     System.out.println("Goal CategoryIncome's ID: " + resultDTOGoalAndIncomes.getCategory_income_id_Goal());
+                     System.out.println();
+                     System.out.println("Income ID: " + resultDTOGoalAndIncomes.getIdIncome());
+                     System.out.println("Income createdDate: " + resultDTOGoalAndIncomes.getCreatedDate());
+                     System.out.println("Income Amount: " + resultDTOGoalAndIncomes.getAmountIncome());
+                     System.out.println("Income User's ID: " + resultDTOGoalAndIncomes.getUserIdIncome());
+                     System.out.println("Income CategoryIncome's ID: " + resultDTOGoalAndIncomes.getCategory_income_id_Income());
+                     System.out.println("Income SUM: " + resultDTOGoalAndIncomes.getAmountIncomeSum());
 
 
 

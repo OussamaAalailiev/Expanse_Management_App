@@ -49,12 +49,18 @@ public class GoalRestController {
         return goalRepository.findById(Integer.parseInt(id)).get();
     }
 
-    @PostMapping(path = "/goals/admin")
-    public Goal addNewGoalController(@RequestBody Goal goal){
+//    @PostMapping(path = "/goals/admin")
+//    public Goal addNewGoalController(@RequestBody Goal goal){
+//        System.out.println(" -----------------------------------");
+//        System.out.println(" ------------- Goal is added Successfully ----------");
+//        Goal savedGoal = goalRepository.save(goal);
+//        return savedGoal;
+//    }
+    @PostMapping(path = "/goals/addGoal")
+    public void addNewGoalController(@RequestBody Goal goal){
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Goal is added Successfully ----------");
-        Goal savedGoal = goalRepository.save(goal);
-        return savedGoal;
+        managementService.calculateIncomesOnAddGoalService(goal);
     }
 
     @PutMapping(path = "/goals/admin/{id}")

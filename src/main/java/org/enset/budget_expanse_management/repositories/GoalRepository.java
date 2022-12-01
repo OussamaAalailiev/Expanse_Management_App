@@ -37,7 +37,7 @@ SELECT * FROM goal g INNER JOIN income i ON (i.user_id=g.user_id) AND g.id=2
             " INNER JOIN Income i " +
             "ON (g.user.id=i.user.id) AND g.id=:x AND (g.categoryIncome.id =i.categoryIncome.id)\n" +
             "   AND (i.createdDate>=:d AND i.createdDate<=:e)")
-    public List<ResultDTOGoalAndIncomes> onAddGoalComputeOnCommonIncomes(
+    public ResultDTOGoalAndIncomes onAddGoalComputeOnCommonIncomes(
             @Param("x") Integer goalId,
             @Param("d") Date dateDebut,
             @Param("e") Date endDate);

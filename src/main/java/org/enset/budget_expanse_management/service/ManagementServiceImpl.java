@@ -912,5 +912,36 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }
     }
 
+    @Override
+    public void calculateIncomesOnAddGoalService(Goal goal) {
+        try {
+            //1) Save new Goal TO DB Before Computation On GoalAchievement & AmountGoal:
+            goalRepository.save(goal);
+             //Convert 'LocalDate' Of Goal into 'Date':
+            ZoneId defaultZoneId = ZoneId.systemDefault();
+            Date goalEndDate = Date.from(goal.getEndDate().atStartOfDay(defaultZoneId).toInstant());
+            //2) Get Common Incomes if exists:
+            ResultDTOGoalAndIncomes resultDTOGoalAndIncomes =
+                    goalRepository.onAddGoalComputeOnCommonIncomes(goal.getId(), goal.getDateDebut(), goalEndDate);
+            //3) Loop On List & Check If the list is empty Or Not:
+            if (resultDTOGoalAndIncomes!=null){
+                Double amountAchieved = resultDTOGoalAndIncomes.getAmountIncomeSum();
+                goal.setAmountAchieved(amountAchieved);
+                if (goal.getAmount() > amountAchieved){
+                    goal.setGoalAchieved(false);
+                } else if (goal.getAmount() <= amountAchieved) {
+                    goal.setGoalAchieved(true);
+                }
+                //4) Save new Goal TO DB Before Computation On GoalAchievement & AmountGoal:
+                goalRepository.save(goal);
+            }else {
+                System.out.println("No Common Incomes related to New Goal Added ...");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("e.getMessage(): " + e.getMessage());
+        }
+    }
+
 }
 

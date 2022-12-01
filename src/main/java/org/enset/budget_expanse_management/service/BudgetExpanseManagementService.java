@@ -34,7 +34,7 @@ public interface BudgetExpanseManagementService {
      *  by a user at each query:
      *  */
     public void calculateExpansesOnAddBudgetService(Budget budget);
-    /**-- Query to get Total Amount of Expanses per Month By UserID: */
+    /** Query to get Total Amount of Expanses per Month By UserID: */
 //    public Page<TotalExpansePerMonthDTO> getTotalExpansesPerYearMonthAndUserService(String userId,
 //                                                                                    int page,
 //                                                                                    int size);
@@ -79,6 +79,10 @@ public interface BudgetExpanseManagementService {
     List<IncomesByCategory> getIncomesSumByCategoryAndUserIdService(String userId);
     /** Get Total Incomes Sum By Category & UserId Ordered by Date Desc:*/
     List<IncomesByCategory> getIncomesSumByCategoryAndUserIdDateDescService(String userId);
+    /**Inner Joint that get all common Expanses(if exists) with one new Budget added
+     *  by a user at each query:
+     *  */
+    public void calculateIncomesOnAddGoalService(Goal goal);
 
 
 }
