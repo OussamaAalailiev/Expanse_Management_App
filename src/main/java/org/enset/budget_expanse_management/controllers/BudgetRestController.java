@@ -127,17 +127,7 @@ public class BudgetRestController {
     public void addNewBudgetController(@RequestBody BudgetFormSubmission budgetFormSubmission){
        System.out.println(" -----------------------------------");
        System.out.println(" ------------- Budget is added Successfully ----------");
-       Budget budget = new Budget();
-       budget.setAmount(budgetFormSubmission.getAmount());
-       budget.setTitle(budgetFormSubmission.getTitle());
-       budget.setDescription(budgetFormSubmission.getDescription());
-       budget.setDateDebut(budgetFormSubmission.getDateDebut());
-       budget.setEndDate(budgetFormSubmission.getEndDate());
-        CategoryExpanse categoryExpanse = categoryExpanseRepository
-                .findById(budgetFormSubmission.getCategoryExpanse()).get();
-        User user = userRepository.findById(UUID.fromString(budgetFormSubmission.getUserId())).get();
-        budget.setCategoryExpanse(categoryExpanse);
-       budget.setUser(user);
+       Budget budget = managementService.mapNewFormBudgetObjToBudgetObj(budgetFormSubmission);
        managementService.calculateExpansesOnAddBudgetService(budget);
     }
 

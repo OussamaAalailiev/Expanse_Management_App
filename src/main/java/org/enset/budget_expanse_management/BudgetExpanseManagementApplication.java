@@ -653,11 +653,12 @@ public class BudgetExpanseManagementApplication {
           */
 
          /** On add New Goal compute common Incomes: */
+         /*
          System.out.println("************** On add New Goal compute common Incomes: ******************");
-         //        Date date = Date.from(localDate.atStartOfDay(defaultZoneId).toInstant());
          //default time zone
          ZoneId defaultZoneId = ZoneId.systemDefault();
          Goal goal = goalRepository.findById(2).get();
+          */
          /*
          goalRepository.onAddGoalComputeOnCommonIncomes(goal.getId(), goal.getDateDebut(),
                          Date.from(goal.getEndDate().atStartOfDay(defaultZoneId).toInstant()))
@@ -680,6 +681,8 @@ public class BudgetExpanseManagementApplication {
                      System.out.println("Income SUM: " + resultDTOGoalAndIncomes.getAmountIncomeSum());
                  });
           */
+
+         /*
          ResultDTOGoalAndIncomes resultDTOGoalAndIncomes = goalRepository.onAddGoalComputeOnCommonIncomes(goal.getId(), goal.getDateDebut(),
                  Date.from(goal.getEndDate().atStartOfDay(defaultZoneId).toInstant()));
 
@@ -699,9 +702,16 @@ public class BudgetExpanseManagementApplication {
                      System.out.println("Income User's ID: " + resultDTOGoalAndIncomes.getUserIdIncome());
                      System.out.println("Income CategoryIncome's ID: " + resultDTOGoalAndIncomes.getCategory_income_id_Income());
                      System.out.println("Income SUM: " + resultDTOGoalAndIncomes.getAmountIncomeSum());
+          */
 
+         /** Delete Goal Test: */
 
+         /*
+                  managementService.deleteGoalService(15);
 
+          */
+
+         
 
 
 

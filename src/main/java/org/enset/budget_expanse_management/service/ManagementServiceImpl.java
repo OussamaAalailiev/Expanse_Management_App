@@ -1,6 +1,7 @@
 package org.enset.budget_expanse_management.service;
 
 import jdk.jfr.RecordingState;
+import org.enset.budget_expanse_management.formModel.BudgetFormSubmission;
 import org.enset.budget_expanse_management.formModel.GoalFormSubmission;
 import org.enset.budget_expanse_management.mapping.*;
 import org.enset.budget_expanse_management.model.*;
@@ -19,7 +20,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
     private final ExpanseRepository expanseRepository;
     private final BudgetRepository budgetRepository;
-//    private final CategoryExpanseRepository categoryExpanseRepository;
+    private final CategoryExpanseRepository categoryExpanseRepository;
     private final IncomeRepository incomeRepository;
     private final GoalRepository goalRepository;
     private final CategoryIncomeRepository categoryIncomeRepository;
@@ -28,7 +29,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
     public ManagementServiceImpl(ExpanseRepository expanseRepository,
                                  BudgetRepository budgetRepository,
-//                                 ,CategoryExpanseRepository categoryExpanseRepository,
+                                 CategoryExpanseRepository categoryExpanseRepository,
                                  IncomeRepository incomeRepository,
                                  GoalRepository goalRepository,
                                  CategoryIncomeRepository categoryIncomeRepository,
@@ -36,7 +37,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     ) {
         this.expanseRepository = expanseRepository;
         this.budgetRepository = budgetRepository;
-//        this.categoryExpanseRepository = categoryExpanseRepository;
+        this.categoryExpanseRepository = categoryExpanseRepository;
         this.incomeRepository = incomeRepository;
         this.goalRepository = goalRepository;
         this.categoryIncomeRepository = categoryIncomeRepository;
@@ -983,18 +984,72 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     @Override
     public void deleteGoalService(Integer goalId) {
         try {
-            boolean isGoalPresentInDB = goalRepository.findById(goalId).isPresent();
-            if (isGoalPresentInDB){
-                Goal goalToDelete = goalRepository.findById(goalId).orElseThrow(
+            Goal goalToDelete = goalRepository.findById(goalId).orElseThrow(
                         () -> {
                             throw new RuntimeException("Goal was Not found! ...");
                         }
                 );
-                goalRepository.delete(goalToDelete);
-            }
+            goalRepository.delete(goalToDelete);
         }catch (Exception e){
             e.printStackTrace();
             throw new RuntimeException("Error while delete Goal! ...");
+        }
+    }
+
+    @Override
+    public void updateGoalService(Goal goalUpdated) {
+        try {
+            Goal goalToUpdateFromDB = goalRepository.findById(goalUpdated.getId())
+                    .orElseThrow(
+                            () -> {
+                                throw new RuntimeException("Cannot find Goal to update from DB!");
+                            }
+                    );
+            if (goalToUpdateFromDB!=null){//1)If goal is Not Null
+                //2)If User Modify just the Goal's amount:
+                if (Objects.equals(goalUpdated.getCategoryIncome().getId(), goalToUpdateFromDB.getCategoryIncome().getId())
+                    && goalUpdated.getEndDate()==goalToUpdateFromDB.getEndDate()
+                    && goalUpdated.getDateDebut()==goalToUpdateFromDB.getDateDebut()){
+                    if (goalUpdated.getAmount() > goalUpdated.getAmountAchieved()){
+                        goalUpdated.setGoalAchieved(false);
+                        goalRepository.save(goalUpdated);
+                    } else if (goalUpdated.getAmount() <= goalUpdated.getAmountAchieved()) {
+                        goalUpdated.setGoalAchieved(true);
+                        goalRepository.save(goalUpdated);
+                    }
+                } else if (!Objects.equals(goalUpdated.getCategoryIncome().getId(), goalToUpdateFromDB.getCategoryIncome().getId())
+                        || goalUpdated.getEndDate()!=goalToUpdateFromDB.getEndDate()
+                        || goalUpdated.getDateDebut()!=goalToUpdateFromDB.getDateDebut()) {//3)If User Modify also CategoryIncome OR Date Range:
+                    //4)Empty the Goal from 'amountAchieved' & 'goalAchieved' THEN Recalculate them by getting
+                    //   Common Incomes from DB:
+                    //Convert 'LocalDate' Of Goal into 'Date':
+                    ZoneId defaultZoneId = ZoneId.systemDefault();
+                    Date goalUpdatedEndDate = Date.from(goalUpdated.getEndDate().atStartOfDay(defaultZoneId).toInstant());
+                    List<CommonIncome> commonIncomesOnUpdatedGoal = goalRepository
+                            .getCommonIncomesOnAddNewGoal(goalUpdated.getUser().getId(),
+                                                          goalUpdated.getCategoryIncome().getId(),
+                                                          goalUpdated.getDateDebut(),
+                                                          goalUpdatedEndDate);
+
+                    if (commonIncomesOnUpdatedGoal.get(0).getId()!=null){//5)Check if it has Common Incomes:
+                        //6)Empty the 'amountAchieved' & 'goalAchieved' in order to Recalculate them:
+                        goalUpdated.setAmountAchieved(commonIncomesOnUpdatedGoal.get(0).getAmountSum());
+                        goalUpdated.setGoalAchieved(false);
+                        if (goalUpdated.getAmount() <= goalUpdated.getAmountAchieved()){
+                            goalUpdated.setGoalAchieved(true);
+                            goalRepository.save(goalUpdated);
+                        } else if (goalUpdated.getAmount() > goalUpdated.getAmountAchieved()) {
+                            goalUpdated.setGoalAchieved(false);
+                            goalRepository.save(goalUpdated);
+                        }
+                    }else {//7)Check if it has change 'CategoryIncome' or 'Date' Range + got NO Common Incomes:
+                        goalRepository.save(goalUpdated);
+                    }
+                }
+
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -1021,6 +1076,31 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         goal.setUser(user);
         goal.setCategoryIncome(categoryIncome);
         return goal;
+    }
+
+    @Override
+    public Budget mapNewFormBudgetObjToBudgetObj(BudgetFormSubmission budgetFormSubmission) {
+        Budget budget = new Budget();
+        budget.setAmount(budgetFormSubmission.getAmount());
+        budget.setTitle(budgetFormSubmission.getTitle());
+        budget.setDescription(budgetFormSubmission.getDescription());
+        budget.setDateDebut(budgetFormSubmission.getDateDebut());
+        budget.setEndDate(budgetFormSubmission.getEndDate());
+        CategoryExpanse categoryExpanse = categoryExpanseRepository
+                .findById(budgetFormSubmission.getCategoryExpanse()).orElseThrow(
+                        () -> {
+                            throw new RuntimeException("Category of Expanse was not found from DB!");
+                        }
+                );
+        User user = userRepository
+                .findById(UUID.fromString(budgetFormSubmission.getUserId())).orElseThrow(
+                        () -> {
+                            throw new RuntimeException("User was not found from DB!");
+                        }
+                );
+        budget.setCategoryExpanse(categoryExpanse);
+        budget.setUser(user);
+        return budget;
     }
 
     private void eliminateNullsOnNewGoal(Goal goal){
