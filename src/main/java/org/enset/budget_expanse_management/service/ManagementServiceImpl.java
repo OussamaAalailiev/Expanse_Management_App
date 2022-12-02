@@ -981,6 +981,24 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     }
 
     @Override
+    public void deleteGoalService(Integer goalId) {
+        try {
+            boolean isGoalPresentInDB = goalRepository.findById(goalId).isPresent();
+            if (isGoalPresentInDB){
+                Goal goalToDelete = goalRepository.findById(goalId).orElseThrow(
+                        () -> {
+                            throw new RuntimeException("Goal was Not found! ...");
+                        }
+                );
+                goalRepository.delete(goalToDelete);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("Error while delete Goal! ...");
+        }
+    }
+
+    @Override
     public Goal mapNewFormGoalObjToGoalObj(GoalFormSubmission goalFormSubmission) {
         Goal goal = new Goal();
         goal.setTitle(goalFormSubmission.getTitle());

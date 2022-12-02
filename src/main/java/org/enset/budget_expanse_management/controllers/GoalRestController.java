@@ -91,16 +91,10 @@ public class GoalRestController {
         return goalRepository.save(goal);
     }
 
-    @DeleteMapping(path = "/goals/admin/delete/{id}")
+    //TODO: Method not tested yet!
+    @DeleteMapping(path = "/goals/delete/{id}")
     public void deleteGoal(@PathVariable(name = "id") String id){
-        boolean isGoalPresent = goalRepository.findById(Integer.parseInt(id)).isPresent();
-        if (!isGoalPresent){
-            throw new RuntimeException("Goal is not found, please delete an existing Goal!");
-        }
-        System.out.println(" -----------------------------------");
-        System.out.println(" ------------- Goal is deleted Successfully ----------");
-        Goal goalToBeDeleted = goalRepository.findById(Integer.parseInt(id)).get();
-        goalRepository.delete(goalToBeDeleted);
+       managementService.deleteGoalService(Integer.valueOf(id));
     }
 
 }

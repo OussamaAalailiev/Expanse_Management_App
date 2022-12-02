@@ -87,6 +87,8 @@ public interface BudgetExpanseManagementService {
     /**Getting Just Common Incomes without new Joined Goal: */
     void calculateIncomesOnAddGoalServiceV2(Goal goal);
 
+    void deleteGoalService(Integer goalId);
+
     Goal mapNewFormGoalObjToGoalObj(GoalFormSubmission goalFormSubmission);
 
 
