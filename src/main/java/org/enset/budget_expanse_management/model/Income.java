@@ -9,7 +9,8 @@ import org.enset.budget_expanse_management.enums.CategoryIncomeType;
 import javax.persistence.*;
 import java.util.Date;
 
-@Data @NoArgsConstructor @AllArgsConstructor
+//@Data
+@NoArgsConstructor @AllArgsConstructor
 @Entity
 public class Income {
     @Id
@@ -41,5 +42,51 @@ public class Income {
         this.createdDate = createdDate;
     }
 
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public CategoryIncome getCategoryIncome() {
+        return categoryIncome;
+    }
+
+    public void setCategoryIncome(CategoryIncome categoryIncome) {
+        this.categoryIncome = categoryIncome;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

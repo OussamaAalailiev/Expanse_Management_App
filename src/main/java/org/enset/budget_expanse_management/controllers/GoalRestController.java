@@ -1,7 +1,12 @@
 package org.enset.budget_expanse_management.controllers;
 
+import org.enset.budget_expanse_management.formModel.GoalFormSubmission;
+import org.enset.budget_expanse_management.model.CategoryIncome;
 import org.enset.budget_expanse_management.model.Goal;
+import org.enset.budget_expanse_management.model.User;
+import org.enset.budget_expanse_management.repositories.CategoryIncomeRepository;
 import org.enset.budget_expanse_management.repositories.GoalRepository;
+import org.enset.budget_expanse_management.repositories.UserRepository;
 import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:4090")
 @Transactional
@@ -19,10 +25,17 @@ public class GoalRestController {
     private final GoalRepository goalRepository;
     private final BudgetExpanseManagementService managementService;
 
+    private final CategoryIncomeRepository categoryIncomeRepository;
+    private final UserRepository userRepository;
+
     public GoalRestController(GoalRepository goalRepository,
-                              BudgetExpanseManagementService managementService) {
+                              BudgetExpanseManagementService managementService,
+                              CategoryIncomeRepository categoryIncomeRepository,
+                              UserRepository userRepository) {
         this.goalRepository = goalRepository;
         this.managementService = managementService;
+        this.categoryIncomeRepository = categoryIncomeRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping(path = "/goals")
@@ -57,10 +70,13 @@ public class GoalRestController {
 //        return savedGoal;
 //    }
     @PostMapping(path = "/goals/addGoal")
-    public void addNewGoalController(@RequestBody Goal goal){
+    public void addNewGoalController(@RequestBody GoalFormSubmission goalFormSubmission){
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Goal is added Successfully ----------");
-        managementService.calculateIncomesOnAddGoalService(goal);
+
+        Goal goal = managementService.mapNewFormGoalObjToGoalObj(goalFormSubmission);
+        //managementService.calculateIncomesOnAddGoalService(goal);
+        managementService.calculateIncomesOnAddGoalServiceV2(goal);
     }
 
     @PutMapping(path = "/goals/admin/{id}")

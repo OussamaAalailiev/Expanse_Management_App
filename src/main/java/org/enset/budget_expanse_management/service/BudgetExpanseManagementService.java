@@ -1,5 +1,6 @@
 package org.enset.budget_expanse_management.service;
 
+import org.enset.budget_expanse_management.formModel.GoalFormSubmission;
 import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
 import org.enset.budget_expanse_management.mapping.IncomesByCategory;
 import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
@@ -82,7 +83,11 @@ public interface BudgetExpanseManagementService {
     /**Inner Joint that get all common Expanses(if exists) with one new Budget added
      *  by a user at each query:
      *  */
-    public void calculateIncomesOnAddGoalService(Goal goal);
+    void calculateIncomesOnAddGoalService(Goal goal);
+    /**Getting Just Common Incomes without new Joined Goal: */
+    void calculateIncomesOnAddGoalServiceV2(Goal goal);
+
+    Goal mapNewFormGoalObjToGoalObj(GoalFormSubmission goalFormSubmission);
 
 
 }

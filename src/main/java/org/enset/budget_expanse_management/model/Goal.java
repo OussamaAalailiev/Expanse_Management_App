@@ -11,7 +11,8 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
-@Data @NoArgsConstructor @AllArgsConstructor
+//@Data
+@NoArgsConstructor @AllArgsConstructor
 @Entity
 public class Goal {
     @Id
@@ -47,5 +48,85 @@ public class Goal {
         this.description = description;
         this.dateDebut = dateDebut;
         this.endDate = endDate;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Date getDateDebut() {
+        return dateDebut;
+    }
+
+    public void setDateDebut(Date dateDebut) {
+        this.dateDebut = dateDebut;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public Double getAmountAchieved() {
+        return amountAchieved;
+    }
+
+    public void setAmountAchieved(Double amountAchieved) {
+        this.amountAchieved = amountAchieved;
+    }
+
+    public Boolean getGoalAchieved() {
+        return goalAchieved;
+    }
+
+    public void setGoalAchieved(Boolean goalAchieved) {
+        this.goalAchieved = goalAchieved;
+    }
+
+    public CategoryIncome getCategoryIncome() {
+        return categoryIncome;
+    }
+
+    public void setCategoryIncome(CategoryIncome categoryIncome) {
+        this.categoryIncome = categoryIncome;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
