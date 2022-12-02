@@ -1043,6 +1043,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                             goalRepository.save(goalUpdated);
                         }
                     }else {//7)Check if it has change 'CategoryIncome' or 'Date' Range + got NO Common Incomes:
+                        goalUpdated.setAmountAchieved(0.0); goalUpdated.setGoalAchieved(false);
                         goalRepository.save(goalUpdated);
                     }
                 }

@@ -22,6 +22,7 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -711,7 +712,20 @@ public class BudgetExpanseManagementApplication {
 
           */
 
-         
+         /** Update Goal Test: */
+         Goal goalUpdated = goalRepository.findById(17).get();
+         goalUpdated.setAmount(19399.0);
+         //How to modify date time (Date Manipulation):
+         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+         Date dateDebut = dateFormat.parse("2022/09/27 00:00:00");
+//         Date dateDebut = dateFormat.parse("2022/09/17 00:00:00");
+//         goalUpdated.setEndDate(LocalDate.of(2022, 9,18));
+         goalUpdated.setDateDebut(dateDebut);
+         goalUpdated.setEndDate(LocalDate.of(2022, 9,28));
+         CategoryIncome categoryIncome = categoryIncomeRepository.findById(10).get();
+         goalUpdated.setCategoryIncome(categoryIncome);
+         managementService.updateGoalService(goalUpdated);
+        // managementService.updateGoalService(new Goal());
 
 
 
