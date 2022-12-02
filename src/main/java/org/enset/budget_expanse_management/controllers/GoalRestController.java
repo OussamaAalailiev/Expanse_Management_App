@@ -68,16 +68,13 @@ public class GoalRestController {
         managementService.calculateIncomesOnAddGoalServiceV2(goal);
     }
 
-    @PutMapping(path = "/goals/admin/{id}")
-    public Goal editGoalController(@PathVariable(name = "id") String id ,@RequestBody Goal goal){
-        boolean isGoalPresent = goalRepository.findById(Integer.parseInt(id)).isPresent();
+    @PutMapping(path = "/goals/edit/{id}")
+    public void editGoalController(@PathVariable(name = "id") String id ,@RequestBody GoalFormSubmission goalFormSubmission){
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Goal is updated Successfully ----------");
-        if (!isGoalPresent){
-            throw new RuntimeException("Goal is not found, please edit an existing goal!");
-        }
+        Goal goal = managementService.mapNewFormGoalObjToGoalObj(goalFormSubmission);
         goal.setId(Integer.parseInt(id));
-        return goalRepository.save(goal);
+        managementService.updateGoalService(goal);
     }
 
     //TODO: Method not tested yet!
