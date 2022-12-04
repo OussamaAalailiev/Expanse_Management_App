@@ -1042,7 +1042,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                             goalUpdated.setGoalAchieved(false);
                             goalRepository.save(goalUpdated);
                         }
-                    }else {//7)Check if it has change 'CategoryIncome' or 'Date' Range + got NO Common Incomes:
+                    }else {//7)Check if it has change 'CategoryIncome' or 'Date' Range BUT still got NO Common Incomes:
                         goalUpdated.setAmountAchieved(0.0); goalUpdated.setGoalAchieved(false);
                         goalRepository.save(goalUpdated);
                     }
@@ -1102,6 +1102,55 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         budget.setCategoryExpanse(categoryExpanse);
         budget.setUser(user);
         return budget;
+    }
+
+    @Override
+    public void calculateGoalsOnAddIncomeServiceV2(Income newIncome) {
+        try {
+            //1) Get Common Goals:
+            List<CommonGoal> commonGoalsFromDB = goalRepository
+                    .getCommonGoalsOnAddNewIncome(newIncome.getUser().getId()
+                            ,newIncome.getCategoryIncome().getId()
+                            ,newIncome.getCreatedDate());
+            //2) Prepare List to save edited Common Goals If exists:
+            List<Goal> goalList = new ArrayList<>();
+            //3) Check If the common goals exists:
+            if (!commonGoalsFromDB.isEmpty()){
+                for (CommonGoal commonGoalFromDB: commonGoalsFromDB){
+                    System.out.println("Inside Common Goals & Income For LOOP:");
+                    Goal goal = goalRepository.findById(commonGoalFromDB.getId())
+                            .orElseThrow(() -> {
+                                throw new RuntimeException("Error, Cannot get Goal from DB!");
+                            });
+                    if (goal!=null && (goal.getAmountAchieved()==null || goal.getAmountAchieved()==0) ){
+                        goal.setAmountAchieved(newIncome.getAmount());
+                        if (goal.getAmount() > goal.getAmountAchieved()){
+                            goal.setGoalAchieved(false);
+                            goalList.add(goal);
+                        }else if (goal.getAmount() <= goal.getAmountAchieved()){
+                            goal.setGoalAchieved(true);
+                            goalList.add(goal);
+                        }
+                    }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
+                        goal.setAmountAchieved(goal.getAmountAchieved() + newIncome.getAmount());
+                        if (goal.getAmount() > goal.getAmountAchieved()){
+                            goal.setGoalAchieved(false);
+                            goalList.add(goal);
+                        }else if (goal.getAmount() <= goal.getAmountAchieved()){
+                            goal.setGoalAchieved(true);
+                            goalList.add(goal);
+                        }
+                    }
+                }
+                goalRepository.saveAll(goalList);//Save the Updated Common Goal(s) & Save the Income:
+                incomeRepository.save(newIncome);
+            }else {//4: if there was No common goals:
+                incomeRepository.save(newIncome);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void eliminateNullsOnNewGoal(Goal goal){

@@ -1,9 +1,6 @@
 package org.enset.budget_expanse_management.repositories;
 
-import org.enset.budget_expanse_management.mapping.CommonIncome;
-import org.enset.budget_expanse_management.mapping.ResultDTOExpansesBudgets;
-import org.enset.budget_expanse_management.mapping.ResultDTOGoalAndIncomes;
-import org.enset.budget_expanse_management.mapping.ResultDTOIncomesGoals;
+import org.enset.budget_expanse_management.mapping.*;
 import org.enset.budget_expanse_management.model.Goal;
 import org.enset.budget_expanse_management.model.Income;
 import org.springframework.data.domain.Page;
@@ -59,6 +56,15 @@ SELECT * FROM goal g INNER JOIN income i ON (i.user_id=g.user_id) AND g.id=2
     List<CommonIncome> getCommonIncomesOnAddNewGoal(@Param("u") UUID userId, @Param("c") Integer categoryOfIncomeId,
                                                     @Param("d") Date dateDebut, @Param("e") Date endDate);
 
-    //g.dateDebut<=:d AND g.endDate>=:d
+    @Query("SELECT NEW org.enset.budget_expanse_management.mapping.CommonGoal(g.id" +
+            ",g.amount, g.dateDebut, g.endDate, g.goalAchieved, g.title, g.categoryIncome.id, " +
+            " g.user.id, g.amountAchieved) FROM Goal g" +
+            " WHERE g.user.id=:u AND g.categoryIncome.id=:c " +
+            " AND (g.dateDebut<=:d AND g.endDate>=:d)")
+    List<CommonGoal> getCommonGoalsOnAddNewIncome(@Param("u") UUID userId,
+                                                  @Param("c") Integer categoryOfIncomeId,
+                                                  @Param("d") Date createdDate);
+
+    //g.dateDebut<=:d AND g.endDate>=:d >>> It's the Better Approach!
     //i.createdDate BETWEEN g.dateDebut AND g.endDate
 }

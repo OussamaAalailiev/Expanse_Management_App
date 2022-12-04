@@ -2,10 +2,7 @@ package org.enset.budget_expanse_management.service;
 
 import org.enset.budget_expanse_management.formModel.BudgetFormSubmission;
 import org.enset.budget_expanse_management.formModel.GoalFormSubmission;
-import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
-import org.enset.budget_expanse_management.mapping.IncomesByCategory;
-import org.enset.budget_expanse_management.mapping.TotalExpansePerMonthDTO;
-import org.enset.budget_expanse_management.mapping.TotalIncomesPerMonthDTO;
+import org.enset.budget_expanse_management.mapping.*;
 import org.enset.budget_expanse_management.model.Budget;
 import org.enset.budget_expanse_management.model.Expanse;
 import org.enset.budget_expanse_management.model.Goal;
@@ -94,5 +91,14 @@ public interface BudgetExpanseManagementService {
     Goal mapNewFormGoalObjToGoalObj(GoalFormSubmission goalFormSubmission);
     Budget mapNewFormBudgetObjToBudgetObj(BudgetFormSubmission budgetFormSubmission);
 
+    /*
+    -- Common Goals On Add new Income:
+SELECT * FROM goal g
+   WHERE g.user_id='3a300bc8-8954-4e93-9136-2b11ad2461b1'
+   AND g.category_income_id=10
+   AND (g.date_debut<='2022-09-27' AND g.end_date>='2022-09-27');
+     */
+
+    void calculateGoalsOnAddIncomeServiceV2(Income income);
 
 }

@@ -713,6 +713,7 @@ public class BudgetExpanseManagementApplication {
           */
 
          /** Update Goal Test: */
+         /*
          Goal goalUpdated = goalRepository.findById(17).get();
          goalUpdated.setAmount(19399.0);
          //How to modify date time (Date Manipulation):
@@ -726,6 +727,7 @@ public class BudgetExpanseManagementApplication {
          goalUpdated.setCategoryIncome(categoryIncome);
          managementService.updateGoalService(goalUpdated);
         // managementService.updateGoalService(new Goal());
+          */
 
 
 
