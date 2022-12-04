@@ -52,9 +52,6 @@ public interface BudgetExpanseManagementService {
     /**Get Income By Page based on title of Income + page N° + Size N° from Service: */
     Page<Income> getIncomesByPageAndSizeAndTitleAndUserIdService(String incomeTitle, String userId, int page, int size);
 
-    /**Inner Joint that get all common Goals(if exists) On Add new Income
-     *  by a user at each query:*/
-    void calculateGoalsOnAddIncomeService(Income income);
     /**Compute all common Goals(if exists) ON Update an Income
      *  by a user at each query.
      *  Completed Algorithm to compute Goals On Update Only 'AMOUNT' of Income.*/
@@ -63,10 +60,6 @@ public interface BudgetExpanseManagementService {
     // TODO: Update All fields (of an Income) On Update Income Algorithm:
    // public void calculateGoalsOnUpdateFullIncomeService(Income income);
     void calculateGoalsOnUpdateFullIncomeServiceV2(Income income);
-
-    /**Compute all common Goals(if exists) ON Delete an Income
-     *  by a user at each query:*/
-    void calculateGoalsOnDeleteIncomeService(Income income);
 
     /** Get Total Amount of Incomes per Month By UserID from Service: */
     List<TotalIncomesPerMonthDTO> getTotalIncomesPerYearMonthAndUserService(String userId);
@@ -99,6 +92,11 @@ SELECT * FROM goal g
    AND (g.date_debut<='2022-09-27' AND g.end_date>='2022-09-27');
      */
 
+    /** Get all common Goals(if exists) On Add new Income
+     *    by a user at each query:*/
     void calculateGoalsOnAddIncomeServiceV2(Income income);
 
+    /**Compute all common Goals(if exists) ON Delete an Income
+     *  by a user at each query:*/
+    void deleteIncomeService(Income income);
 }

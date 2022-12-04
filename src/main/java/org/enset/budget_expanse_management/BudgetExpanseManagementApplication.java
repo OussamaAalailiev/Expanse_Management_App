@@ -729,7 +729,27 @@ public class BudgetExpanseManagementApplication {
         // managementService.updateGoalService(new Goal());
           */
 
+         /** Add Income Test: */
+         /*
+         Income income = new Income();
+         income.setAmount(1.0);
+         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+         Date createdDate = dateFormat.parse("2022/09/01 00:00:00");
+         income.setCreatedDate(createdDate);
+         CategoryIncome categoryIncome = categoryIncomeRepository.findById(10).get();
+         User user = userRepository
+                 .findById(UUID.fromString("3a300bc8-8954-4e93-9136-2b11ad2461b1")).get();
+         income.setCategoryIncome(categoryIncome);
+         income.setUser(user);
+//         goalRepository.getCommonGoalsOnAddNewIncome(income.getUser().getId(),
+//                 income.getCategoryIncome().getId(),
+//                 income.getCreatedDate());
+         managementService.calculateGoalsOnAddIncomeServiceV2(income);
+          */
 
+         /** Delete Income Test: */
+         //Income income = incomeRepository.findById(23L).get();
+         managementService.deleteIncomeService(null);
 
      };
     }
