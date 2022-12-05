@@ -99,4 +99,10 @@ SELECT * FROM goal g
     /**Compute all common Goals(if exists) ON Delete an Income
      *  by a user at each query:*/
     void deleteIncomeService(Income income);
+
+    void updateIncomeService(Income incomeUpdated);
+
+
+
+
 }

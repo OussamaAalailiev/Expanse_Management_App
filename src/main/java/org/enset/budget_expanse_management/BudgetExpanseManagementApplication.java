@@ -748,8 +748,11 @@ public class BudgetExpanseManagementApplication {
           */
 
          /** Delete Income Test: */
-         //Income income = incomeRepository.findById(23L).get();
-         managementService.deleteIncomeService(null);
+         /*
+         Income income = incomeRepository.findById(23L).get();
+         managementService.deleteIncomeService(income);
+          */
+
 
      };
     }

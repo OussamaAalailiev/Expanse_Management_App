@@ -1023,32 +1023,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             List<Goal> goalList = new ArrayList<>();
             //3) Check If the common goals exists:
             if (!commonGoalsFromDB.isEmpty()){
-                for (CommonGoal commonGoalFromDB: commonGoalsFromDB){
-                    System.out.println("Inside Common Goals & Income For LOOP:");
-                    Goal goal = goalRepository.findById(commonGoalFromDB.getId())
-                            .orElseThrow(() -> {
-                                throw new RuntimeException("Error, Cannot get Goal from DB!");
-                            });
-                    if (goal!=null && (goal.getAmountAchieved()==null || goal.getAmountAchieved()==0) ){
-                        goal.setAmountAchieved(newIncome.getAmount());
-                        if (goal.getAmount() > goal.getAmountAchieved()){
-                            goal.setGoalAchieved(false);
-                            goalList.add(goal);
-                        }else if (goal.getAmount() <= goal.getAmountAchieved()){
-                            goal.setGoalAchieved(true);
-                            goalList.add(goal);
-                        }
-                    }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
-                        goal.setAmountAchieved(goal.getAmountAchieved() + newIncome.getAmount());
-                        if (goal.getAmount() > goal.getAmountAchieved()){
-                            goal.setGoalAchieved(false);
-                            goalList.add(goal);
-                        }else if (goal.getAmount() <= goal.getAmountAchieved()){
-                            goal.setGoalAchieved(true);
-                            goalList.add(goal);
-                        }
-                    }
-                }
+                computeOnCommonGoalsOnAmountIncomeUpdate(newIncome, commonGoalsFromDB, goalList);
                 goalRepository.saveAll(goalList);//Save the Updated Common Goal(s) & Save the Income:
                 incomeRepository.save(newIncome);
             }else {//4: if there was No common goals:
@@ -1083,15 +1058,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 //                        goalList.add(goal);
                         continue;
                     }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
-                        Double intervalAmountAchieved = goal.getAmountAchieved() - incomeToDelete.getAmount();
-                        goal.setAmountAchieved(intervalAmountAchieved);
-                        if (goal.getAmount() > goal.getAmountAchieved()){
-                            goal.setGoalAchieved(false);
-                            goalList.add(goal);
-                        }else if (goal.getAmount() <= goal.getAmountAchieved()){
-                            goal.setGoalAchieved(true);
-                            goalList.add(goal);
-                        }
+                        removeIncomeAmountFromGoalThenCompute(incomeToDelete ,goal , goalList);
                     }
                 }
                 goalRepository.saveAll(goalList);//Save the Updated Common Goal(s) & Save the Income:
@@ -1102,6 +1069,160 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 
         }catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    private void removeIncomeAmountFromGoalThenCompute(Income income, Goal goal, List<Goal> goalList) {
+        Double intervalAmountAchieved = goal.getAmountAchieved() - income.getAmount();
+        goal.setAmountAchieved(intervalAmountAchieved);
+        if (goal.getAmount() > goal.getAmountAchieved()){
+            goal.setGoalAchieved(false);
+            goalList.add(goal);
+        }else if (goal.getAmount() <= goal.getAmountAchieved()){
+            goal.setGoalAchieved(true);
+            goalList.add(goal);
+        }
+    }
+
+    @Override
+    public void updateIncomeService(Income incomeUpdated) {
+        try {
+            //1) Get OLD Income from DB before update:
+            Income incomeBeforeUpdateDB = incomeRepository.findById(incomeUpdated.getId())
+                    .orElseThrow(
+                            () -> {
+                                throw new RuntimeException("Cannot find old Income from DB");
+                            }
+                    );
+            //2) Get old Common Goals if exists:
+            List<CommonGoal> oldCommonGoalsFromDB = goalRepository.getCommonGoalsOnAddNewIncome
+                    (incomeUpdated.getUser().getId(), incomeBeforeUpdateDB.getCategoryIncome().getId(),
+                            incomeBeforeUpdateDB.getCreatedDate());
+            //2) Get Current Common Goals if exists:
+            List<CommonGoal> newCommonGoalsFromDB = goalRepository.getCommonGoalsOnAddNewIncome
+                            (incomeUpdated.getUser().getId(), incomeUpdated.getCategoryIncome().getId(),
+                            incomeUpdated.getCreatedDate());
+            //3) Prepare the list of edited goals to be saved late:
+            List<Goal> goalListToUpdate = new ArrayList<>();
+
+            //4) Check if just the Amount of income is updated:
+            if (Objects.equals(incomeUpdated.getCategoryIncome().getId(), incomeBeforeUpdateDB.getCategoryIncome().getId())
+            && incomeUpdated.getCreatedDate()==incomeBeforeUpdateDB.getCreatedDate()){
+                //4.1) Should get same Old Goals if exists:
+                //should act as if I should add new Income to DB:
+                if (!newCommonGoalsFromDB.isEmpty()){
+                    for (CommonGoal commonGoal: newCommonGoalsFromDB) {
+                        Goal goal = goalRepository.findById(commonGoal.getId()).orElseThrow(
+                                () -> { throw new RuntimeException("Cannot find Goal from DB!"); }
+                        );
+                        Double intervalAmountIncome = incomeUpdated.getAmount() - incomeBeforeUpdateDB.getAmount();
+                        if (goal!=null && (goal.getAmountAchieved()==null || goal.getAmountAchieved()==0) ){
+                            goal.setAmountAchieved(incomeUpdated.getAmount());
+                            if (goal.getAmount() > goal.getAmountAchieved()){
+                                goal.setGoalAchieved(false);
+                                goalListToUpdate.add(goal);
+                            }else if (goal.getAmount() <= goal.getAmountAchieved()){
+                                goal.setGoalAchieved(true);
+                                goalListToUpdate.add(goal);
+                            }
+                        }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
+                            goal.setAmountAchieved(intervalAmountIncome);
+                            if (goal.getAmount() > goal.getAmountAchieved()){
+                                goal.setGoalAchieved(false);
+                                goalListToUpdate.add(goal);
+                            }else if (goal.getAmount() <= goal.getAmountAchieved()){
+                                goal.setGoalAchieved(true);
+                                goalListToUpdate.add(goal);
+                            }
+                        }
+
+                    }
+                    goalRepository.saveAll(goalListToUpdate);
+                }
+            } else if (!Objects.equals(incomeUpdated.getCategoryIncome().getId(), incomeBeforeUpdateDB.getCategoryIncome().getId())
+                || incomeUpdated.getCreatedDate() != incomeBeforeUpdateDB.getCreatedDate()){
+            //5) Check if Category OR CreatedDate of income is also updated:
+                //5.1) Should get New Goals or + also some Old Goals if exists:
+                if (!newCommonGoalsFromDB.isEmpty()){
+                    for (CommonGoal commonGoal: newCommonGoalsFromDB) {
+                        Goal goal = goalRepository.findById(commonGoal.getId()).orElseThrow(
+                                () -> { throw new RuntimeException("Cannot find Goal from DB!"); }
+                        );
+                        Double intervalAmountIncome = incomeUpdated.getAmount() - incomeBeforeUpdateDB.getAmount();
+                        if (goal!=null && (goal.getAmountAchieved()==null || goal.getAmountAchieved()==0) ){
+                            goal.setAmountAchieved(incomeUpdated.getAmount());
+                            if (goal.getAmount() > goal.getAmountAchieved()){
+                                goal.setGoalAchieved(false);
+                                goalListToUpdate.add(goal);
+                            }else if (goal.getAmount() <= goal.getAmountAchieved()){
+                                goal.setGoalAchieved(true);
+                                goalListToUpdate.add(goal);
+                            }
+                        }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
+                            goal.setAmountAchieved(intervalAmountIncome);
+                            if (goal.getAmount() > goal.getAmountAchieved()){
+                                goal.setGoalAchieved(false);
+                                goalListToUpdate.add(goal);
+                            }else if (goal.getAmount() <= goal.getAmountAchieved()){
+                                goal.setGoalAchieved(true);
+                                goalListToUpdate.add(goal);
+                            }
+                        }
+
+                    }
+
+                    goalRepository.saveAll(goalListToUpdate);
+                }
+            }
+
+            incomeRepository.save(incomeUpdated);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void removeIncomeAmountFromGoalThenComputeOnLoop(List<CommonGoal> commonGoalsFromDB,
+                                                             Income incomeBeforeUpdateDB, List<Goal> goalListToUpdate) {
+        for (CommonGoal commonGoal: commonGoalsFromDB) {
+            Goal oldGoal = goalRepository.findById(commonGoal.getId())
+                    .orElseThrow(
+                            () -> {
+                                throw new RuntimeException("Cannot find old goal from DB!");
+                            }
+                    );
+            if (oldGoal!=null && (oldGoal.getAmountAchieved()==null || oldGoal.getAmountAchieved()==0) ){
+                continue;
+            }else if (oldGoal!=null && (oldGoal.getAmountAchieved()!=null || oldGoal.getAmountAchieved()>=0)){
+                removeIncomeAmountFromGoalThenCompute(incomeBeforeUpdateDB, oldGoal, goalListToUpdate);
+            }
+        }
+    }
+
+    private void computeOnCommonGoalsOnAmountIncomeUpdate(Income income, List<CommonGoal> commonGoalsFromDB, List<Goal> goalList) {
+        for (CommonGoal commonGoalFromDB: commonGoalsFromDB){
+            Goal goal = goalRepository.findById(commonGoalFromDB.getId())
+                    .orElseThrow(() -> {
+                        throw new RuntimeException("Error, Cannot get Goal from DB!");
+                    });
+            if (goal!=null && (goal.getAmountAchieved()==null || goal.getAmountAchieved()==0) ){
+                goal.setAmountAchieved(income.getAmount());
+                if (goal.getAmount() > goal.getAmountAchieved()){
+                    goal.setGoalAchieved(false);
+                    goalList.add(goal);
+                }else if (goal.getAmount() <= goal.getAmountAchieved()){
+                    goal.setGoalAchieved(true);
+                    goalList.add(goal);
+                }
+            }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
+                goal.setAmountAchieved(goal.getAmountAchieved() + income.getAmount());
+                if (goal.getAmount() > goal.getAmountAchieved()){
+                    goal.setGoalAchieved(false);
+                    goalList.add(goal);
+                }else if (goal.getAmount() <= goal.getAmountAchieved()){
+                    goal.setGoalAchieved(true);
+                    goalList.add(goal);
+                }
+            }
         }
     }
 
