@@ -753,6 +753,15 @@ public class BudgetExpanseManagementApplication {
          managementService.deleteIncomeService(income);
           */
 
+         /** Update Income Test: */
+         Income income = incomeRepository.findById(20L).get();
+         income.setAmount(1003.0);
+         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+         Date createdDate = dateFormat.parse("2028/02/10 00:00:00");
+         income.setCreatedDate(createdDate);
+         CategoryIncome categoryIncome = categoryIncomeRepository.findById(3).get();
+         income.setCategoryIncome(categoryIncome);
+         managementService.updateIncomeService(income);
 
      };
     }
