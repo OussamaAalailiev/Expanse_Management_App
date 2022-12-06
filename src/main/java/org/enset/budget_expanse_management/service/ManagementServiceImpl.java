@@ -1113,42 +1113,59 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             && incomeUpdated.getCreatedDate()==incomeBeforeUpdateDB.getCreatedDate()){
                 //4.1) Should get same Old Goals if exists:
                 //should act as if I should add new Income to DB:
-                System.out.println("************** Category Of Income is Not changed ******************");
+                System.out.println("************** Same Category Of Income & createdDate are Not changed ******************");
                 if (!newCommonGoalsFromDB.isEmpty()){
                     computeNewCommonGoalsOnUpdateIncome(incomeUpdated, incomeBeforeUpdateDB, newCommonGoalsFromDB, goalListToUpdate);
                     goalRepository.saveAll(goalListToUpdate);
                 }
             } else if (!Objects.equals(incomeUpdated.getCategoryIncome().getId(), incomeBeforeUpdateDB.getCategoryIncome().getId())
-                        || incomeUpdated.getCreatedDate() != incomeBeforeUpdateDB.getCreatedDate()){
+                        ){
             //5) Check if Category OR CreatedDate of income is also updated:
                 //5.1) Should get New Goals or + also some Old Goals if exists:
                 System.out.println("************** Category Of Income is Changed ******************");
                 if (!newCommonGoalsFromDB.isEmpty()){
                     computeNewCommonGoalsOnUpdateIncome(incomeUpdated, incomeBeforeUpdateDB, newCommonGoalsFromDB, goalListToUpdate);
                     goalRepository.saveAll(goalListToUpdate);
+                    if (!oldCommonGoalsFromDB.isEmpty()){
+                        System.out.println("*** !oldCommonGoalsFromDB.isEmpty() ***");
+                        List<Goal> oldGoalList = new ArrayList<>();
+                        removeIncomeAmountFromGoalThenComputeOnLoop(oldCommonGoalsFromDB, incomeBeforeUpdateDB, oldGoalList);
+                        goalRepository.saveAll(oldGoalList);
+                    }
                 }
-                if (!oldCommonGoalsFromDB.isEmpty()){
-                    List<Goal> oldGoalList = new ArrayList<>();
-                    removeIncomeAmountFromGoalThenComputeOnLoop(oldCommonGoalsFromDB, incomeBeforeUpdateDB, oldGoalList);
-                    goalRepository.saveAll(oldGoalList);
+
+            }else if (!Objects.equals(incomeUpdated.getCategoryIncome().getId(), incomeBeforeUpdateDB.getCategoryIncome().getId())
+                        && incomeUpdated.getCreatedDate() != incomeBeforeUpdateDB.getCreatedDate()){
+            //5) Check if Category OR CreatedDate of income is also updated:
+                //5.1) Should get New Goals or + also some Old Goals if exists:
+                System.out.println("************** Category Of Income & CreatedDate are changed ******************");
+                if (!newCommonGoalsFromDB.isEmpty()){
+                    computeNewCommonGoalsOnUpdateIncome(incomeUpdated, incomeBeforeUpdateDB, newCommonGoalsFromDB, goalListToUpdate);
+                    goalRepository.saveAll(goalListToUpdate);
+                    if (!oldCommonGoalsFromDB.isEmpty()){
+                        System.out.println("*** !oldCommonGoalsFromDB.isEmpty() ***");
+                        List<Goal> oldGoalList = new ArrayList<>();
+                        removeIncomeAmountFromGoalThenComputeOnLoop(oldCommonGoalsFromDB, incomeBeforeUpdateDB, oldGoalList);
+                        goalRepository.saveAll(oldGoalList);
+                    }
+                }
+
+            } else if (incomeUpdated.getCreatedDate() != incomeBeforeUpdateDB.getCreatedDate()) {
+                //6) Check if CreatedDate of income is also updated:
+                System.out.println("************** CreatedDate 1 Of Income is Changed ******************");
+                if (!newCommonGoalsFromDB.isEmpty()){
+                    computeNewCommonGoalsOnUpdateIncome(incomeUpdated, incomeBeforeUpdateDB, newCommonGoalsFromDB, goalListToUpdate);
+                    goalRepository.saveAll(goalListToUpdate);
+                }
+            }
+
+            if (!oldCommonGoalsFromDB.isEmpty()){
+                    System.out.println("******* CreatedDate 2 Of Income is Changed ******************");
                     List<Goal> oldGoalList2 = new ArrayList<>();
                     removeIncomeAmountFromGoalThenComputeOnLoopBasedOnDate(oldCommonGoalsFromDB, incomeUpdated, oldGoalList2);
                     goalRepository.saveAll(oldGoalList2);
-                }
-            }
-//            if (incomeUpdated.getCreatedDate() != incomeBeforeUpdateDB.getCreatedDate()) {
-//                //6) Check if CreatedDate of income is also updated:
-//                System.out.println("************** CreatedDate Of Income is Changed ******************");
-//                if (!newCommonGoalsFromDB.isEmpty()){
-//                    computeNewCommonGoalsOnUpdateIncome(incomeUpdated, incomeBeforeUpdateDB, newCommonGoalsFromDB, goalListToUpdate);
-//                    goalRepository.saveAll(goalListToUpdate);
-//                }
-//                if (!oldCommonGoalsFromDB.isEmpty()){
-//                    List<Goal> oldGoalList2 = new ArrayList<>();
-//                    removeIncomeAmountFromGoalThenComputeOnLoopBasedOnDate(oldCommonGoalsFromDB, incomeUpdated, oldGoalList2);
-//                    goalRepository.saveAll(oldGoalList2);
-//                }
-//            }
+             }
+
 
             incomeRepository.save(incomeUpdated);
         }catch (Exception e){
@@ -1171,7 +1188,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                 Date goalEndDate = Date.from(oldGoal.getEndDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
                 if (incomeUpdated.getCreatedDate().compareTo(oldGoal.getDateDebut()) < 0
                         || incomeUpdated.getCreatedDate().compareTo(goalEndDate) > 0){
-                    System.out.println("************** CreatedDate Of Income is Changed ******************");
+                    System.out.println("**** CreatedDate 3 Of Income is Changed ******************");
                     removeIncomeAmountFromGoalThenCompute(incomeUpdated, oldGoal, oldGoalList);
                 }
             }
@@ -1212,7 +1229,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                     goalListToUpdate.add(goal);
                 }
             }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
-                goal.setAmountAchieved(intervalAmountIncome);
+                goal.setAmountAchieved(goal.getAmountAchieved()+ intervalAmountIncome);
                 if (goal.getAmount() > goal.getAmountAchieved()){
                     goal.setGoalAchieved(false);
                     goalListToUpdate.add(goal);
