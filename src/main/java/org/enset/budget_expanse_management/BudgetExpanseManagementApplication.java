@@ -755,11 +755,11 @@ public class BudgetExpanseManagementApplication {
 
          /** Update Income Test: */
          Income income = incomeRepository.findById(20L).get();
-         income.setAmount(1005.0);
+         income.setAmount(20.0);
          DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-         Date createdDate = dateFormat.parse("2026/03/16 00:00:00");
+         Date createdDate = dateFormat.parse("2029/02/08 00:00:00");
          income.setCreatedDate(createdDate);
-         income.setTitle("aaaaa");
+         income.setTitle("zzzzz");
          CategoryIncome categoryIncome = categoryIncomeRepository.findById(3).get();
          income.setCategoryIncome(categoryIncome);
          managementService.updateIncomeService(income);
