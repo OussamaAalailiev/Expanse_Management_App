@@ -755,7 +755,7 @@ public class BudgetExpanseManagementApplication {
 
          /** Update Income Test: */
          Income income = incomeRepository.findById(20L).get();
-         income.setAmount(12575.0);
+         income.setAmount(12626.0);
          DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
          Date createdDate = dateFormat.parse("2027/02/07 00:00:00");
          income.setCreatedDate(createdDate);
