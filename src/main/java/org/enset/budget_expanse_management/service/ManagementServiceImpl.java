@@ -1109,9 +1109,9 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             List<Goal> goalListToUpdate = new ArrayList<>();
 
             //4) Check if just the Amount of income is updated:
-            if (Objects.equals(incomeUpdated.getCategoryIncome().getId(), incomeBeforeUpdateDB.getCategoryIncome().getId())
-                && incomeUpdated.getCreatedDate()==incomeBeforeUpdateDB.getCreatedDate()
-                && !Objects.equals(incomeUpdated.getAmount(), incomeBeforeUpdateDB.getAmount())){
+            if (!Objects.equals(incomeUpdated.getAmount(), incomeBeforeUpdateDB.getAmount())
+                && Objects.equals(incomeUpdated.getCategoryIncome().getId(), incomeBeforeUpdateDB.getCategoryIncome().getId())
+                && incomeUpdated.getCreatedDate()==incomeBeforeUpdateDB.getCreatedDate()){
                 //4.1) Should get same Old Goals if exists:
                 //should act as if I should add new Income to DB:
                 System.out.println("************** Same Category Of Income & createdDate are Not changed, BUT 'Amount' was changed ******************");
@@ -1148,7 +1148,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                 if (!oldCommonGoalsFromDB.isEmpty()){
                     System.out.println("*** !oldCommonGoalsFromDB.isEmpty() ***");
                     List<Goal> oldGoalList = new ArrayList<>();
-                    removeIncomeAmountFromGoalThenComputeOnLoopBasedOnDate(oldCommonGoalsFromDB, incomeUpdated, oldGoalList);
+                    removeIncomeAmountFromGoalThenComputeOnLoopBasedOnDate(oldCommonGoalsFromDB, incomeBeforeUpdateDB, incomeUpdated, oldGoalList);
                     goalRepository.saveAll(oldGoalList);
                 }
             } else if ((!Objects.equals(incomeUpdated.getCategoryIncome().getId(), incomeBeforeUpdateDB.getCategoryIncome().getId())
@@ -1180,13 +1180,15 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                 //5.1) Should get New Goals or + also some Old Goals if exists:
                 System.out.println("************** 'Amount' Of Income AND 'CreatedDate' were changed, BUT Not Category ******************");
                 if (!newCommonGoalsFromDB.isEmpty()){
-                    computeNewCommonGoalsOnUpdateIncome(incomeUpdated, incomeBeforeUpdateDB, newCommonGoalsFromDB, goalListToUpdate);
+                    computeNewCommonGoalsOnUpdateIncome(incomeUpdated,
+                            incomeBeforeUpdateDB, newCommonGoalsFromDB, goalListToUpdate);
                     goalRepository.saveAll(goalListToUpdate);
                 }
                 if (!oldCommonGoalsFromDB.isEmpty()){
                     System.out.println("*** !oldCommonGoalsFromDB.isEmpty() ***");
                     List<Goal> oldGoalList = new ArrayList<>();
-                    removeIncomeAmountFromGoalThenComputeOnLoopBasedOnDate(oldCommonGoalsFromDB, incomeUpdated, oldGoalList);
+                    removeIncomeAmountFromGoalThenComputeOnLoopBasedOnDate(oldCommonGoalsFromDB,
+                            incomeBeforeUpdateDB, incomeUpdated, oldGoalList);
                     goalRepository.saveAll(oldGoalList);
                 }
             }else if ((!Objects.equals(incomeUpdated.getAmount(), incomeBeforeUpdateDB.getAmount())
@@ -1230,7 +1232,11 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }
     }
 
-    private void removeIncomeAmountFromGoalThenComputeOnLoopBasedOnDate(List<CommonGoal> oldCommonGoalsFromDB, Income incomeUpdated, List<Goal> oldGoalList) {
+    private void removeIncomeAmountFromGoalThenComputeOnLoopBasedOnDate(
+            List<CommonGoal> oldCommonGoalsFromDB,
+            Income incomeBeforeUpdateDB,
+            Income incomeUpdated,
+            List<Goal> oldGoalList) {
         for (CommonGoal commonGoal: oldCommonGoalsFromDB) {
             System.out.println("Inside Loop & removeIncomeAmountFromGoalThenComputeOnLoopBasedOnDate(...)");
             Goal oldGoal = goalRepository.findById(commonGoal.getId())
@@ -1247,7 +1253,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                 if (incomeUpdated.getCreatedDate().compareTo(oldGoal.getDateDebut()) < 0
                         || incomeUpdated.getCreatedDate().compareTo(goalEndDate) > 0){
                     System.out.println("**** CreatedDate 3 Of Income is Changed ******************");
-                    removeIncomeAmountFromGoalThenCompute(incomeUpdated, oldGoal, oldGoalList);
+                    removeIncomeAmountFromGoalThenCompute(incomeBeforeUpdateDB, oldGoal, oldGoalList);
                 }
             }
         }
