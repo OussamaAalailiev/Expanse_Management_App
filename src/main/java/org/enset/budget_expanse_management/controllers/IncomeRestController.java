@@ -1,8 +1,9 @@
 package org.enset.budget_expanse_management.controllers;
 
-import org.enset.budget_expanse_management.mapping.ExpensesByCategory;
+import org.enset.budget_expanse_management.formModel.IncomeFormSubmission;
 import org.enset.budget_expanse_management.mapping.IncomesByCategory;
 import org.enset.budget_expanse_management.mapping.TotalIncomesPerMonthDTO;
+import org.enset.budget_expanse_management.model.Goal;
 import org.enset.budget_expanse_management.model.Income;
 import org.enset.budget_expanse_management.repositories.IncomeRepository;
 import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
@@ -105,6 +106,15 @@ public class IncomeRestController {
     public List<IncomesByCategory> getIncomesByCategoryAndUserIdDateDesc(
             @PathVariable(name = "id") Optional<String> userId){
         return managementService.getIncomesSumByCategoryAndUserIdDateDescService(userId.orElse(""));
+    }
+
+    @PostMapping(path = "/incomes/addIncome")
+    public void addNewIncomeController(@RequestBody IncomeFormSubmission incomeFormSubmission){
+        System.out.println(" -----------------------------------");
+        System.out.println(" ------------- Income is added Successfully ----------");
+
+        Income income = managementService.mapNewFormIncomeObjToIncomeObj(incomeFormSubmission);
+        managementService.calculateGoalsOnAddIncomeServiceV2(income);
     }
 
 }

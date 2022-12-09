@@ -3,6 +3,7 @@ package org.enset.budget_expanse_management.service;
 import jdk.jfr.RecordingState;
 import org.enset.budget_expanse_management.formModel.BudgetFormSubmission;
 import org.enset.budget_expanse_management.formModel.GoalFormSubmission;
+import org.enset.budget_expanse_management.formModel.IncomeFormSubmission;
 import org.enset.budget_expanse_management.mapping.*;
 import org.enset.budget_expanse_management.model.*;
 import org.enset.budget_expanse_management.repositories.*;
@@ -990,6 +991,37 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     }
 
     @Override
+    public Income mapNewFormIncomeObjToGoalObj(IncomeFormSubmission incomeFormSubmission) {
+        Income income = new Income();
+        income.setTitle(incomeFormSubmission.getTitle());
+        income.setAmount(incomeFormSubmission.getAmount());
+        income.setCreatedDate(incomeFormSubmission.getCreatedDate());
+        CategoryIncome categoryIncome = getCategoryIncomeFromIncomeForm(incomeFormSubmission);
+        User user = getUserFromIncomeFormObj(incomeFormSubmission);
+        income.setUser(user);
+        income.setCategoryIncome(categoryIncome);
+        return income;
+    }
+
+    private User getUserFromIncomeFormObj(IncomeFormSubmission incomeFormSubmission) {
+        return userRepository.findById(UUID.fromString(incomeFormSubmission.getUserId()))
+                .orElseThrow(
+                        () -> {
+                            throw new RuntimeException("Cannot find 'User' from DB!");
+                        }
+                );
+    }
+
+    private CategoryIncome getCategoryIncomeFromIncomeForm(IncomeFormSubmission incomeFormSubmission) {
+       return categoryIncomeRepository
+                .findById(incomeFormSubmission.getCategoryIncome()).orElseThrow(
+                        () -> {
+                            throw new RuntimeException("Cannot find 'Category of Income' from DB!");
+                        }
+                );
+    }
+
+    @Override
     public Budget mapNewFormBudgetObjToBudgetObj(BudgetFormSubmission budgetFormSubmission) {
         Budget budget = new Budget();
         budget.setAmount(budgetFormSubmission.getAmount());
@@ -1153,7 +1185,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                 }
             } else if ((!Objects.equals(incomeUpdated.getCategoryIncome().getId(), incomeBeforeUpdateDB.getCategoryIncome().getId())
                         && incomeUpdated.getCreatedDate().compareTo(incomeBeforeUpdateDB.getCreatedDate())!=0
-                    && Objects.equals(incomeUpdated.getAmount(), incomeBeforeUpdateDB.getAmount()))
+                        && Objects.equals(incomeUpdated.getAmount(), incomeBeforeUpdateDB.getAmount()))
                         ){
             //5) Check if Category OR CreatedDate of income is also updated:
                 //5.1) Should get New Goals or + also some Old Goals if exists:
@@ -1173,7 +1205,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                     goalRepository.saveAll(oldGoalList);
                 }
             }else if ((!Objects.equals(incomeUpdated.getAmount(), incomeBeforeUpdateDB.getAmount())
-                        && incomeUpdated.getCreatedDate().compareTo(incomeBeforeUpdateDB.getCreatedDate()) != 0
+                        && incomeUpdated.getCreatedDate().compareTo(incomeBeforeUpdateDB.getCreatedDate())!=0
                         && Objects.equals(incomeUpdated.getCategoryIncome().getId(), incomeBeforeUpdateDB.getCategoryIncome().getId()))
                         ){
             //5) Check if Category OR CreatedDate of income is also updated:

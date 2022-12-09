@@ -77,7 +77,6 @@ public class GoalRestController {
         managementService.updateGoalService(goal);
     }
 
-    //TODO: Method not tested yet!
     @DeleteMapping(path = "/goals/delete/{id}")
     public void deleteGoal(@PathVariable(name = "id") String id){
        managementService.deleteGoalService(Integer.valueOf(id));

@@ -2,6 +2,7 @@ package org.enset.budget_expanse_management.service;
 
 import org.enset.budget_expanse_management.formModel.BudgetFormSubmission;
 import org.enset.budget_expanse_management.formModel.GoalFormSubmission;
+import org.enset.budget_expanse_management.formModel.IncomeFormSubmission;
 import org.enset.budget_expanse_management.mapping.*;
 import org.enset.budget_expanse_management.model.Budget;
 import org.enset.budget_expanse_management.model.Expanse;
@@ -82,6 +83,7 @@ public interface BudgetExpanseManagementService {
     void updateGoalService(Goal goal);
 
     Goal mapNewFormGoalObjToGoalObj(GoalFormSubmission goalFormSubmission);
+    Income mapNewFormIncomeObjToIncomeObj(IncomeFormSubmission incomeFormSubmission);
     Budget mapNewFormBudgetObjToBudgetObj(BudgetFormSubmission budgetFormSubmission);
 
     /*
