@@ -991,7 +991,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     }
 
     @Override
-    public Income mapNewFormIncomeObjToGoalObj(IncomeFormSubmission incomeFormSubmission) {
+    public Income mapNewFormIncomeObjToIncomeObj(IncomeFormSubmission incomeFormSubmission) {
         Income income = new Income();
         income.setTitle(incomeFormSubmission.getTitle());
         income.setAmount(incomeFormSubmission.getAmount());
@@ -1071,8 +1071,10 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     }
 
     @Override
-    public void deleteIncomeService(Income incomeToDelete) {
+    public void deleteIncomeService(Long incomeId) {
         try {
+            Income incomeToDelete = incomeRepository.findById(incomeId)
+                    .orElseThrow(() -> {throw new RuntimeException("Cannot find income from DB!");});
             //1) Get Common Goals:
             List<CommonGoal> commonGoalsFromDB = goalRepository
                     .getCommonGoalsOnAddNewIncome(incomeToDelete.getUser().getId()

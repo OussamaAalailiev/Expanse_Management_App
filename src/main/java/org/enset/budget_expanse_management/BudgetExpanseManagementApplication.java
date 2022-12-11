@@ -754,6 +754,7 @@ public class BudgetExpanseManagementApplication {
           */
 
          /** Update Income Test: */
+         /*
          Income income = incomeRepository.findById(20L).get();
          income.setAmount(12626.0);
          DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -763,6 +764,7 @@ public class BudgetExpanseManagementApplication {
          CategoryIncome categoryIncome = categoryIncomeRepository.findById(3).get();
          income.setCategoryIncome(categoryIncome);
          managementService.updateIncomeService(income);
+          */
 
      };
     }

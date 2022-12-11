@@ -3,7 +3,6 @@ package org.enset.budget_expanse_management.controllers;
 import org.enset.budget_expanse_management.formModel.IncomeFormSubmission;
 import org.enset.budget_expanse_management.mapping.IncomesByCategory;
 import org.enset.budget_expanse_management.mapping.TotalIncomesPerMonthDTO;
-import org.enset.budget_expanse_management.model.Goal;
 import org.enset.budget_expanse_management.model.Income;
 import org.enset.budget_expanse_management.repositories.IncomeRepository;
 import org.enset.budget_expanse_management.service.BudgetExpanseManagementService;
@@ -71,17 +70,17 @@ public class IncomeRestController {
         return incomeRepository.save(income);
     }
 
-    @DeleteMapping(path = "/incomes/admin/delete/{id}")
-    public void deleteIncome(@PathVariable(name = "id") String id){
-        boolean isIncomePresent = incomeRepository.findById(Long.valueOf(id)).isPresent();
-        if (!isIncomePresent){
-            throw new RuntimeException("Income is not found, please delete an existing income!");
-        }
-        System.out.println(" -----------------------------------");
-        System.out.println(" ------------- Income is deleted Successfully ----------");
-        Income incomeToBeDeleted = incomeRepository.findById(Long.valueOf(id)).get();
-        incomeRepository.delete(incomeToBeDeleted);
-    }
+//    @DeleteMapping(path = "/incomes/admin/delete/{id}")
+//    public void deleteIncome(@PathVariable(name = "id") String id){
+//        boolean isIncomePresent = incomeRepository.findById(Long.valueOf(id)).isPresent();
+//        if (!isIncomePresent){
+//            throw new RuntimeException("Income is not found, please delete an existing income!");
+//        }
+//        System.out.println(" -----------------------------------");
+//        System.out.println(" ------------- Income is deleted Successfully ----------");
+//        Income incomeToBeDeleted = incomeRepository.findById(Long.valueOf(id)).get();
+//        incomeRepository.delete(incomeToBeDeleted);
+//    }
 
     @GetMapping(path = "/incomes/incomesSumByUser/{id}")
     public List<TotalIncomesPerMonthDTO> getSumOfIncomesByYearMonthUserId(
@@ -116,5 +115,18 @@ public class IncomeRestController {
         Income income = managementService.mapNewFormIncomeObjToIncomeObj(incomeFormSubmission);
         managementService.calculateGoalsOnAddIncomeServiceV2(income);
     }
+
+    @DeleteMapping(path = "/incomes/delete/{id}")
+    public void deleteIncome(@PathVariable(name = "id") String id){
+        boolean isIncomePresent = incomeRepository.findById(Long.valueOf(id)).isPresent();
+        if (!isIncomePresent){
+            throw new RuntimeException("Income is not found, please delete an existing income!");
+        }
+        System.out.println(" -----------------------------------");
+        System.out.println(" ------------- Income is deleted Successfully ----------");
+        managementService.deleteIncomeService(Long.valueOf(id));
+    }
+
+
 
 }
