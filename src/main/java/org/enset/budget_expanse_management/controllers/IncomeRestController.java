@@ -58,17 +58,17 @@ public class IncomeRestController {
         return incomeRepository.save(income);
     }
 
-    @PutMapping(path = "/incomes/admin/{id}")
-    public Income editIncomeController(@PathVariable(name = "id") String id ,@RequestBody Income income){
-        boolean isIncomePresent = incomeRepository.findById(Long.valueOf(id)).isPresent();
-        System.out.println(" -----------------------------------");
-        System.out.println(" ------------- Income is updated Successfully ----------");
-        if (!isIncomePresent){
-            throw new RuntimeException("Income is not found, please edit an existing income!");
-        }
-        income.setId(Long.valueOf(id));
-        return incomeRepository.save(income);
-    }
+//    @PutMapping(path = "/incomes/admin/{id}")
+//    public Income editIncomeController(@PathVariable(name = "id") String id ,@RequestBody Income income){
+//        boolean isIncomePresent = incomeRepository.findById(Long.valueOf(id)).isPresent();
+//        System.out.println(" -----------------------------------");
+//        System.out.println(" ------------- Income is updated Successfully ----------");
+//        if (!isIncomePresent){
+//            throw new RuntimeException("Income is not found, please edit an existing income!");
+//        }
+//        income.setId(Long.valueOf(id));
+//        return incomeRepository.save(income);
+//    }
 
 //    @DeleteMapping(path = "/incomes/admin/delete/{id}")
 //    public void deleteIncome(@PathVariable(name = "id") String id){
@@ -118,13 +118,19 @@ public class IncomeRestController {
 
     @DeleteMapping(path = "/incomes/delete/{id}")
     public void deleteIncome(@PathVariable(name = "id") String id){
-        boolean isIncomePresent = incomeRepository.findById(Long.valueOf(id)).isPresent();
-        if (!isIncomePresent){
-            throw new RuntimeException("Income is not found, please delete an existing income!");
-        }
         System.out.println(" -----------------------------------");
         System.out.println(" ------------- Income is deleted Successfully ----------");
         managementService.deleteIncomeService(Long.valueOf(id));
+    }
+
+    @PutMapping(path = "/incomes/edit/{id}")
+    public void editIncomeController(@PathVariable(name = "id") String id ,
+                                     @RequestBody IncomeFormSubmission incomeFormSubmission){
+        System.out.println(" -----------------------------------");
+        System.out.println(" ------------- Income is updated Successfully ----------");
+        Income income = managementService.mapNewFormIncomeObjToIncomeObj(incomeFormSubmission);
+        income.setId(Long.valueOf(id));//In order to preserve the old 'Id' & Not be overwritten by a new one created.
+        managementService.updateIncomeService(income);
     }
 
 
