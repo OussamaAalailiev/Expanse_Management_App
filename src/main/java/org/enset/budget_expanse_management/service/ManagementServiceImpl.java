@@ -1352,7 +1352,9 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }
     }
 
-    private void computeOnCommonGoalsOnAmountIncomeUpdate(Income incomeUpdated, List<CommonGoal> commonGoalsFromDB, List<Goal> goalList) {
+    private void computeOnCommonGoalsOnAmountIncomeUpdate(Income incomeUpdated,
+                                                          List<CommonGoal> commonGoalsFromDB,
+                                                          List<Goal> goalList) {
         for (CommonGoal commonGoalFromDB: commonGoalsFromDB){
             Goal goal = goalRepository.findById(commonGoalFromDB.getId())
                     .orElseThrow(() -> {
@@ -1368,13 +1370,42 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                     goalList.add(goal);
                 }
             }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
-                //TODO: should check if Date changed recently is the still in Goal's range OR Not:
-                if (goal.getIncomeId()==incomeUpdated.getId()){
-                    goal.setAmountAchieved(goal.getAmountAchieved());
-                }else if (goal.getIncomeId()==null){
-                    goal.setAmountAchieved(goal.getAmountAchieved() + incomeUpdated.getAmount());
-                    goal.setIncomeId(incomeUpdated.getId());
+                //TODO: Should check if Date changed recently is still in Goal's range OR Not:
+
+                List<Income> incomeListFromGoal = goal.getIncomes();
+                if (incomeListFromGoal.contains(null)){
+                    for (Income incomeFromGoal: incomeListFromGoal) {
+                        if (incomeFromGoal.getId()==null){
+                            goal.setAmountAchieved(goal.getAmountAchieved() + incomeUpdated.getAmount());
+                            //goal.setIncomes(incomeFromGoal.setId(incomeUpdated.getId()));
+                            incomeListFromGoal.add(incomeUpdated);
+                        }
+                    }
+                }else {//Check If Goal has already tied to Income(s):
+                    //Check If Goal has already tied to Income(s) & IncomeUpdatedId is Found already:
+                    boolean goalAlreadyTiedToIncome = false;
+                    for (Income incomeFromGoal: incomeListFromGoal) {
+                        if (Objects.equals(incomeFromGoal.getId(), incomeUpdated.getId())){
+                            goalAlreadyTiedToIncome = true;
+                            goal.setAmountAchieved(goal.getAmountAchieved());
+                        }
+                    }//Check If Goal has already tied to Income(s) & IncomeUpdatedId is Not Found:
+                    if (!goalAlreadyTiedToIncome) {
+                        boolean notUnique = false;
+                        for (Income incomeFromGoal : incomeListFromGoal) {
+                            if (Objects.equals(incomeFromGoal.getId(), incomeUpdated.getId())) {
+                                goal.setAmountAchieved(goal.getAmountAchieved());
+                                notUnique = true;
+                                break;
+                            }
+                        }
+                        if (!notUnique) {
+                            goal.setAmountAchieved(goal.getAmountAchieved() + incomeUpdated.getAmount());
+                        }
+                    }
                 }
+                goal.setIncomes(incomeListFromGoal);
+
                 if (goal.getAmount() > goal.getAmountAchieved()){
                     goal.setGoalAchieved(false);
                     goalList.add(goal);

@@ -2,7 +2,6 @@ package org.enset.budget_expanse_management.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.enset.budget_expanse_management.enums.UserCurrency;
 import org.hibernate.annotations.GenericGenerator;
