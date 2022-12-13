@@ -1098,6 +1098,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 //                        goalList.add(goal);
                         continue;
                     }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
+
                         removeIncomeAmountFromGoalThenCompute(incomeToDelete ,goal , goalList);
                     }
                 }
@@ -1115,6 +1116,19 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     private void removeIncomeAmountFromGoalThenCompute(Income income, Goal goal, List<Goal> goalList) {
         Double intervalAmountAchieved = goal.getAmountAchieved() - income.getAmount();
         goal.setAmountAchieved(intervalAmountAchieved);
+        String incomeIdsStringListFromGoal = goal.getIncomeIdsList();
+        if (incomeIdsStringListFromGoal==null || incomeIdsStringListFromGoal.isEmpty()){
+            goal.setAmountAchieved(goal.getAmountAchieved() + income.getAmount());
+            //goal.setIncomes(incomeFromGoal.setId(incomeUpdated.getId()));
+            incomeIdsStringListFromGoal = "";
+            incomeIdsStringListFromGoal = incomeIdsStringListFromGoal.concat(income.getId().toString());
+
+        }
+        for (int i=0; i<incomeIdsStringListFromGoal.length(); i++) {
+            if (Objects.equals(Character.toString(incomeIdsStringListFromGoal.charAt(i)), income.getId().toString())){
+              incomeIdsStringListFromGoal = incomeIdsStringListFromGoal.replace(Character.toString(incomeIdsStringListFromGoal.charAt(i)),"");
+            }
+        }
         if (goal.getAmount() > goal.getAmountAchieved()){
             goal.setGoalAchieved(false);
             goalList.add(goal);
@@ -1361,6 +1375,15 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                         throw new RuntimeException("Error, Cannot get Goal from DB!");
                     });
             if (goal!=null && (goal.getAmountAchieved()==null || goal.getAmountAchieved()==0) ){
+                String incomeIdsStringListFromGoal = goal.getIncomeIdsList();
+                if (incomeIdsStringListFromGoal==null || incomeIdsStringListFromGoal.isEmpty()){
+                    goal.setAmountAchieved(goal.getAmountAchieved() + incomeUpdated.getAmount());
+                    //goal.setIncomes(incomeFromGoal.setId(incomeUpdated.getId()));
+                    incomeIdsStringListFromGoal = "";
+                    incomeIdsStringListFromGoal = incomeIdsStringListFromGoal.concat(incomeUpdated.getId().toString());
+
+                }
+                goal.setIncomeIdsList(incomeIdsStringListFromGoal);
                 goal.setAmountAchieved(incomeUpdated.getAmount());
                 if (goal.getAmount() > goal.getAmountAchieved()){
                     goal.setGoalAchieved(false);
@@ -1372,28 +1395,26 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
                 //TODO: Should check if Date changed recently is still in Goal's range OR Not:
 
-                List<Income> incomeListFromGoal = goal.getIncomes();
-                if (incomeListFromGoal.contains(null)){
-                    for (Income incomeFromGoal: incomeListFromGoal) {
-                        if (incomeFromGoal.getId()==null){
+                String incomeIdsStringListFromGoal = goal.getIncomeIdsList();
+                if (incomeIdsStringListFromGoal==null || incomeIdsStringListFromGoal.isEmpty()){
                             goal.setAmountAchieved(goal.getAmountAchieved() + incomeUpdated.getAmount());
                             //goal.setIncomes(incomeFromGoal.setId(incomeUpdated.getId()));
-                            incomeListFromGoal.add(incomeUpdated);
-                        }
-                    }
+                    incomeIdsStringListFromGoal = "";
+                    incomeIdsStringListFromGoal = incomeIdsStringListFromGoal.concat(incomeUpdated.getId().toString());
+
                 }else {//Check If Goal has already tied to Income(s):
-                    //Check If Goal has already tied to Income(s) & IncomeUpdatedId is Found already:
+                    //Check If Goal has already tied to Income(s) & 'IncomeUpdatedId' is Found already:
                     boolean goalAlreadyTiedToIncome = false;
-                    for (Income incomeFromGoal: incomeListFromGoal) {
-                        if (Objects.equals(incomeFromGoal.getId(), incomeUpdated.getId())){
+                    for (int i=0; i<incomeIdsStringListFromGoal.length(); i++) {
+                        if (Objects.equals(Character.toString(incomeIdsStringListFromGoal.charAt(i)), incomeUpdated.getId().toString())){
                             goalAlreadyTiedToIncome = true;
                             goal.setAmountAchieved(goal.getAmountAchieved());
                         }
-                    }//Check If Goal has already tied to Income(s) & IncomeUpdatedId is Not Found:
+                    }//Check If Goal has already tied to 1 or more other Income(s) But Not to 'Id of IncomeUpdated':
                     if (!goalAlreadyTiedToIncome) {
                         boolean notUnique = false;
-                        for (Income incomeFromGoal : incomeListFromGoal) {
-                            if (Objects.equals(incomeFromGoal.getId(), incomeUpdated.getId())) {
+                        for (int j=0; j<incomeIdsStringListFromGoal.length(); j++) {
+                            if (Objects.equals(Character.toString(incomeIdsStringListFromGoal.charAt(j)), incomeUpdated.getId().toString())) {
                                 goal.setAmountAchieved(goal.getAmountAchieved());
                                 notUnique = true;
                                 break;
@@ -1404,7 +1425,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                         }
                     }
                 }
-                goal.setIncomes(incomeListFromGoal);
+                goal.setIncomeIdsList(incomeIdsStringListFromGoal);
 
                 if (goal.getAmount() > goal.getAmountAchieved()){
                     goal.setGoalAchieved(false);

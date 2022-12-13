@@ -38,9 +38,14 @@ public class Goal {
    // @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     private User user;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @OneToMany(mappedBy = "goal")
-    private List<Income> incomes;
+    //On add, on Update Or on Delete we add or remove the 'incomeId' from this string 'Goal' Table so that we compute
+    // Goals with good accuracy On Date Updates:
+    private String incomeIdsList;
+
+
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @OneToMany(mappedBy = "goal")
+//    private List<Income> incomes;
 
     public Goal(Integer id, String title, String description, Date dateDebut, LocalDate endDate) {
         this.id = id;
@@ -130,11 +135,19 @@ public class Goal {
         this.user = user;
     }
 
-    public List<Income> getIncomes() {
-        return incomes;
+    public String getIncomeIdsList() {
+        return incomeIdsList;
     }
 
-    public void setIncomes(List<Income> incomes) {
-        this.incomes = incomes;
+    public void setIncomeIdsList(String incomeIdsList) {
+        this.incomeIdsList = incomeIdsList;
     }
+
+    //    public List<Income> getIncomes() {
+//        return incomes;
+//    }
+//    public void setIncomes(List<Income> incomes) {
+//        this.incomes = incomes;
+//    }
+
 }
