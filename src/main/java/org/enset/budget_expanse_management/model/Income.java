@@ -7,6 +7,7 @@ import org.enset.budget_expanse_management.enums.CategoryIncomeType;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 //@Data
 @NoArgsConstructor @AllArgsConstructor
@@ -30,6 +31,7 @@ public class Income {
    // @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     private User user;
+
 //    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 //    @ManyToOne
 //    private Goal goal;

@@ -42,7 +42,6 @@ public class Goal {
     // Goals with good accuracy On Date Updates:
     private String incomeIdsList;
 
-
 //    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 //    @OneToMany(mappedBy = "goal")
 //    private List<Income> incomes;
