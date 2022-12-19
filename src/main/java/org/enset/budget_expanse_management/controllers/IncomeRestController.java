@@ -130,7 +130,7 @@ public class IncomeRestController {
         System.out.println(" ------------- Income is updated Successfully ----------");
         Income income = managementService.mapNewFormIncomeObjToIncomeObj(incomeFormSubmission);
         income.setId(Long.valueOf(id));//In order to preserve the old 'Id' & Not be overwritten by a new one created.
-        managementService.updateIncomeService(income);
+        managementService.updateIncomeServiceV2(income);
     }
 
 
