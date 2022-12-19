@@ -40,7 +40,7 @@ public class Goal {
     private User user;
     //On add, on Update Or on Delete we add or remove the 'incomeId' from this string 'Goal' Table so that we compute
     // Goals with good accuracy On Date Updates:
-    private String incomeIdsList;
+    //private String incomeIdsList;
 
 //    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 //    @OneToMany(mappedBy = "goal")
@@ -134,13 +134,13 @@ public class Goal {
         this.user = user;
     }
 
-    public String getIncomeIdsList() {
-        return incomeIdsList;
-    }
-
-    public void setIncomeIdsList(String incomeIdsList) {
-        this.incomeIdsList = incomeIdsList;
-    }
+//    public String getIncomeIdsList() {
+//        return incomeIdsList;
+//    }
+//
+//    public void setIncomeIdsList(String incomeIdsList) {
+//        this.incomeIdsList = incomeIdsList;
+//    }
 
     //    public List<Income> getIncomes() {
 //        return incomes;

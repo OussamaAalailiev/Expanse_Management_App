@@ -1,6 +1,5 @@
 package org.enset.budget_expanse_management.service;
 
-import jdk.jfr.RecordingState;
 import org.enset.budget_expanse_management.formModel.BudgetFormSubmission;
 import org.enset.budget_expanse_management.formModel.GoalFormSubmission;
 import org.enset.budget_expanse_management.formModel.IncomeFormSubmission;
@@ -12,10 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 @Transactional
@@ -30,6 +26,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
     private final CategoryIncomeRepository categoryIncomeRepository;
 //
     private final UserRepository userRepository;
+    private final CommonIncomeGoalRepository commonIncomeGoalRepository;
 
     public ManagementServiceImpl(ExpanseRepository expanseRepository,
                                  BudgetRepository budgetRepository,
@@ -37,8 +34,8 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                                  IncomeRepository incomeRepository,
                                  GoalRepository goalRepository,
                                  CategoryIncomeRepository categoryIncomeRepository,
-                                 UserRepository userRepository
-    ) {
+                                 UserRepository userRepository,
+                                 CommonIncomeGoalRepository commonIncomeGoalRepository) {
         this.expanseRepository = expanseRepository;
         this.budgetRepository = budgetRepository;
         this.categoryExpanseRepository = categoryExpanseRepository;
@@ -46,6 +43,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         this.goalRepository = goalRepository;
         this.categoryIncomeRepository = categoryIncomeRepository;
         this.userRepository = userRepository;
+        this.commonIncomeGoalRepository = commonIncomeGoalRepository;
     }
 
     //User can update Only the 'amount' of Expanse, but if user want to update
@@ -1058,7 +1056,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             List<Goal> goalList = new ArrayList<>();
             //3) Check If the common goals exists:
             if (!commonGoalsFromDB.isEmpty()){
-                computeOnCommonGoalsOnAmountIncomeUpdate(newIncome, commonGoalsFromDB, goalList);
+                computeOnCommonGoalsOnAddIncome(newIncome, commonGoalsFromDB, goalList);
                 goalRepository.saveAll(goalList);//Save the Updated Common Goal(s) & Save the Income:
                 incomeRepository.save(newIncome);
             }else {//4: if there was No common goals:
@@ -1083,6 +1081,9 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                     .getCommonGoalsOnAddNewIncome(incomeToDelete.getUser().getId()
                             ,incomeToDelete.getCategoryIncome().getId()
                             ,incomeToDelete.getCreatedDate());
+            //1.2) Get Common Goals with the Income THEN Delete them from CommonIncomeGoals Table DB:
+            removeIncomeGoalsFromCommonIncomeGoalsTableDB(incomeToDelete.getId());
+
             //2) Prepare List to save edited Common Goals If exists:
             List<Goal> goalList = new ArrayList<>();
             //3) Check If the common goals exists:
@@ -1098,8 +1099,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
 //                        goalList.add(goal);
                         continue;
                     }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
-
-                        removeIncomeAmountFromGoalThenCompute(incomeToDelete ,goal , goalList);
+                        removeIncomeAmountFromGoalThenComputeOnDelete(incomeToDelete ,goal , goalList);
                     }
                 }
                 goalRepository.saveAll(goalList);//Save the Updated Common Goal(s) & Save the Income:
@@ -1113,22 +1113,21 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }
     }
 
+    //TODO: To be modified (created on 16/12/2022) :
+    private void removeIncomeAmountFromGoalThenComputeOnDelete(Income income, Goal goal, List<Goal> goalList) {
+        Double intervalAmountAchieved = goal.getAmountAchieved() - income.getAmount();
+        goal.setAmountAchieved(intervalAmountAchieved);
+        if (goal.getAmount() > goal.getAmountAchieved()){
+            goal.setGoalAchieved(false);
+            goalList.add(goal);
+        }else if (goal.getAmount() <= goal.getAmountAchieved()){
+            goal.setGoalAchieved(true);
+            goalList.add(goal);
+        }
+    }
     private void removeIncomeAmountFromGoalThenCompute(Income income, Goal goal, List<Goal> goalList) {
         Double intervalAmountAchieved = goal.getAmountAchieved() - income.getAmount();
         goal.setAmountAchieved(intervalAmountAchieved);
-        String incomeIdsStringListFromGoal = goal.getIncomeIdsList();
-        if (incomeIdsStringListFromGoal==null || incomeIdsStringListFromGoal.isEmpty()){
-            goal.setAmountAchieved(goal.getAmountAchieved() + income.getAmount());
-            //goal.setIncomes(incomeFromGoal.setId(incomeUpdated.getId()));
-            incomeIdsStringListFromGoal = "";
-            incomeIdsStringListFromGoal = incomeIdsStringListFromGoal.concat(income.getId().toString());
-
-        }
-        for (int i=0; i<incomeIdsStringListFromGoal.length(); i++) {
-            if (Objects.equals(Character.toString(incomeIdsStringListFromGoal.charAt(i)), income.getId().toString())){
-              incomeIdsStringListFromGoal = incomeIdsStringListFromGoal.replace(Character.toString(incomeIdsStringListFromGoal.charAt(i)),"");
-            }
-        }
         if (goal.getAmount() > goal.getAmountAchieved()){
             goal.setGoalAchieved(false);
             goalList.add(goal);
@@ -1177,15 +1176,18 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                 //   ) If only the Category of Income is changed:
                 //should act as if I should add new Income to DB:
                 System.out.println("************** Same Amount & createdDate of income were Not changed, BUT 'Category' was changed ******************");
-                if (!newCommonGoalsFromDB.isEmpty()){
-                    computeNewCommonGoalsOnUpdateIncome(incomeUpdated, incomeBeforeUpdateDB, newCommonGoalsFromDB, goalListToUpdate);
-                }
                 if (!oldCommonGoalsFromDB.isEmpty()){
                     System.out.println("*** !oldCommonGoalsFromDB.isEmpty() ***");
                     List<Goal> oldGoalList = new ArrayList<>();
                     removeIncomeAmountFromOldGoalsThenComputeOnLoop(oldCommonGoalsFromDB, incomeBeforeUpdateDB, oldGoalList);
+                    removeIncomeGoalsFromCommonIncomeGoalsTableDB(incomeUpdated.getId());
                     goalRepository.saveAll(oldGoalList);
                 }
+                if (!newCommonGoalsFromDB.isEmpty()){
+                    computeNewCommonGoalsOnUpdateIncome(incomeUpdated, incomeBeforeUpdateDB, newCommonGoalsFromDB, goalListToUpdate);
+                    addCommonIncomeGoalsListToCommonTableDB(newCommonGoalsFromDB, incomeUpdated.getId());
+                }
+
             }else if (incomeUpdated.getCreatedDate().compareTo(incomeBeforeUpdateDB.getCreatedDate())!=0
                       && Objects.equals(incomeUpdated.getCategoryIncome().getId(), incomeBeforeUpdateDB.getCategoryIncome().getId())
                       && Objects.equals(incomeUpdated.getAmount(), incomeBeforeUpdateDB.getAmount())){
@@ -1214,16 +1216,17 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                 // amount of Income from 'oldCommonGoals' List OR Not Before
                 // calling 'removeIncomeAmountFromOldGoalsThenComputeOnLoop(...)':
                 System.out.println("************** 'Category' Of Income AND 'CreatedDate' are changed, BUT Not the Amount******************");
-                if (!newCommonGoalsFromDB.isEmpty()){
-                    //computeNewCommonGoalsOnUpdateIncome(incomeUpdated, incomeBeforeUpdateDB, newCommonGoalsFromDB, goalListToUpdate);
-                    computeOnCommonGoalsOnAmountIncomeUpdate(incomeUpdated, newCommonGoalsFromDB, goalListToUpdate);
-                    goalRepository.saveAll(goalListToUpdate);
-                }
                 if (!oldCommonGoalsFromDB.isEmpty()){
                     System.out.println("*** !oldCommonGoalsFromDB.isEmpty() ***");
                     List<Goal> oldGoalList = new ArrayList<>();
                     removeIncomeAmountFromOldGoalsThenComputeOnLoop(oldCommonGoalsFromDB, incomeBeforeUpdateDB, oldGoalList);
+                    removeIncomeGoalsFromCommonIncomeGoalsTableDB(incomeUpdated.getId());
                     goalRepository.saveAll(oldGoalList);
+                }
+                if (!newCommonGoalsFromDB.isEmpty()){
+                    //computeNewCommonGoalsOnUpdateIncome(incomeUpdated, incomeBeforeUpdateDB, newCommonGoalsFromDB, goalListToUpdate);
+                    computeOnCommonGoalsOnAmountIncomeUpdate(incomeUpdated, newCommonGoalsFromDB, goalListToUpdate);
+                    goalRepository.saveAll(goalListToUpdate);
                 }
             }else if ((!Objects.equals(incomeUpdated.getAmount(), incomeBeforeUpdateDB.getAmount())
                         && incomeUpdated.getCreatedDate().compareTo(incomeBeforeUpdateDB.getCreatedDate())!=0
@@ -1291,6 +1294,62 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }
     }
 
+    @Override
+    public void updateIncomeServiceV2(Income incomeUpdated) {
+        try {
+            //1) Get Old income from DB:
+            Income incomeBeforeUpdateDB = incomeRepository.findById(incomeUpdated.getId())
+                    .orElseThrow(
+                            () -> {
+                                throw new RuntimeException("Cannot find old Income from DB");
+                            }
+                    );
+            //2) Get old Common Goals if exists:
+            List<CommonGoal> oldCommonGoalsFromDB = goalRepository.getCommonGoalsOnAddNewIncome
+                    (incomeUpdated.getUser().getId(), incomeBeforeUpdateDB.getCategoryIncome().getId(),
+                            incomeBeforeUpdateDB.getCreatedDate());
+            //3) Get the new Common Goals:
+            List<CommonGoal> newCommonGoalsFromDB = goalRepository.getCommonGoalsOnAddNewIncome
+                    (incomeUpdated.getUser().getId(), incomeUpdated.getCategoryIncome().getId(),
+                            incomeUpdated.getCreatedDate());
+            //4) Prepare List to save edited Common Goals If exists:
+            List<Goal> oldGoalList = new ArrayList<>();
+            List<Goal> newGoalList = new ArrayList<>();
+            //5) Check If the common goals exists:
+            if (!oldCommonGoalsFromDB.isEmpty()){
+                for (CommonGoal commonGoalFromDB: oldCommonGoalsFromDB){
+                    System.out.println("Inside Common Goals & Income For LOOP:");
+                    Goal goal = goalRepository.findById(commonGoalFromDB.getId())
+                            .orElseThrow(() -> {
+                                throw new RuntimeException("Error, Cannot get Goal from DB!");
+                            });
+                    if (goal!=null && (goal.getAmountAchieved()==null || goal.getAmountAchieved()==0) ){
+                        continue;
+                    }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
+                        removeIncomeAmountFromGoalThenComputeOnDelete(incomeBeforeUpdateDB ,goal , oldGoalList);
+                    }
+                }
+                goalRepository.saveAll(oldGoalList);//Save the Old Common Goal(s) & Save the Income:
+
+                //6) Add the whole Income 'amount' to the new common Goals:
+                //7) Save the Updated Goals & Income:
+                if (!newCommonGoalsFromDB.isEmpty()){
+                    computeOnCommonGoalsOnAddIncome(incomeUpdated, newCommonGoalsFromDB, newGoalList);
+                    goalRepository.saveAll(newGoalList);//Save the Updated Common Goal(s) & Save the Income:
+                }
+                incomeRepository.save(incomeUpdated);
+            }else {//8: if there was No Old common Goals:
+                if (!newCommonGoalsFromDB.isEmpty()){
+                    computeOnCommonGoalsOnAddIncome(incomeUpdated, newCommonGoalsFromDB, newGoalList);
+                    goalRepository.saveAll(newGoalList);//Save the Updated Common Goal(s) & Save the Income:
+                }
+                incomeRepository.save(incomeUpdated);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     private void removeIncomeAmountFromGoalThenComputeOnLoopBasedOnDate(
             List<CommonGoal> oldCommonGoalsFromDB,
             Income incomeBeforeUpdateDB,
@@ -1335,6 +1394,18 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }
     }
 
+    //Remove Common Income with Goals FROM 'CommonIncomeGoals' Table DB:
+    private void removeIncomeGoalsFromCommonIncomeGoalsTableDB(Long incomeIdToDelete){
+        List<CommonIncomeGoal> commonIncomeGoals = commonIncomeGoalRepository.findById_IncomeId(incomeIdToDelete);
+        if (!commonIncomeGoals.isEmpty()){
+            for (CommonIncomeGoal incomeGoal: commonIncomeGoals) {
+                if (Objects.equals(incomeGoal.getId().getIncomeId(), incomeIdToDelete)){
+                    commonIncomeGoalRepository.delete(incomeGoal);
+                }
+            }
+        }
+    }
+
     private void computeNewCommonGoalsOnUpdateIncome(Income incomeUpdated,Income incomeBeforeUpdateDB,
                                                      List<CommonGoal> newCommonGoalsFromDB, List<Goal> goalListToUpdate){
         for (CommonGoal commonGoal: newCommonGoalsFromDB) {
@@ -1344,6 +1415,7 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
             System.out.println("Inside -> computeNewCommonGoalsOnUpdateIncome(...)");
             Double intervalAmountIncome = incomeUpdated.getAmount() - incomeBeforeUpdateDB.getAmount();
             if (goal!=null && (goal.getAmountAchieved()==null || goal.getAmountAchieved()==0) ){
+                addCommonIncomeGoalToCommonTableDB(incomeUpdated.getId(), goal.getId());
                 goal.setAmountAchieved(incomeUpdated.getAmount());
                 if (goal.getAmount() > goal.getAmountAchieved()){
                     goal.setGoalAchieved(false);
@@ -1366,6 +1438,26 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
         }
     }
 
+    //Add 1 Common Goal To 'CommonIncomeGoal' Table DB:
+    private void addCommonIncomeGoalToCommonTableDB(Long commonIncomeId, Integer commonGoalId){
+        CommonIncomeGoal commonIncomeGoal = new CommonIncomeGoal();
+        CommonIncomeGoalID incomeGoalID = new CommonIncomeGoalID(commonIncomeId, commonGoalId);
+        commonIncomeGoal.setId(incomeGoalID);
+        commonIncomeGoalRepository.save(commonIncomeGoal);
+    }
+
+    //Add List of Common Goal To 'CommonIncomeGoal' Table DB:
+    private void addCommonIncomeGoalsListToCommonTableDB(List<CommonGoal> newCommonGoalsFromDB,Long commonIncomeId){
+        for (CommonGoal commonGoal: newCommonGoalsFromDB) {
+            CommonIncomeGoal commonIncomeGoal = new CommonIncomeGoal();
+            CommonIncomeGoalID incomeGoalID = new CommonIncomeGoalID(commonIncomeId, commonGoal.getId());
+            commonIncomeGoal.setId(incomeGoalID);
+            commonIncomeGoalRepository.save(commonIncomeGoal);
+        }
+
+    }
+
+    //TODO: The method below Should be updated:
     private void computeOnCommonGoalsOnAmountIncomeUpdate(Income incomeUpdated,
                                                           List<CommonGoal> commonGoalsFromDB,
                                                           List<Goal> goalList) {
@@ -1375,16 +1467,11 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                         throw new RuntimeException("Error, Cannot get Goal from DB!");
                     });
             if (goal!=null && (goal.getAmountAchieved()==null || goal.getAmountAchieved()==0) ){
-                String incomeIdsStringListFromGoal = goal.getIncomeIdsList();
-                if (incomeIdsStringListFromGoal==null || incomeIdsStringListFromGoal.isEmpty()){
-                    goal.setAmountAchieved(goal.getAmountAchieved() + incomeUpdated.getAmount());
-                    //goal.setIncomes(incomeFromGoal.setId(incomeUpdated.getId()));
-                    incomeIdsStringListFromGoal = "";
-                    incomeIdsStringListFromGoal = incomeIdsStringListFromGoal.concat(incomeUpdated.getId().toString());
-
-                }
-                goal.setIncomeIdsList(incomeIdsStringListFromGoal);
-                goal.setAmountAchieved(incomeUpdated.getAmount());
+//                    CommonIncomeGoal commonIncomeGoal = new CommonIncomeGoal();
+//                    CommonIncomeGoalID incomeGoalID = new CommonIncomeGoalID(incomeUpdated.getId(), goal.getId());
+//                    commonIncomeGoal.setId(incomeGoalID);
+//                    commonIncomeGoalRepository.save(commonIncomeGoal);
+//                goal.setAmountAchieved(incomeUpdated.getAmount());
                 if (goal.getAmount() > goal.getAmountAchieved()){
                     goal.setGoalAchieved(false);
                     goalList.add(goal);
@@ -1394,39 +1481,49 @@ public class ManagementServiceImpl implements BudgetExpanseManagementService {
                 }
             }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
                 //TODO: Should check if Date changed recently is still in Goal's range OR Not:
-
-                String incomeIdsStringListFromGoal = goal.getIncomeIdsList();
-                if (incomeIdsStringListFromGoal==null || incomeIdsStringListFromGoal.isEmpty()){
-                            goal.setAmountAchieved(goal.getAmountAchieved() + incomeUpdated.getAmount());
-                            //goal.setIncomes(incomeFromGoal.setId(incomeUpdated.getId()));
-                    incomeIdsStringListFromGoal = "";
-                    incomeIdsStringListFromGoal = incomeIdsStringListFromGoal.concat(incomeUpdated.getId().toString());
-
-                }else {//Check If Goal has already tied to Income(s):
-                    //Check If Goal has already tied to Income(s) & 'IncomeUpdatedId' is Found already:
-                    boolean goalAlreadyTiedToIncome = false;
-                    for (int i=0; i<incomeIdsStringListFromGoal.length(); i++) {
-                        if (Objects.equals(Character.toString(incomeIdsStringListFromGoal.charAt(i)), incomeUpdated.getId().toString())){
-                            goalAlreadyTiedToIncome = true;
-                            goal.setAmountAchieved(goal.getAmountAchieved());
-                        }
-                    }//Check If Goal has already tied to 1 or more other Income(s) But Not to 'Id of IncomeUpdated':
-                    if (!goalAlreadyTiedToIncome) {
-                        boolean notUnique = false;
-                        for (int j=0; j<incomeIdsStringListFromGoal.length(); j++) {
-                            if (Objects.equals(Character.toString(incomeIdsStringListFromGoal.charAt(j)), incomeUpdated.getId().toString())) {
-                                goal.setAmountAchieved(goal.getAmountAchieved());
-                                notUnique = true;
-                                break;
-                            }
-                        }
-                        if (!notUnique) {
-                            goal.setAmountAchieved(goal.getAmountAchieved() + incomeUpdated.getAmount());
-                        }
-                    }
+//                CommonIncomeGoal commonIncomeGoal = new CommonIncomeGoal();
+//                CommonIncomeGoalID incomeGoalID = new CommonIncomeGoalID(incomeUpdated.getId(), goal.getId());
+//                commonIncomeGoal.setId(incomeGoalID);
+//                commonIncomeGoalRepository.save(commonIncomeGoal);
+                goal.setAmountAchieved(goal.getAmountAchieved() + incomeUpdated.getAmount());
+                if (goal.getAmount() > goal.getAmountAchieved()){
+                    goal.setGoalAchieved(false);
+                    goalList.add(goal);
+                }else if (goal.getAmount() <= goal.getAmountAchieved()){
+                    goal.setGoalAchieved(true);
+                    goalList.add(goal);
                 }
-                goal.setIncomeIdsList(incomeIdsStringListFromGoal);
-
+            }
+        }
+    }
+    //TODO: The method below is created to compute Common Goals if exists If a User ADD an Income:
+    private void computeOnCommonGoalsOnAddIncome(Income incomeUpdated,
+                                                          List<CommonGoal> commonGoalsFromDB,
+                                                          List<Goal> goalList) {
+        for (CommonGoal commonGoalFromDB: commonGoalsFromDB){
+            Goal goal = goalRepository.findById(commonGoalFromDB.getId())
+                    .orElseThrow(() -> {
+                        throw new RuntimeException("Error, Cannot get Goal from DB!");
+                    });
+            if (goal!=null && (goal.getAmountAchieved()==null || goal.getAmountAchieved()==0) ){
+//                    CommonIncomeGoal commonIncomeGoal = new CommonIncomeGoal();
+//                    CommonIncomeGoalID incomeGoalID = new CommonIncomeGoalID(incomeUpdated.getId(), goal.getId());
+//                    commonIncomeGoal.setId(incomeGoalID);
+//                    commonIncomeGoalRepository.save(commonIncomeGoal);
+                goal.setAmountAchieved(incomeUpdated.getAmount());
+                if (goal.getAmount() > goal.getAmountAchieved()){
+                    goal.setGoalAchieved(false);
+                    goalList.add(goal);
+                }else if (goal.getAmount() <= goal.getAmountAchieved()){
+                    goal.setGoalAchieved(true);
+                    goalList.add(goal);
+                }
+            }else if (goal!=null && (goal.getAmountAchieved()!=null || goal.getAmountAchieved()>=0)){
+//                CommonIncomeGoal commonIncomeGoal = new CommonIncomeGoal();
+//                CommonIncomeGoalID incomeGoalID = new CommonIncomeGoalID(incomeUpdated.getId(), goal.getId());
+//                commonIncomeGoal.setId(incomeGoalID);
+//                commonIncomeGoalRepository.save(commonIncomeGoal);
+                goal.setAmountAchieved(goal.getAmountAchieved() + incomeUpdated.getAmount());
                 if (goal.getAmount() > goal.getAmountAchieved()){
                     goal.setGoalAchieved(false);
                     goalList.add(goal);

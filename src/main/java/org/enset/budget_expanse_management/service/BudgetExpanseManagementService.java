@@ -103,6 +103,7 @@ SELECT * FROM goal g
     void deleteIncomeService(Long id);
 
     void updateIncomeService(Income incomeUpdated);
+    void updateIncomeServiceV2(Income incomeUpdated);
 
 
 

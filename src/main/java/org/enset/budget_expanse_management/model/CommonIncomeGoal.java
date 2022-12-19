@@ -12,5 +12,5 @@ import java.io.Serializable;
 public class CommonIncomeGoal implements Serializable {
     @EmbeddedId
     private CommonIncomeGoalID id;
-    
+
 }
